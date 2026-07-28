@@ -11,9 +11,10 @@ export type VisaType =
 export type PurposeOfVisit = 'tourism' | 'business' | 'transit' | 'family';
 
 export type ProcessingTime = 
-  | 'standard'         // Normal 5-10 working days
-  | 'urgent_24h'       // 2 working days
-  | 'emergency_4h';     // 1 working day
+  | 'standard'             // Normal 5-10 working days
+  | 'urgent_24h'           // 2 working days
+  | 'emergency_4h'         // 1 working day
+  | 'super_emergency_1h';  // 1 hour super emergency
 
 export type ArrivalPort = 
   | 'noi_bai'          // Noi Bai Intl Airport (Hanoi)

@@ -245,7 +245,62 @@ Your role:
   }
 });
 
+// SEO Endpoint 1: Dynamic XML Sitemap for Search Engine Crawlers
+app.get('/sitemap.xml', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  const now = new Date().toISOString().split('T')[0];
+
+  const pages = [
+    { loc: '/', priority: '1.0', changefreq: 'daily' },
+    { loc: '/apply-online', priority: '0.9', changefreq: 'daily' },
+    { loc: '/fee-calculator', priority: '0.8', changefreq: 'weekly' },
+    { loc: '/visa-requirements', priority: '0.9', changefreq: 'weekly' },
+    { loc: '/track-application', priority: '0.8', changefreq: 'always' },
+    { loc: '/faqs', priority: '0.7', changefreq: 'weekly' },
+    { loc: '/contact-us', priority: '0.6', changefreq: 'monthly' }
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages
+  .map(
+    page => `  <url>
+    <loc>${baseUrl}${page.loc}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`
+  )
+  .join('\n')}
+</urlset>`;
+
+  res.header('Content-Type', 'application/xml');
+  return res.send(xml);
+});
+
+// SEO Endpoint 2: Robots.txt Rules
+app.get('/robots.txt', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  const robots = `User-agent: *
+Allow: /
+Allow: /apply-online
+Allow: /fee-calculator
+Allow: /visa-requirements
+Allow: /track-application
+Allow: /faqs
+Allow: /contact-us
+
+Disallow: /api/
+
+Sitemap: ${baseUrl}/sitemap.xml
+`;
+
+  res.header('Content-Type', 'text/plain');
+  return res.send(robots);
+});
+
 async function startServer() {
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

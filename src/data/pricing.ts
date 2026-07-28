@@ -62,12 +62,20 @@ export const PROCESSING_SPEED_PRICING: Record<ProcessingTime, { labelEn: string;
   },
   emergency_4h: {
     labelEn: 'Super Urgent',
-    labelVi: 'Siêu Khẩn',
+    labelVi: 'Siêu Khẩn 4 Giờ',
     feePerApplicantUsd: 85,
-    timeTextEn: '1 business day',
-    timeTextVi: '1 ngày làm việc'
+    timeTextEn: '4 hours guaranteed',
+    timeTextVi: 'Xử lý trong 4 giờ'
+  },
+  super_emergency_1h: {
+    labelEn: 'Hỏa Tốc 1h Airport',
+    labelVi: 'Hỏa Tốc 1 Giờ Sân Bay',
+    feePerApplicantUsd: 135,
+    timeTextEn: '1 hour express airport approval',
+    timeTextVi: 'Cấp khẩn 1 giờ tại sân bay'
   }
 };
+
 
 export const EXTRA_SERVICES_PRICING: Record<ExtraService, { labelEn: string; labelVi: string; feePerApplicantUsd: number; descriptionEn: string; descriptionVi: string }> = {
   travel_insurance: {

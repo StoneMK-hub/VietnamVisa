@@ -1,14 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { HeroBanner } from './components/HeroBanner';
 import { QuickFeeCalculator } from './components/QuickFeeCalculator';
-import { StepProgressBar } from './components/ApplicationForm/StepProgressBar';
-import { Step1Options } from './components/ApplicationForm/Step1Options';
-import { Step2Applicants } from './components/ApplicationForm/Step2Applicants';
-import { Step3Review } from './components/ApplicationForm/Step3Review';
-import { Step4Payment } from './components/ApplicationForm/Step4Payment';
-import { VisaApprovalCertificate } from './components/VisaApprovalCertificate';
 import { StatusTrackerView } from './components/StatusTrackerView';
 import { RequirementsChecker } from './components/RequirementsChecker';
 import { FaqSection } from './components/FaqSection';
@@ -17,6 +11,10 @@ import { SeoContentSection } from './components/SeoContentSection';
 import { GoogleReviewsSection } from './components/GoogleReviewsSection';
 import { ApplyOnlineGuideView } from './components/ApplyOnlineGuideView';
 import { AIVisaAssistant } from './components/AIVisaAssistant';
+import { SEOMetadata } from './components/SEOMetadata';
+import { SEOBreadcrumb } from './components/SEOBreadcrumb';
+import { TabType, getTabFromPath, getRouteFromTab } from './routes';
+import { VisaApprovalCertificate } from './components/VisaApprovalCertificate';
 
 import {
   Language,
@@ -31,7 +29,34 @@ import {
 
 export default function App() {
   const [currentLang, setCurrentLang] = useState<Language>('en');
-  const [activeTab, setActiveTab] = useState<'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'contact'>('home');
+  const [activeTab, setActiveTab] = useState<TabType>(() => getTabFromPath(window.location.pathname));
+
+  // Handle URL changes & Browser Back/Forward buttons (SEO Routing)
+  useEffect(() => {
+    const initialTab = getTabFromPath(window.location.pathname);
+    setActiveTab(initialTab);
+
+    const handlePopState = () => {
+      const tabFromUrl = getTabFromPath(window.location.pathname);
+      setActiveTab(tabFromUrl);
+      setViewingCertificate(false);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleNavigate = (tab: TabType | 'faq') => {
+    const targetTab: TabType = tab === 'faq' ? 'faqs' : (tab as TabType);
+    setActiveTab(targetTab);
+    setViewingCertificate(false);
+
+    const route = getRouteFromTab(targetTab);
+    if (window.location.pathname !== route.path) {
+      window.history.pushState({}, '', route.path);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Application Wizard State
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -71,60 +96,27 @@ export default function App() {
     processingTime: ProcessingTime;
     applicantCount: number;
   }) => {
-    setActiveTab('apply');
-    window.scrollTo({ top: 100, behavior: 'smooth' });
-  };
-
-  // Step 3 -> Step 4 Create Application Call
-  const handleProceedToPayment = async () => {
-    try {
-      const res = await fetch('/api/visa/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          visaType,
-          purpose,
-          entryDate,
-          exitDate,
-          arrivalPort,
-          processingTime,
-          extraServices,
-          applicants,
-          contactEmail,
-          contactPhone,
-          contactAddress,
-          specialNotes
-        })
-      });
-
-      const data = await res.json();
-      if (data.success && data.application) {
-        setCreatedApplication(data.application);
-        setCurrentStep(4);
-      } else {
-        alert(data.error || 'Could not process application request.');
-      }
-    } catch (err) {
-      alert('Error connecting to server.');
-    }
-  };
-
-  const handlePaymentSuccess = (updatedApp: VisaApplication) => {
-    setCreatedApplication(updatedApp);
-    setViewingCertificate(true);
+    handleNavigate('apply');
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-800 antialiased selection:bg-indigo-600 selection:text-white">
+      {/* SEO Head Metadata & OpenGraph/JSON-LD Dynamic Tags */}
+      <SEOMetadata activeTab={activeTab} currentLang={currentLang} />
+
       {/* Top Navigation */}
       <Header
         currentLang={currentLang}
         onLanguageChange={setCurrentLang}
+        activeTab={activeTab === 'faqs' ? 'faq' : activeTab}
+        onNavigate={handleNavigate}
+      />
+
+      {/* SEO Breadcrumb Bar */}
+      <SEOBreadcrumb
         activeTab={activeTab}
-        onNavigate={(tab) => {
-          setActiveTab(tab);
-          setViewingCertificate(false);
-        }}
+        currentLang={currentLang}
+        onNavigate={handleNavigate}
       />
 
       {/* Main Body */}
@@ -135,47 +127,41 @@ export default function App() {
             <VisaApprovalCertificate
               currentLang={currentLang}
               application={createdApplication}
-              onBackToHome={() => {
-                setViewingCertificate(false);
-                setActiveTab('home');
-              }}
-              onTrackStatus={() => {
-                setViewingCertificate(false);
-                setActiveTab('track');
-              }}
+              onBackToHome={() => handleNavigate('home')}
+              onTrackStatus={() => handleNavigate('track')}
             />
           </div>
         ) : (
           <>
-            {/* HOME VIEW */}
+            {/* HOME VIEW (Path: /) */}
             {activeTab === 'home' && (
               <div className="space-y-12 pb-16">
                 <HeroBanner
                   currentLang={currentLang}
-                  onStartApplication={() => setActiveTab('apply')}
-                  onOpenCalculator={() => {
-                    setActiveTab('calculator');
-                  }}
-                  onOpenTrack={() => setActiveTab('track')}
+                  onStartApplication={() => handleNavigate('apply')}
+                  onOpenCalculator={() => handleNavigate('calculator')}
+                  onOpenTrack={() => handleNavigate('track')}
                   onApplyWithOptions={handleApplyWithOptions}
                 />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-8">
                   <SeoContentSection
                     currentLang={currentLang}
-                    onStartApplication={() => setActiveTab('apply')}
-                    onOpenRequirements={() => setActiveTab('requirements')}
+                    onStartApplication={() => handleNavigate('apply')}
+                    onOpenRequirements={() => handleNavigate('requirements')}
                   />
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-8">
                   <RequirementsChecker
                     currentLang={currentLang}
+                    isHome={true}
+                    onViewAll={() => handleNavigate('requirements')}
                     onApplyForCountry={(cName) => {
                       if (applicants.length > 0) {
                         setApplicants([{ ...applicants[0], nationality: cName }]);
                       }
-                      setActiveTab('apply');
+                      handleNavigate('apply');
                     }}
                   />
                 </div>
@@ -190,12 +176,12 @@ export default function App() {
               </div>
             )}
 
-            {/* APPLY ONLINE GUIDE & DIRECT PORTAL LINK VIEW */}
+            {/* APPLY ONLINE GUIDE & DIRECT PORTAL VIEW (Path: /apply-online) */}
             {activeTab === 'apply' && (
               <ApplyOnlineGuideView currentLang={currentLang} />
             )}
 
-            {/* CALCULATOR TAB */}
+            {/* CALCULATOR TAB (Path: /fee-calculator) */}
             {activeTab === 'calculator' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
                 <QuickFeeCalculator
@@ -205,7 +191,7 @@ export default function App() {
               </div>
             )}
 
-            {/* REQUIREMENTS TAB */}
+            {/* REQUIREMENTS TAB (Path: /visa-requirements) */}
             {activeTab === 'requirements' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
                 <RequirementsChecker
@@ -214,13 +200,13 @@ export default function App() {
                     if (applicants.length > 0) {
                       setApplicants([{ ...applicants[0], nationality: cName }]);
                     }
-                    setActiveTab('apply');
+                    handleNavigate('apply');
                   }}
                 />
               </div>
             )}
 
-            {/* TRACKING TAB */}
+            {/* TRACKING TAB (Path: /track-application) */}
             {activeTab === 'track' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
                 <StatusTrackerView
@@ -233,21 +219,18 @@ export default function App() {
               </div>
             )}
 
-            {/* FAQ TAB */}
-            {activeTab === 'faq' && (
+            {/* FAQ TAB (Path: /faqs) */}
+            {activeTab === 'faqs' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
                 <FaqSection currentLang={currentLang} />
               </div>
             )}
 
-            {/* CONTACT TAB */}
+            {/* CONTACT TAB (Path: /contact-us) */}
             {activeTab === 'contact' && (
               <ContactView
                 currentLang={currentLang}
-                onStartApplication={() => {
-                  setActiveTab('apply');
-                  window.scrollTo({ top: 100, behavior: 'smooth' });
-                }}
+                onStartApplication={() => handleNavigate('apply')}
               />
             )}
           </>
@@ -260,11 +243,9 @@ export default function App() {
       {/* Official Footer */}
       <Footer
         currentLang={currentLang}
-        onNavigate={(tab) => {
-          setActiveTab(tab);
-          setViewingCertificate(false);
-        }}
+        onNavigate={handleNavigate}
       />
     </div>
   );
 }
+

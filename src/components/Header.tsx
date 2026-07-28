@@ -71,8 +71,12 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Desktop Nav Links */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-xs font-semibold text-slate-700">
-          <button
-            onClick={() => onNavigate('home')}
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('home');
+            }}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               activeTab === 'home'
                 ? 'bg-indigo-50 text-indigo-700 font-bold'
@@ -80,10 +84,14 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t.navHome}
-          </button>
+          </a>
           
-          <button
-            onClick={() => onNavigate('apply')}
+          <a
+            href="/apply-online"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('apply');
+            }}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               activeTab === 'apply'
                 ? 'bg-indigo-50 text-indigo-700 font-bold'
@@ -91,10 +99,14 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t.navApply}
-          </button>
+          </a>
 
-          <button
-            onClick={() => onNavigate('calculator')}
+          <a
+            href="/fee-calculator"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('calculator');
+            }}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               activeTab === 'calculator'
                 ? 'bg-indigo-50 text-indigo-700 font-bold'
@@ -102,10 +114,14 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t.navCalculator}
-          </button>
+          </a>
 
-          <button
-            onClick={() => onNavigate('requirements')}
+          <a
+            href="/visa-requirements"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('requirements');
+            }}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               activeTab === 'requirements'
                 ? 'bg-indigo-50 text-indigo-700 font-bold'
@@ -113,21 +129,44 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t.navRequirements}
-          </button>
+          </a>
 
-          <button
-            onClick={() => onNavigate('faq')}
+          <a
+            href="/track-application"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('track');
+            }}
             className={`px-3 py-1.5 rounded-lg transition-all ${
-              activeTab === 'faq'
+              activeTab === 'track'
+                ? 'bg-indigo-50 text-indigo-700 font-bold'
+                : 'hover:bg-slate-100 text-slate-600'
+            }`}
+          >
+            {currentLang === 'vi' ? 'Tra Cứu' : 'Track Status'}
+          </a>
+
+          <a
+            href="/faqs"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('faq');
+            }}
+            className={`px-3 py-1.5 rounded-lg transition-all ${
+              activeTab === 'faq' || activeTab === 'faqs'
                 ? 'bg-indigo-50 text-indigo-700 font-bold'
                 : 'hover:bg-slate-100 text-slate-600'
             }`}
           >
             {t.navFaq}
-          </button>
+          </a>
 
-          <button
-            onClick={() => onNavigate('contact')}
+          <a
+            href="/contact-us"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate('contact');
+            }}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               activeTab === 'contact'
                 ? 'bg-indigo-50 text-indigo-700 font-bold'
@@ -135,8 +174,9 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t.navContact || 'Contact'}
-          </button>
+          </a>
         </nav>
+
 
         {/* Right Actions: Language + Compact CTA */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -189,37 +229,50 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile Nav Subbar */}
       <div className="lg:hidden bg-slate-50 border-t border-slate-200 px-4 py-2 flex items-center justify-around text-xs font-semibold text-slate-700">
-        <button 
-          onClick={() => onNavigate('home')} 
+        <a 
+          href="/"
+          onClick={(e) => { e.preventDefault(); onNavigate('home'); }} 
           className={`py-1 px-2 rounded ${activeTab === 'home' ? 'text-indigo-700 font-bold' : ''}`}
         >
           {t.navHome}
-        </button>
-        <button 
-          onClick={() => onNavigate('apply')} 
+        </a>
+        <a 
+          href="/apply-online"
+          onClick={(e) => { e.preventDefault(); onNavigate('apply'); }} 
           className={`py-1 px-2 rounded ${activeTab === 'apply' ? 'text-indigo-700 font-bold' : ''}`}
         >
           {t.navApply}
-        </button>
-        <button 
-          onClick={() => onNavigate('calculator')} 
+        </a>
+        <a 
+          href="/fee-calculator"
+          onClick={(e) => { e.preventDefault(); onNavigate('calculator'); }} 
           className={`py-1 px-2 rounded ${activeTab === 'calculator' ? 'text-indigo-700 font-bold' : ''}`}
         >
           {t.navCalculator}
-        </button>
-        <button 
-          onClick={() => onNavigate('faq')} 
-          className={`py-1 px-2 rounded ${activeTab === 'faq' ? 'text-indigo-700 font-bold' : ''}`}
+        </a>
+        <a 
+          href="/visa-requirements"
+          onClick={(e) => { e.preventDefault(); onNavigate('requirements'); }} 
+          className={`py-1 px-2 rounded ${activeTab === 'requirements' ? 'text-indigo-700 font-bold' : ''}`}
+        >
+          {t.navRequirements}
+        </a>
+        <a 
+          href="/faqs"
+          onClick={(e) => { e.preventDefault(); onNavigate('faq'); }} 
+          className={`py-1 px-2 rounded ${activeTab === 'faq' || activeTab === 'faqs' ? 'text-indigo-700 font-bold' : ''}`}
         >
           {t.navFaq}
-        </button>
-        <button 
-          onClick={() => onNavigate('contact')} 
+        </a>
+        <a 
+          href="/contact-us"
+          onClick={(e) => { e.preventDefault(); onNavigate('contact'); }} 
           className={`py-1 px-2 rounded ${activeTab === 'contact' ? 'text-indigo-700 font-bold' : ''}`}
         >
           {t.navContact || 'Contact'}
-        </button>
+        </a>
       </div>
+
     </header>
   );
 };

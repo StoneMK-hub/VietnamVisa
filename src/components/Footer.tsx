@@ -75,42 +75,72 @@ export const Footer: React.FC<FooterProps> = ({ currentLang, onNavigate }) => {
             </h4>
             <ul className="space-y-1.5 text-[11px]">
               <li>
-                <button
-                  onClick={() => onNavigate('apply')}
-                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1"
+                <a
+                  href="/apply-online"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('apply');
+                  }}
+                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1 cursor-pointer"
                 >
                   <span>{isVi ? 'Đăng ký E-Visa Trực Tuyến' : 'Apply E-Visa Online'}</span>
                   <ArrowUpRight className="w-3 h-3 text-slate-400" />
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('calculator')}
-                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1"
+                <a
+                  href="/fee-calculator"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('calculator');
+                  }}
+                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1 cursor-pointer"
                 >
                   <span>{isVi ? 'Công Cụ Tính Phí Visa' : 'Visa Fee Calculator'}</span>
                   <ArrowUpRight className="w-3 h-3 text-slate-400" />
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('requirements')}
-                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1"
+                <a
+                  href="/visa-requirements"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('requirements');
+                  }}
+                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1 cursor-pointer"
                 >
                   <span>{isVi ? 'Miễn Thị Thực & Điều Kiện' : 'Exemptions & Requirements'}</span>
                   <ArrowUpRight className="w-3 h-3 text-slate-400" />
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('faq')}
-                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1"
+                <a
+                  href="/faqs"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('faq');
+                  }}
+                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1 cursor-pointer"
                 >
                   <span>{isVi ? 'Câu Hỏi Thường Gặp (FAQ)' : 'FAQ & Support'}</span>
                   <ArrowUpRight className="w-3 h-3 text-slate-400" />
-                </button>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/contact-us"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('contact');
+                  }}
+                  className="hover:text-white text-slate-300 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>{isVi ? 'Liên Hệ Hỗ Trợ 24/7' : 'Contact Us 24/7'}</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                </a>
               </li>
             </ul>
+
           </div>
 
           {/* Col 3: Support Contact Information (5 cols) */}

@@ -3,6 +3,7 @@ import { ShieldCheck, Clock, CheckCircle2, ArrowRight, Zap, Calculator, Sparkles
 import { VisaType, ProcessingTime, Language } from '../types';
 import { TRANSLATIONS } from '../data/translations';
 import { VISA_TYPE_PRICING, PROCESSING_SPEED_PRICING, calculateVisaFees } from '../data/pricing';
+import trongDongImg from '../assets/images/trong_dong_pattern_1785216791732.jpg';
 
 interface HeroBannerProps {
   currentLang: Language;
@@ -58,15 +59,16 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
   return (
     <div className="relative bg-gradient-to-br from-amber-50/90 via-slate-50 to-indigo-50/70 text-slate-900 overflow-hidden py-10 lg:py-14 border-b border-slate-200">
-      {/* Trống Đồng Đông Sơn Watermark Background Layer */}
-      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden opacity-10">
-        <svg viewBox="0 0 500 500" className="w-full h-full text-indigo-950 fill-current">
-          <circle cx="250" cy="250" r="230" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="6 3" />
-          <circle cx="250" cy="250" r="190" fill="none" stroke="currentColor" strokeWidth="2" />
-          <circle cx="250" cy="250" r="140" fill="none" stroke="currentColor" strokeWidth="3" />
-          <circle cx="250" cy="250" r="80" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
-          <polygon points="250,50 262,100 300,75 275,120 325,125 280,155 312,188 270,195 288,238 250,212 212,238 230,195 188,188 220,155 175,125 225,120 200,75 238,100" />
-        </svg>
+      {/* Trống Đồng Đông Sơn Watermark Background Image Layer */}
+      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
+        <img
+          src={trongDongImg}
+          alt="Trống Đồng Việt Nam Background"
+          className="w-full h-full object-cover opacity-20 mix-blend-multiply"
+          referrerPolicy="no-referrer"
+        />
+        {/* Soft Radial Gradient Fade overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-50/70 via-slate-50/50 to-indigo-50/70" />
       </div>
 
       {/* Decorative Dong Son Drum Radial Vector Watermark */}

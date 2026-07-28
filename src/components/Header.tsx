@@ -132,21 +132,6 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           <a
-            href="/track-application"
-            onClick={(e) => {
-              e.preventDefault();
-              onNavigate('track');
-            }}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              activeTab === 'track'
-                ? 'bg-indigo-50 text-indigo-700 font-bold'
-                : 'hover:bg-slate-100 text-slate-600'
-            }`}
-          >
-            {currentLang === 'vi' ? 'Tra Cứu' : 'Track Status'}
-          </a>
-
-          <a
             href="/faqs"
             onClick={(e) => {
               e.preventDefault();

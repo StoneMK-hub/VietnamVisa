@@ -1,0 +1,6 @@
+{
+  "name": "Vietnam Visa Services",
+  "description": "Vietnam e-Visa & Visa on Arrival application service, real-time fee calculator, and secure online payment workflow.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

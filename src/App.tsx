@@ -10,7 +10,6 @@ import { ContactView } from './components/ContactView';
 import { SeoContentSection } from './components/SeoContentSection';
 import { GoogleReviewsSection } from './components/GoogleReviewsSection';
 import { ApplyOnlineGuideView } from './components/ApplyOnlineGuideView';
-import { AIVisaAssistant } from './components/AIVisaAssistant';
 import { SEOMetadata } from './components/SEOMetadata';
 import { SEOBreadcrumb } from './components/SEOBreadcrumb';
 import { TabType, getTabFromPath, getRouteFromTab } from './routes';
@@ -272,9 +271,6 @@ export default function App() {
           </>
         )}
       </main>
-
-      {/* Floating Gemini AI Consultant */}
-      <AIVisaAssistant currentLang={currentLang} />
 
       {/* Cookie Consent Banner */}
       <CookieConsentBanner

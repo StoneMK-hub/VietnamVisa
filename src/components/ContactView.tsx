@@ -429,7 +429,7 @@ export const ContactView: React.FC<ContactViewProps> = ({
             {onStartApplication && (
               <button
                 onClick={onStartApplication}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xs py-3 px-5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/40"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm py-3 px-5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-indigo-500"
               >
                 <span>{isVi ? 'Bắt đầu nộp đơn ngay →' : 'Start your application →'}</span>
               </button>

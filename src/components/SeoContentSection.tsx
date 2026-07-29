@@ -154,9 +154,9 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
         <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
           <button
             onClick={onOpenOverview || onStartApplication}
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-orange-500"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-indigo-500"
           >
-            <span>{isVi ? 'Xem Tổng Quan E-Visa →' : 'Vietnam eVisa Overview →'}</span>
+            <span>Vietnam E-Visa →</span>
           </button>
 
           <button

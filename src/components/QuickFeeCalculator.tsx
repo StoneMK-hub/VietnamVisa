@@ -33,7 +33,7 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
 }) => {
   const isVi = currentLang === 'vi';
 
-  const [selectedNationality, setSelectedNationality] = useState('United States');
+  const [selectedNationality] = useState('United States');
   const [selectedVisaType, setSelectedVisaType] = useState<VisaType>('tourist_30_single');
   const [selectedSpeed, setSelectedSpeed] = useState<ProcessingTime>('standard');
   const [applicantCount, setApplicantCount] = useState<number>(1);
@@ -41,10 +41,6 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
 
   // Mobile & Desktop SEO Text Collapse/Expand State
   const [isSeoExpanded, setIsSeoExpanded] = useState<boolean>(false);
-
-  const countryInfo =
-    COUNTRIES_DATA.find(c => c.countryName === selectedNationality || c.countryNameVi === selectedNationality) ||
-    COUNTRIES_DATA[0];
 
   const pricing = calculateVisaFees(
     selectedVisaType,
@@ -62,7 +58,7 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
   };
 
   return (
-    <div id="fee-calculator" className="max-w-7xl mx-auto py-8 sm:py-12 space-y-10 font-sans">
+    <div id="visa-fee" className="max-w-7xl mx-auto py-8 sm:py-12 space-y-10 font-sans">
       {/* 1. PAGE HEADER & SAPO - PRIMARILY ENGLISH */}
       <article className="space-y-3 text-center max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold px-4 py-1.5 rounded-full shadow-2xs">
@@ -78,10 +74,10 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             : 'Vietnam E-Visa Fee Calculator & Official Pricing Schedule'}
         </h1>
 
-        <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed text-center bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-2xs">
+        <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed text-center bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-2xs">
           {isVi
-            ? 'Tra cứu và tính toán chính xác tổng chi phí cấp Thị thực điện tử (E-Visa) Việt Nam cho tất cả 190+ quốc tịch. Bảng giá minh bạch đã bao gồm phí đóng dấu Chính phủ và phí dịch vụ thẩm định hồ sơ.'
-            : 'Calculate the total cost for your Vietnam Electronic Visa (E-Visa) for all 190+ eligible nationalities. Our transparent breakdown includes government stamping fees and application processing with zero hidden charges.'}
+            ? 'Tra cứu và tính toán chính xác tổng chi phí cấp Thị thực điện tử (E-Visa) Việt Nam. Bảng giá minh bạch đã bao gồm phí đóng dấu Chính phủ và phí dịch vụ thẩm định hồ sơ.'
+            : 'Calculate the total cost for your Vietnam Electronic Visa (E-Visa). Our transparent breakdown includes government stamping fees and application processing with zero hidden charges.'}
         </p>
       </article>
 
@@ -89,93 +85,52 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
       <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div>
-            <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs uppercase tracking-wider mb-0.5">
+            <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs sm:text-sm uppercase tracking-wider mb-0.5">
               <Sparkles className="w-4 h-4 text-indigo-600" />
               <span>{isVi ? 'Tính Phí Nhanh Trực Tuyến' : 'Live Fee Estimator'}</span>
             </div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
               {isVi ? 'Chọn Thông Tin Chuyến Đi Của Bạn' : 'Select Visa Options'}
             </h2>
           </div>
-
-          {countryInfo.exemptionDays > 0 && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-emerald-900 text-xs font-semibold flex items-center gap-2 shrink-0">
-              <span className="text-lg">{countryInfo.flagEmoji}</span>
-              <div>
-                <p className="font-bold text-emerald-950 text-[11px] sm:text-xs">
-                  {countryInfo.countryName}: {countryInfo.exemptionDays}-Day Visa-Free Exemption!
-                </p>
-                <p className="text-[10px] sm:text-[11px] text-emerald-700 font-normal">
-                  {isVi
-                    ? `Miễn visa nếu thời gian lưu trú dưới ${countryInfo.exemptionDays} ngày.`
-                    : `No visa required if staying under ${countryInfo.exemptionDays} days.`}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Controls Form - Sleek & Compact Dropdowns (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
-            {/* Grid 2 Cols for Nationality & Applicant Count */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Nationality Dropdown */}
-              <div className="space-y-1">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                  <Globe className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>{isVi ? 'Quốc tịch hộ chiếu' : 'Passport Nationality'}</span>
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedNationality}
-                    onChange={(e) => setSelectedNationality(e.target.value)}
-                    className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 pr-8 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
-                  >
-                    {COUNTRIES_DATA.map((c) => (
-                      <option key={c.code} value={c.countryName}>
-                        {c.flagEmoji} {c.countryName} {c.exemptionDays > 0 ? `(${c.exemptionDays}-Day Exemption)` : ''}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Number of Applicants Dropdown */}
-              <div className="space-y-1">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>{isVi ? 'Số lượng khách' : 'Applicants Count'}</span>
-                </label>
-                <div className="relative">
-                  <select
-                    value={applicantCount}
-                    onChange={(e) => setApplicantCount(parseInt(e.target.value))}
-                    className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 pr-8 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? 'Applicant' : 'Applicants'}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+            {/* Number of Applicants Dropdown */}
+            <div className="space-y-1">
+              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                <Users className="w-4 h-4 text-indigo-600" />
+                <span>{isVi ? 'Số lượng khách' : 'Applicants Count'}</span>
+              </label>
+              <div className="relative">
+                <select
+                  value={applicantCount}
+                  onChange={(e) => setApplicantCount(parseInt(e.target.value))}
+                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm sm:text-base font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <option key={num} value={num}>
+                      {num} {num === 1 ? 'Applicant' : 'Applicants'}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
             {/* Visa Type Dropdown */}
             <div className="space-y-1">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                <FileText className="w-3.5 h-3.5 text-indigo-600" />
+              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                <FileText className="w-4 h-4 text-indigo-600" />
                 <span>{isVi ? 'Loại thị thực (Visa Type & Duration)' : 'Visa Type & Duration'}</span>
               </label>
               <div className="relative">
                 <select
                   value={selectedVisaType}
                   onChange={(e) => setSelectedVisaType(e.target.value as VisaType)}
-                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 pr-8 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm sm:text-base font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
                 >
                   <option value="tourist_30_single">1-month single (30 days - Single entry) — $54 / pax</option>
                   <option value="tourist_30_multi">1-month multiple (30 days - Multiple entry) — $84 / pax</option>
@@ -190,15 +145,15 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
 
             {/* Processing Speed Dropdown */}
             <div className="space-y-1">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-indigo-600" />
+              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                <Clock className="w-4 h-4 text-indigo-600" />
                 <span>{isVi ? 'Tốc độ xử lý (Processing Speed)' : 'Processing Speed Tier'}</span>
               </label>
               <div className="relative">
                 <select
                   value={selectedSpeed}
                   onChange={(e) => setSelectedSpeed(e.target.value as ProcessingTime)}
-                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 pr-8 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm sm:text-base font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
                 >
                   <option value="standard">Normal (5 to 10 business days) — Included ($0)</option>
                   <option value="urgent_24h">Urgent (2 business days) — +$45 / pax</option>
@@ -209,11 +164,11 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             </div>
 
             {/* Compact Add-ons Selection */}
-            <div className="space-y-1.5 pt-2 border-t border-slate-100">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700">
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700">
                 {isVi ? 'Dịch Vụ Bổ Sung Sân Bay (Tùy Chọn)' : 'Optional Airport Add-Ons'}
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {(['travel_insurance', 'fast_track', 'car_pickup'] as ExtraService[]).map((srvKey) => {
                   const srv = EXTRA_SERVICES_PRICING[srvKey];
                   const isChecked = selectedServices.includes(srvKey);
@@ -221,7 +176,7 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                     <label
                       key={srvKey}
                       onClick={() => toggleService(srvKey)}
-                      className={`flex items-center gap-2 p-2.5 rounded-xl border text-[11px] cursor-pointer transition-all ${
+                      className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs sm:text-sm cursor-pointer transition-all ${
                         isChecked
                           ? 'bg-emerald-50/90 border-emerald-500 text-emerald-950 font-bold shadow-2xs'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -231,11 +186,11 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => {}}
-                        className="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer shrink-0"
+                        className="accent-emerald-600 w-4 h-4 rounded cursor-pointer shrink-0"
                       />
                       <div className="flex-1 truncate">
-                        <div className="truncate font-semibold">{srv.labelEn}</div>
-                        <div className="text-[10px] text-emerald-700 font-extrabold">+${srv.feePerApplicantUsd}/pax</div>
+                        <div className="truncate font-semibold text-xs sm:text-sm">{srv.labelEn}</div>
+                        <div className="text-xs text-emerald-700 font-extrabold">+${srv.feePerApplicantUsd}/pax</div>
                       </div>
                     </label>
                   );
@@ -244,77 +199,68 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             </div>
           </div>
 
-          {/* Results Summary Box - Clear Live Breakdown (5 Cols) */}
-          <div className="lg:col-span-5 bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-xl border border-slate-800 flex flex-col justify-between space-y-5">
+          {/* Results Summary Box - Clear Light Breakdown (5 Cols) */}
+          <div className="lg:col-span-5 bg-slate-50/90 text-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
             <div className="space-y-3.5">
-              <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
-                <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-indigo-700">
                   {isVi ? 'Bảng Chi Tiết Giá' : 'Fee Calculation Breakdown'}
                 </span>
-                <span className="text-xs text-slate-400 font-semibold">{applicantCount} Pax</span>
+                <span className="text-xs sm:text-sm text-slate-500 font-semibold">{applicantCount} Pax</span>
               </div>
 
-              <div className="space-y-2.5 text-xs">
+              <div className="space-y-3 text-sm sm:text-base">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">
+                  <span className="text-slate-600">
                     {isVi ? 'Phí Visa Cơ Bản' : 'Base Visa Fee'} (${pricing.govFeePerPerson + pricing.serviceFeePerPerson} x {applicantCount}):
                   </span>
-                  <span className="font-bold text-white">${(pricing.govFeePerPerson + pricing.serviceFeePerPerson) * applicantCount} USD</span>
+                  <span className="font-bold text-slate-900">${(pricing.govFeePerPerson + pricing.serviceFeePerPerson) * applicantCount} USD</span>
                 </div>
 
                 {pricing.speedFeeTotal > 0 && (
-                  <div className="flex items-center justify-between text-indigo-300">
+                  <div className="flex items-center justify-between text-indigo-800">
                     <span>{isVi ? 'Phụ Phí Xử Lý Khẩn' : 'Speed Surcharge'}:</span>
                     <span className="font-extrabold">+${pricing.speedFeeTotal} USD</span>
                   </div>
                 )}
 
                 {pricing.extraServicesTotal > 0 && (
-                  <div className="flex items-center justify-between text-emerald-300">
+                  <div className="flex items-center justify-between text-emerald-800">
                     <span>{isVi ? 'Dịch Vụ Bổ Sung' : 'Selected Add-Ons'}:</span>
                     <span className="font-extrabold">+${pricing.extraServicesTotal} USD</span>
                   </div>
                 )}
 
                 {pricing.groupDiscount > 0 && (
-                  <div className="flex items-center justify-between text-emerald-400 font-semibold">
+                  <div className="flex items-center justify-between text-emerald-700 font-semibold">
                     <span>{isVi ? 'Giảm Giá Nhóm' : 'Group Discount'}:</span>
                     <span>-${pricing.groupDiscount} USD</span>
                   </div>
                 )}
               </div>
 
-              <div className="pt-3 border-t border-slate-800 space-y-0.5">
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+              <div className="pt-3.5 border-t border-slate-200 space-y-1">
+                <div className="text-xs text-slate-500 uppercase tracking-wider font-bold">
                   {isVi ? 'TỔNG CỘNG TRỌN GÓI' : 'GRAND TOTAL'}
                 </div>
-                <div className="text-3xl font-black text-indigo-400">
-                  ${pricing.grandTotalUsd} <span className="text-xs font-normal text-slate-300">USD</span>
-                </div>
-                <div className="text-[11px] text-slate-400 font-medium">
-                  ≈ {pricing.grandTotalVnd.toLocaleString('en-US')} VND
+                <div className="text-3xl sm:text-4xl font-black text-indigo-700">
+                  ${pricing.grandTotalUsd} <span className="text-sm font-normal text-slate-500">USD</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() =>
-                  onApplyWithOptions({
-                    nationality: selectedNationality,
-                    visaType: selectedVisaType,
-                    processingTime: selectedSpeed,
-                    applicantCount: applicantCount
-                  })
-                }
-                className="w-full bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 border border-orange-500 cursor-pointer"
+            <div className="space-y-3 pt-2">
+              <a
+                href="https://vietnamvisa.govt.vn/apply-online"
+                target="_blank"
+                rel="nofollow"
+                className="w-full bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-sm sm:text-base py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 border border-orange-500 cursor-pointer"
               >
                 <span>{isVi ? 'Bắt Đầu Nộp Đơn Ngay →' : 'Apply Online Now →'}</span>
-              </button>
+              </a>
 
-              <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{isVi ? 'Không phụ phí ẩn • Cam kết hoàn 100%' : '100% Transparent Fee Guarantee'}</span>
               </div>
             </div>
@@ -337,15 +283,15 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
 
         {/* TABLE 1: VISA TYPE */}
         <div className="space-y-2.5">
-          <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-            <FileText className="w-4 h-4 text-indigo-600" />
+          <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <FileText className="w-4.5 h-4.5 text-indigo-600" />
             <span>1. VISA TYPE & DURATION</span>
           </h3>
 
           <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-sm sm:text-base border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-[11px]">
+                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-xs sm:text-sm">
                   <th className="py-3 px-4 sm:px-6">VISA TYPE</th>
                   <th className="py-3 px-4 sm:px-6">DURATION</th>
                   <th className="py-3 px-4 sm:px-6">ENTRIES</th>
@@ -354,28 +300,28 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">1-month single</td>
-                  <td className="py-3 px-4 sm:px-6">30 days</td>
-                  <td className="py-3 px-4 sm:px-6">Single entry</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800 text-xs sm:text-sm">$54</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">1-month single</td>
+                  <td className="py-3.5 px-4 sm:px-6">30 days</td>
+                  <td className="py-3.5 px-4 sm:px-6">Single entry</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$54</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">1-month multiple</td>
-                  <td className="py-3 px-4 sm:px-6">30 days</td>
-                  <td className="py-3 px-4 sm:px-6">Multiple entry</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800 text-xs sm:text-sm">$84</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">1-month multiple</td>
+                  <td className="py-3.5 px-4 sm:px-6">30 days</td>
+                  <td className="py-3.5 px-4 sm:px-6">Multiple entry</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$84</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">3-month single</td>
-                  <td className="py-3 px-4 sm:px-6">90 days</td>
-                  <td className="py-3 px-4 sm:px-6">Single entry</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800 text-xs sm:text-sm">$94</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">3-month single</td>
+                  <td className="py-3.5 px-4 sm:px-6">90 days</td>
+                  <td className="py-3.5 px-4 sm:px-6">Single entry</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$94</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">3-month multiple</td>
-                  <td className="py-3 px-4 sm:px-6">90 days</td>
-                  <td className="py-3 px-4 sm:px-6">Multiple entry</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800 text-xs sm:text-sm">$104</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">3-month multiple</td>
+                  <td className="py-3.5 px-4 sm:px-6">90 days</td>
+                  <td className="py-3.5 px-4 sm:px-6">Multiple entry</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$104</td>
                 </tr>
               </tbody>
             </table>
@@ -385,19 +331,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         {/* TABLE 2: PROCESSING SPEED */}
         <div className="space-y-2.5 pt-2">
           <div className="space-y-0.5">
-            <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-              <Clock className="w-4 h-4 text-indigo-600" />
+            <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              <Clock className="w-4.5 h-4.5 text-indigo-600" />
               <span>2. PROCESSING SPEED</span>
             </h3>
-            <p className="text-xs text-slate-600 leading-relaxed font-normal">
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration, typically within 2 business hours of payment.
             </p>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-sm sm:text-base border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-[11px]">
+                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-xs sm:text-sm">
                   <th className="py-3 px-4 sm:px-6">TIER</th>
                   <th className="py-3 px-4 sm:px-6">DELIVERY</th>
                   <th className="py-3 px-4 sm:px-6 text-right">SURCHARGE</th>
@@ -405,19 +351,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">Normal</td>
-                  <td className="py-3 px-4 sm:px-6">5 to 10 business days</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800">Included</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Normal</td>
+                  <td className="py-3.5 px-4 sm:px-6">5 to 10 business days</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">Included</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">Urgent</td>
-                  <td className="py-3 px-4 sm:px-6">2 business days</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800">+$45 per applicant</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Urgent</td>
+                  <td className="py-3.5 px-4 sm:px-6">2 business days</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">+$45 per applicant</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">Super Urgent</td>
-                  <td className="py-3 px-4 sm:px-6">1 business day</td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800">+$85 per applicant</td>
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Super Urgent</td>
+                  <td className="py-3.5 px-4 sm:px-6">1 business day</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">+$85 per applicant</td>
                 </tr>
               </tbody>
             </table>
@@ -427,16 +373,16 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         {/* TABLE 3: OPTIONAL ADD-ONS */}
         <div className="space-y-2.5 pt-2">
           <div className="space-y-0.5">
-            <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-              <Zap className="w-4 h-4 text-indigo-600" />
+            <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              <Zap className="w-4.5 h-4.5 text-indigo-600" />
               <span>3. OPTIONAL ADD-ONS</span>
             </h3>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-sm sm:text-base border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-[11px]">
+                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-xs sm:text-sm">
                   <th className="py-3 px-4 sm:px-6 min-w-[140px]">ADD-ON</th>
                   <th className="py-3 px-4 sm:px-6">WHAT YOU GET</th>
                   <th className="py-3 px-4 sm:px-6 text-right min-w-[130px]">PRICE</th>
@@ -444,25 +390,25 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">Travel Insurance</td>
-                  <td className="py-3 px-4 sm:px-6 text-slate-600">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Travel Insurance</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-600">
                     Coverage for unexpected medical events (including Covid-19) and baggage issues, up to $10,000
                   </td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800">$30 per applicant</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">$30 per applicant</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">Airport Fast-Track</td>
-                  <td className="py-3 px-4 sm:px-6 text-slate-600">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Airport Fast-Track</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-600">
                     Priority immigration lane on arrival, typically saves 30 to 60 minutes, and up to 2 hours during peak season and holidays
                   </td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800">$35 per applicant</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">$35 per applicant</td>
                 </tr>
                 <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 sm:px-6 font-bold text-slate-900">Car Pickup</td>
-                  <td className="py-3 px-4 sm:px-6 text-slate-600">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Car Pickup</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-600">
                     Meet & greet at the arrival hall, private transfer to your hotel
                   </td>
-                  <td className="py-3 px-4 sm:px-6 text-right font-black text-emerald-800">$35 per applicant</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">$35 per applicant</td>
                 </tr>
               </tbody>
             </table>
@@ -473,19 +419,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
       {/* 4. LONG SEO CONTENT SECTION IN ENGLISH WITH COLLAPSIBLE READ MORE FOR MOBILE & DESKTOP */}
       <section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-5 relative overflow-hidden">
         <div className="border-b border-slate-100 pb-3">
-          <div className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-            <Info className="w-3.5 h-3.5 text-indigo-600" />
+          <div className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+            <Info className="w-4 h-4 text-indigo-600" />
             <span>SEO VISA FEE GUIDE & POLICIES</span>
           </div>
-          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
             {isVi ? 'Hướng Dẫn Chi Tiết Chi Phí & Quy Định Thị Thực Việt Nam 2026' : 'Comprehensive Guide to Vietnam E-Visa Fees & Payment Policies'}
           </h2>
         </div>
 
         {/* Collapsible Article Body in English */}
         <div
-          className={`relative transition-all duration-500 overflow-hidden text-xs text-slate-700 leading-relaxed space-y-5 ${
-            !isSeoExpanded ? 'max-h-[300px] sm:max-h-[360px]' : 'max-h-[5000px]'
+          className={`relative transition-all duration-500 overflow-hidden text-sm sm:text-base text-slate-700 leading-relaxed space-y-5 ${
+            !isSeoExpanded ? 'max-h-[320px] sm:max-h-[400px]' : 'max-h-[5000px]'
           }`}
         >
           {/* Article Section 1 */}

@@ -101,13 +101,15 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
-              <button
-                onClick={onStartApplication}
+              <a
+                href="https://vietnamvisa.govt.vn/apply-online"
+                target="_blank"
+                rel="nofollow"
                 className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
               >
                 <span>{t.heroCtaApply}</span>
                 <ArrowRight className="w-4 h-4 text-white" />
-              </button>
+              </a>
 
               <button
                 onClick={onOpenCalculator}
@@ -228,23 +230,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onApplyWithOptions) {
-                      onApplyWithOptions({
-                        visaType: quoteVisaType,
-                        processingTime: quoteSpeed,
-                        applicantCount: quoteApplicants
-                      });
-                    } else {
-                      onStartApplication();
-                    }
-                  }}
+                <a
+                  href="https://vietnamvisa.govt.vn/apply-online"
+                  target="_blank"
+                  rel="nofollow"
                   className="w-full bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-sm py-3 px-5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-orange-500"
                 >
                   <span>Start Application →</span>
-                </button>
+                </a>
               </div>
 
               {/* Fine Print Footer */}

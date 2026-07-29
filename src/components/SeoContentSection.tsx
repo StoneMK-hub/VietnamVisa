@@ -19,12 +19,14 @@ interface SeoContentSectionProps {
   currentLang: Language;
   onStartApplication: () => void;
   onOpenRequirements: () => void;
+  onOpenOverview?: () => void;
 }
 
 export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
   currentLang,
   onStartApplication,
-  onOpenRequirements
+  onOpenRequirements,
+  onOpenOverview
 }) => {
   const isVi = currentLang === 'vi';
 
@@ -130,8 +132,8 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
           </h3>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             {isVi
-              ? 'Thị thực điện tử Việt Nam áp dụng cho tất cả 190+ quốc gia và vùng lãnh thổ, có thời hạn từ 30 ngày đến 90 ngày (nhập cảnh 1 lần hoặc nhiều lần). Cho phép nhập cảnh qua 33 cửa khẩu quốc tế gồm sân bay, đường bộ và đường biển.'
-              : 'Vietnam e-Visa is valid for 30 to 90 days with Single or Multiple entry options for all countries. Valid across 33 international border checkpoints (airports, land ports, and seaports). No physical passport submission required.'}
+              ? 'Thị thực điện tử Việt Nam áp dụng cho tất cả 190+ quốc gia và vùng lãnh thổ, có thời hạn từ 30 ngày đến 90 ngày (nhập cảnh 1 lần hoặc nhiều lần). Cho phép nhập cảnh qua các cửa khẩu quốc tế gồm sân bay, đường bộ và đường biển.'
+              : 'Vietnam e-Visa is valid for 30 to 90 days with Single or Multiple entry options for all countries. Valid across international border checkpoints in Vietnam (airports, land ports, and seaports). No physical passport submission required.'}
           </p>
           <div className="pt-1 flex flex-wrap items-center gap-4 text-xs font-semibold text-amber-300">
             <span className="flex items-center gap-1">
@@ -144,18 +146,17 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
             </span>
             <span className="flex items-center gap-1">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>33 Border Gates Accepted</span>
+              <span>Vietnam Entry Checkpoints</span>
             </span>
           </div>
         </div>
 
         <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
           <button
-            onClick={onStartApplication}
+            onClick={onOpenOverview || onStartApplication}
             className="w-full bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-orange-500"
           >
-            <span>{isVi ? 'Nộp Đơn Visa Ngay' : 'Apply Online Now'}</span>
-            <ChevronRight className="w-4 h-4" />
+            <span>{isVi ? 'Xem Tổng Quan E-Visa →' : 'Vietnam eVisa Overview →'}</span>
           </button>
 
           <button

@@ -1,6 +1,18 @@
 import { Language } from './types';
 
-export type TabType = 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faqs' | 'contact';
+export type TabType = 
+  | 'home' 
+  | 'overview'
+  | 'apply' 
+  | 'calculator' 
+  | 'requirements' 
+  | 'track' 
+  | 'faqs' 
+  | 'contact'
+  | 'about'
+  | 'payment-guidelines'
+  | 'terms-and-conditions'
+  | 'privacy-policy';
 
 export interface RouteConfig {
   tab: TabType;
@@ -28,29 +40,41 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     breadcrumbEn: 'Home',
     breadcrumbVi: 'Trang Chủ'
   },
+  overview: {
+    tab: 'overview',
+    path: '/overview',
+    titleEn: 'Vietnam E-Visa Overview 2026 | Comprehensive Entry Guide',
+    titleVi: 'Tổng Quan E-Visa Việt Nam 2026 | Hướng Dẫn Nhập Cảnh Chi Tiết',
+    descEn: 'Complete overview of Vietnam electronic visa requirements, 83 accepted entry points, duration, pricing, and border guidelines.',
+    descVi: 'Tổng quan chi tiết về e-Visa Việt Nam, 83 cửa khẩu nhập cảnh, thời hạn, chi phí và quy trình nhập cảnh mới nhất.',
+    keywordsEn: 'vietnam evisa overview, vietnam visa guide, 83 entry points vietnam, evisa requirements, vietnam visa duration',
+    keywordsVi: 'tong quan evisa viet nam, huong dan visa viet nam, 83 cua khau nhap canh, dieu kien xin visa',
+    breadcrumbEn: 'Overview',
+    breadcrumbVi: 'Tổng Quan'
+  },
   apply: {
     tab: 'apply',
-    path: '/apply-online',
-    titleEn: 'Apply for Vietnam E-Visa Online 2026 | Official Application Form',
-    titleVi: 'Tờ Khai Xin E-Visa Việt Nam Trực Tuyến 2026 | Đăng Ký Fast-Track',
-    descEn: 'Complete your official Vietnam e-Visa application form in 3 simple steps. Instant price transparency, express 1-hour emergency options, and secure submission.',
-    descVi: 'Hoàn tất tờ khai xin e-Visa Việt Nam chính thức qua 3 bước đơn giản. Minh bạch chi phí, xử lý khẩn 1 giờ và bảo mật thông tin.',
-    keywordsEn: 'vietnam visa application, apply vietnam evisa online, vietnam visa form 2026, 90 day vietnam evisa, urgent visa application',
-    keywordsVi: 'to khai visa viet nam, xin evisa online, dang ky visa 90 ngay, visa khan 1 gio, thu tuc nhap canh viet nam',
-    breadcrumbEn: 'Apply Online',
-    breadcrumbVi: 'Nộp Hồ Sơ Online'
+    path: '/how-to-apply',
+    titleEn: 'How to Apply for Vietnam E-Visa Online 2026 | Application Guide',
+    titleVi: 'Hướng Dẫn Xin E-Visa Việt Nam Trực Tuyến 2026 | Đăng Ký Nhanh',
+    descEn: 'Complete guide on how to apply for official Vietnam e-Visa in 3 simple steps. Instant price transparency, express options, and official link.',
+    descVi: 'Hướng dẫn chi tiết cách xin e-Visa Việt Nam chính thức qua 3 bước đơn giản. Minh bạch chi phí và xử lý khẩn tại sân bay.',
+    keywordsEn: 'how to apply vietnam visa, vietnam visa application guide, apply vietnam evisa online 2026, 90 day vietnam evisa',
+    keywordsVi: 'huong dan xin visa viet nam, cach dang ky evisa, huong dan lam visa nhap canh',
+    breadcrumbEn: 'How to Apply',
+    breadcrumbVi: 'Hướng Dẫn Xin Visa'
   },
   calculator: {
     tab: 'calculator',
-    path: '/fee-calculator',
+    path: '/visa-fee',
     titleEn: 'Vietnam Visa Fee Calculator 2026 | E-Visa & Speed Pricing',
     titleVi: 'Bảng Tính Phí Visa Việt Nam 2026 | Tính Phí E-Visa & Nhanh',
     descEn: 'Calculate official government stamp fees, service fees, and urgent processing rates for 30-day and 90-day single or multiple entry Vietnam visas.',
     descVi: 'Tra cứu bảng phí chính thức gồm phí nhà nước, phí dịch vụ và phí làm khẩn cho các loại e-Visa 30 ngày, 90 ngày 1 lần hoặc nhiều lần.',
     keywordsEn: 'vietnam visa fee calculator, how much is vietnam visa, vietnam evisa price 2026, urgent visa cost, fast track price',
     keywordsVi: 'bang gia visa viet nam, le phi evisa viet nam 2026, tinh phi visa viet nam, gia visa khan',
-    breadcrumbEn: 'Fee Calculator',
-    breadcrumbVi: 'Tính Phí Visa'
+    breadcrumbEn: 'Visa Fee',
+    breadcrumbVi: 'Phí Visa'
   },
   requirements: {
     tab: 'requirements',
@@ -85,8 +109,8 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     descVi: 'Giải đáp thắc mắc thường gặp về ảnh hộ chiếu e-Visa Việt Nam, cửa khẩu nhập cảnh, quy định ngày bay và quy trình xử lý khẩn tại sân bay.',
     keywordsEn: 'vietnam visa faqs, evisa photo guidelines, vietnam entry ports, can I change entry port vietnam evisa, emergency visa questions',
     keywordsVi: 'hoi dap visa viet nam, quy dinh anh evisa, cac cua khau nhap canh, huong dan lam visa',
-    breadcrumbEn: 'FAQs & Guidelines',
-    breadcrumbVi: 'Hỏi Đáp & Hướng Dẫn'
+    breadcrumbEn: 'FAQ',
+    breadcrumbVi: 'Hỏi Đáp'
   },
   contact: {
     tab: 'contact',
@@ -99,6 +123,54 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     keywordsVi: 'lien he visa viet nam, tong dai ho tro evisa 24/7, hotline nhap canh viet nam',
     breadcrumbEn: 'Contact Us',
     breadcrumbVi: 'Liên Hệ'
+  },
+  'payment-guidelines': {
+    tab: 'payment-guidelines',
+    path: '/payment-guidelines',
+    titleEn: 'Payment Guidelines & Fee Transparency | Vietnam E-Visa Services',
+    titleVi: 'Hướng Dẫn Thanh Toán & Minh Bạch Lệ Phí | Visa Việt Nam',
+    descEn: 'Official payment terms, accepted payment methods (Credit/Debit, Wire, PayPal), refund policies, and fee breakdown for Vietnam e-Visa processing.',
+    descVi: 'Quy định thanh toán, các phương thức thanh toán hợp lệ (Thẻ Visa/Master, Chuyển khoản), chính sách hoàn tiền và bảng kê chi phí visa.',
+    keywordsEn: 'vietnam visa payment guidelines, visa payment methods, refund policy, vietnam evisa fee breakdown',
+    keywordsVi: 'huong dan thanh toan visa, phuong thuc thanh toan, chinh sach hoan tien evisa, le phi nhap canh',
+    breadcrumbEn: 'Payment Guidelines',
+    breadcrumbVi: 'Hướng Dẫn Thanh Toán'
+  },
+  'terms-and-conditions': {
+    tab: 'terms-and-conditions',
+    path: '/terms-and-conditions',
+    titleEn: 'Terms and Conditions | Vietnam E-Visa Service Facilitator',
+    titleVi: 'Điều Khoản & Điều Kiện Sử Dụng | Dịch Vụ Visa Việt Nam',
+    descEn: 'Read our commercial terms and conditions, service scope, user obligations, urgent processing guarantees, and limitation of liability.',
+    descVi: 'Quy định và điều khoản dịch vụ, phạm vi trách nhiệm, nghĩa vụ người đăng ký, quy định làm khẩn và cam kết dịch vụ visa Việt Nam.',
+    keywordsEn: 'vietnam visa terms and conditions, service agreement, commercial visa agency terms',
+    keywordsVi: 'dieu khoan su dung, quy dinh dich vu visa, hop dong va cam ket dich vu',
+    breadcrumbEn: 'Terms and Conditions',
+    breadcrumbVi: 'Điều Khoản & Điều Kiện'
+  },
+  'privacy-policy': {
+    tab: 'privacy-policy',
+    path: '/privacy-policy',
+    titleEn: 'Privacy Policy & Data Security | Official Vietnam Visa Services',
+    titleVi: 'Chính Sách Bảo Mật & An Toàn Dữ Liệu | Visa Việt Nam',
+    descEn: 'Learn how we collect, protect, and encrypt your passport and personal data for Vietnam e-Visa submission under 256-Bit SSL standards.',
+    descVi: 'Cam kết bảo mật thông tin cá nhân, mã hóa dữ liệu hộ chiếu theo chuẩn 256-Bit SSL và quy định lưu trữ dữ liệu người dùng.',
+    keywordsEn: 'vietnam visa privacy policy, data security, ssl encryption passport data, GDPR compliance',
+    keywordsVi: 'chinh sach bao mat, an toan du lieu ho chieu, bao mat thong tin ca nhan',
+    breadcrumbEn: 'Privacy Policy',
+    breadcrumbVi: 'Chính Sách Bảo Mật'
+  },
+  about: {
+    tab: 'about',
+    path: '/about',
+    titleEn: 'About Us | Vietnam Visa by BDA Tech & Media JSC',
+    titleVi: 'Về Chúng Tôi | Vietnam Visa by BDA Tech & Media JSC',
+    descEn: 'Learn about Vietnam Visa by BDA Tech & Media JSC - operating since 2007 in Hanoi with over 100 dedicated travel & visa technology specialists.',
+    descVi: 'Giới thiệu về dịch vụ Vietnam Visa vận hành bởi BDA Tech & Media JSC từ năm 2007 tại Hà Nội với đội ngũ hơn 100 chuyên viên hỗ trợ visa.',
+    keywordsEn: 'about vietnam visa bda, bda tech & media jsc, vietnam visa team hanoi, official visa service agency',
+    keywordsVi: 'gioi thieu vietnam visa bda, bda tech and media, doi ngu ho tro visa ha noi',
+    breadcrumbEn: 'About Us',
+    breadcrumbVi: 'Giới Thệu'
   }
 };
 

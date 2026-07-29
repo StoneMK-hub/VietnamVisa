@@ -64,11 +64,11 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                 placeholder={t.searchCountryPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
               />
             </div>
 
-            <div className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shrink-0">
+            <div className="text-xs sm:text-sm font-bold text-slate-600 bg-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-200 shrink-0">
               {currentLang === 'vi'
                 ? `Hiển thị ${filteredCountries.length} / ${COUNTRIES_DATA.length} quốc gia`
                 : `Showing ${filteredCountries.length} of ${COUNTRIES_DATA.length} countries`}
@@ -77,11 +77,11 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
         )}
 
         {/* Country Cards Grid (4 Columns) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pt-2">
           {countriesToDisplay.map((c) => (
             <div
               key={c.code}
-              className="bg-slate-50 hover:bg-white rounded-xl p-3.5 border border-slate-200/90 hover:border-indigo-300 hover:shadow-md transition-all flex flex-col justify-between space-y-3 group"
+              className="bg-slate-50 hover:bg-white rounded-2xl p-4 border border-slate-200/90 hover:border-indigo-300 hover:shadow-md transition-all flex flex-col justify-between space-y-3 group"
             >
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-slate-200/70 gap-1.5">
@@ -92,30 +92,30 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                       className="w-5 h-3.5 object-cover rounded-[2px] border border-slate-200/80 shrink-0 shadow-2xs"
                       loading="lazy"
                     />
-                    <span className="font-bold text-slate-900 text-xs truncate group-hover:text-indigo-600 transition-colors">
+                    <span className="font-bold text-slate-900 text-sm truncate group-hover:text-indigo-600 transition-colors">
                       {currentLang === 'vi' ? c.countryNameVi : c.countryName}
                     </span>
                   </div>
 
                   {c.exemptionDays > 0 ? (
-                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-1.5 py-0.5 rounded border border-emerald-300/80 shrink-0">
+                    <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-2 py-0.5 rounded border border-emerald-300/80 shrink-0">
                       {c.exemptionDays}D EXEMPT
                     </span>
                   ) : (
-                    <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-200 shrink-0">
+                    <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded border border-blue-200 shrink-0">
                       E-VISA
                     </span>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-600 mt-2 leading-snug line-clamp-2">
+                <p className="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed line-clamp-2">
                   {currentLang === 'vi' ? c.notesVi : c.notes}
                 </p>
               </div>
 
               <button
                 onClick={() => onApplyForCountry(c.countryName)}
-                className="w-full bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 font-bold text-[11px] py-1.5 px-2 rounded-lg border border-slate-200 hover:border-indigo-600 transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
+                className="w-full bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 font-bold text-xs sm:text-sm py-2 px-3 rounded-xl border border-slate-200 hover:border-indigo-600 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <span>{currentLang === 'vi' ? `Xin Visa cho ${c.countryNameVi}` : `Apply Visa for ${c.countryName}`}</span>
               </button>

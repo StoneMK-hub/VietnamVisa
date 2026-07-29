@@ -25,14 +25,10 @@ interface ApplyOnlineGuideViewProps {
   currentLang: Language;
 }
 
-const APPLY_PORTAL_URL = 'https://vietnamvisaservice.com/apply-online';
+const APPLY_PORTAL_URL = 'https://vietnamvisa.govt.vn/apply-online';
 
 export const ApplyOnlineGuideView: React.FC<ApplyOnlineGuideViewProps> = ({ currentLang }) => {
   const isVi = currentLang === 'vi';
-
-  const handleRedirect = () => {
-    window.open(APPLY_PORTAL_URL, '_blank', 'noopener,noreferrer');
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-10">
@@ -72,7 +68,7 @@ export const ApplyOnlineGuideView: React.FC<ApplyOnlineGuideViewProps> = ({ curr
             </span>
             <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>{isVi ? 'Nhập cảnh qua 33 Cửa khẩu' : 'Accepted at 33 International Ports'}</span>
+              <span>{isVi ? 'Thị Thực Nhập Cảnh Việt Nam' : 'Valid for Vietnam Entry Visa'}</span>
             </span>
             <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -83,13 +79,15 @@ export const ApplyOnlineGuideView: React.FC<ApplyOnlineGuideViewProps> = ({ curr
 
         {/* CLEAN, DIRECT ORANGE CTA BUTTON (NO HEAVY BACKGROUND BLOCK) */}
         <div className="pt-2 flex flex-col items-center justify-center text-center space-y-3 max-w-2xl mx-auto">
-          <button
-            onClick={handleRedirect}
+          <a
+            href={APPLY_PORTAL_URL}
+            target="_blank"
+            rel="nofollow"
             className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-black text-sm sm:text-base px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 border border-orange-500 cursor-pointer"
           >
             <span>{isVi ? 'TRUY CẬP TRANG NỘP ĐƠN E-VISA (APPLY ONLINE) →' : 'GO TO ONLINE APPLICATION FORM →'}</span>
             <ExternalLink className="w-5 h-5 text-white" />
-          </button>
+          </a>
 
           <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -302,18 +300,20 @@ export const ApplyOnlineGuideView: React.FC<ApplyOnlineGuideViewProps> = ({ curr
               </p>
             </div>
 
-            <button
-              onClick={handleRedirect}
+            <a
+              href={APPLY_PORTAL_URL}
+              target="_blank"
+              rel="nofollow"
               className="w-full bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-sm py-3.5 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-orange-500"
             >
               <span>{isVi ? 'Đến Trang Nộp Đơn Ngay →' : 'Go to Application Form →'}</span>
               <ExternalLink className="w-4 h-4 text-white" />
-            </button>
+            </a>
 
             <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
               <p className="flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Target URL: https://vietnamvisa.govt.vn/apply-online</span>
+                <span>Target URL: https://vietnamvisa.govt.vn/how-to-apply</span>
               </p>
               <p className="text-slate-500">
                 {isVi

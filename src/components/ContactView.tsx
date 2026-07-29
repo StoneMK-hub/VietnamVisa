@@ -152,7 +152,7 @@ export const ContactView: React.FC<ContactViewProps> = ({
           ) : (
             <form onSubmit={handleSubmit} className="pt-6 space-y-4">
               {error && (
-                <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+                <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-semibold flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -160,8 +160,8 @@ export const ContactView: React.FC<ContactViewProps> = ({
 
               {/* Name fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-800 block">
                     {isVi ? 'Tên (First name)' : 'First name'} <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -169,12 +169,12 @@ export const ContactView: React.FC<ContactViewProps> = ({
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder={isVi ? 'Ví dụ: John' : 'e.g. John'}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-800 block">
                     {isVi ? 'Họ (Last name)' : 'Last name'}
                   </label>
                   <input
@@ -182,15 +182,15 @@ export const ContactView: React.FC<ContactViewProps> = ({
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder={isVi ? 'Ví dụ: Smith' : 'e.g. Smith'}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                   />
                 </div>
               </div>
 
               {/* Nationality & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-800 block">
                     {isVi ? 'Quốc tịch' : 'Nationality'}
                   </label>
                   <input
@@ -198,12 +198,12 @@ export const ContactView: React.FC<ContactViewProps> = ({
                     value={nationality}
                     onChange={(e) => setNationality(e.target.value)}
                     placeholder={isVi ? 'Nhập quốc tịch của bạn...' : 'Start typing your country...'}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-slate-800 block">
                     {isVi ? 'Số điện thoại' : 'Phone number'}
                   </label>
                   <input
@@ -211,14 +211,14 @@ export const ContactView: React.FC<ContactViewProps> = ({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+1 555 555 5555"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                   />
                 </div>
               </div>
 
               {/* Email */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 block">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-800 block">
                   {isVi ? 'Địa chỉ Email' : 'Email address'} <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -226,19 +226,19 @@ export const ContactView: React.FC<ContactViewProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 />
               </div>
 
               {/* Subject */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 block">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-800 block">
                   {isVi ? 'Chủ đề thắc mắc' : 'Subject'}
                 </label>
                 <select
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer"
                 >
                   <option value="Urgent Visa Status Check">
                     {isVi ? 'Kiểm tra tiến độ visa khẩn' : 'Urgent Visa Status Check'}
@@ -259,8 +259,8 @@ export const ContactView: React.FC<ContactViewProps> = ({
               </div>
 
               {/* Message */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 block">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-800 block">
                   {isVi ? 'Nội dung tin nhắn' : 'Message'} <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -272,7 +272,7 @@ export const ContactView: React.FC<ContactViewProps> = ({
                       ? 'Nhập nội dung cần hỗ trợ (Ví dụ: Tôi đã nộp đơn nhưng chưa nhận được mail, mã hồ sơ VNV-2026...)'
                       : 'Please enter details of your inquiry or reference code...'
                   }
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 resize-y"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 resize-y"
                 ></textarea>
               </div>
 
@@ -281,10 +281,10 @@ export const ContactView: React.FC<ContactViewProps> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   {loading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
                       <span>{isVi ? 'Gửi Tin Nhắn →' : 'Send Message →'}</span>

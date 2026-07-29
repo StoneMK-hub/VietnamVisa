@@ -69,18 +69,18 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ currentLang }) => {
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full text-left p-4 bg-slate-50 hover:bg-slate-100 font-bold text-xs sm:text-sm text-slate-900 flex items-center justify-between gap-4 transition-colors"
+                  className="w-full text-left p-4 sm:p-5 bg-slate-50 hover:bg-slate-100 font-bold text-sm sm:text-base text-slate-900 flex items-center justify-between gap-4 transition-colors"
                 >
                   <span>{currentLang === 'vi' ? faq.qVi : faq.qEn}</span>
                   {isOpen ? (
-                    <ChevronUp className="w-4 h-4 text-indigo-600 shrink-0" />
+                    <ChevronUp className="w-4.5 h-4.5 text-indigo-600 shrink-0" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                    <ChevronDown className="w-4.5 h-4.5 text-slate-400 shrink-0" />
                   )}
                 </button>
 
                 {isOpen && (
-                  <div className="p-4 bg-white text-xs text-slate-600 leading-relaxed border-t border-slate-200">
+                  <div className="p-4 sm:p-5 bg-white text-sm sm:text-base text-slate-700 leading-relaxed border-t border-slate-200">
                     {currentLang === 'vi' ? faq.aVi : faq.aEn}
                   </div>
                 )}

@@ -15,6 +15,10 @@ import { SEOMetadata } from './components/SEOMetadata';
 import { SEOBreadcrumb } from './components/SEOBreadcrumb';
 import { TabType, getTabFromPath, getRouteFromTab } from './routes';
 import { VisaApprovalCertificate } from './components/VisaApprovalCertificate';
+import { PaymentGuidelinesView, TermsAndConditionsView, PrivacyPolicyView } from './components/PolicyViews';
+import { CookieConsentBanner } from './components/CookieConsentBanner';
+import { AboutView } from './components/AboutView';
+import { OverviewView } from './components/OverviewView';
 
 import {
   Language,
@@ -88,6 +92,7 @@ export default function App() {
   // Submitted Application for Certificate View
   const [createdApplication, setCreatedApplication] = useState<VisaApplication | null>(null);
   const [viewingCertificate, setViewingCertificate] = useState<boolean>(false);
+  const [forceOpenCookieBanner, setForceOpenCookieBanner] = useState<boolean>(false);
 
   // Quick action from Calculator -> Direct Apply Portal Guide
   const handleApplyWithOptions = (_options: {
@@ -109,13 +114,6 @@ export default function App() {
         currentLang={currentLang}
         onLanguageChange={setCurrentLang}
         activeTab={activeTab === 'faqs' ? 'faq' : activeTab}
-        onNavigate={handleNavigate}
-      />
-
-      {/* SEO Breadcrumb Bar */}
-      <SEOBreadcrumb
-        activeTab={activeTab}
-        currentLang={currentLang}
         onNavigate={handleNavigate}
       />
 
@@ -149,6 +147,7 @@ export default function App() {
                     currentLang={currentLang}
                     onStartApplication={() => handleNavigate('apply')}
                     onOpenRequirements={() => handleNavigate('requirements')}
+                    onOpenOverview={() => handleNavigate('overview')}
                   />
                 </div>
 
@@ -176,12 +175,17 @@ export default function App() {
               </div>
             )}
 
-            {/* APPLY ONLINE GUIDE & DIRECT PORTAL VIEW (Path: /apply-online) */}
+            {/* OVERVIEW VIEW (Path: /overview) */}
+            {activeTab === 'overview' && (
+              <OverviewView currentLang={currentLang} onNavigate={handleNavigate} />
+            )}
+
+            {/* APPLY ONLINE GUIDE & DIRECT PORTAL VIEW (Path: /how-to-apply) */}
             {activeTab === 'apply' && (
               <ApplyOnlineGuideView currentLang={currentLang} />
             )}
 
-            {/* CALCULATOR TAB (Path: /fee-calculator) */}
+            {/* CALCULATOR TAB (Path: /visa-fee) */}
             {activeTab === 'calculator' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
                 <QuickFeeCalculator
@@ -233,6 +237,38 @@ export default function App() {
                 onStartApplication={() => handleNavigate('apply')}
               />
             )}
+
+            {/* ABOUT US TAB (Path: /about) */}
+            {activeTab === 'about' && (
+              <AboutView
+                currentLang={currentLang}
+                onNavigate={handleNavigate}
+              />
+            )}
+
+            {/* PAYMENT GUIDELINES TAB (Path: /payment-guidelines) */}
+            {activeTab === 'payment-guidelines' && (
+              <PaymentGuidelinesView
+                currentLang={currentLang}
+                onNavigate={handleNavigate}
+              />
+            )}
+
+            {/* TERMS & CONDITIONS TAB (Path: /terms-and-conditions) */}
+            {activeTab === 'terms-and-conditions' && (
+              <TermsAndConditionsView
+                currentLang={currentLang}
+                onNavigate={handleNavigate}
+              />
+            )}
+
+            {/* PRIVACY POLICY TAB (Path: /privacy-policy) */}
+            {activeTab === 'privacy-policy' && (
+              <PrivacyPolicyView
+                currentLang={currentLang}
+                onNavigate={handleNavigate}
+              />
+            )}
           </>
         )}
       </main>
@@ -240,10 +276,19 @@ export default function App() {
       {/* Floating Gemini AI Consultant */}
       <AIVisaAssistant currentLang={currentLang} />
 
+      {/* Cookie Consent Banner */}
+      <CookieConsentBanner
+        currentLang={currentLang}
+        onNavigate={handleNavigate}
+        forceOpen={forceOpenCookieBanner}
+        onCloseForceOpen={() => setForceOpenCookieBanner(false)}
+      />
+
       {/* Official Footer */}
       <Footer
         currentLang={currentLang}
         onNavigate={handleNavigate}
+        onOpenCookiePreferences={() => setForceOpenCookieBanner(true)}
       />
     </div>
   );

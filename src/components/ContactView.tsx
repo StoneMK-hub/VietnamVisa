@@ -276,12 +276,12 @@ export const ContactView: React.FC<ContactViewProps> = ({
                 ></textarea>
               </div>
 
-              {/* Submit Button - Vibrant Orange button matching user screenshot */}
+              {/* Submit Button */}
               <div className="pt-2 flex justify-end">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-indigo-500 disabled:opacity-60"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -299,12 +299,12 @@ export const ContactView: React.FC<ContactViewProps> = ({
         {/* Right Column: Other ways to reach us & Super Urgent Banner (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Card 1: Other ways to reach us */}
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 space-y-6">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-7 space-y-6">
             <div>
-              <h3 className="text-lg font-extrabold text-slate-900">
+              <h3 className="text-xl font-extrabold text-slate-900">
                 {isVi ? 'Phương thức liên hệ khác' : 'Other ways to reach us'}
               </h3>
-              <p className="text-xs text-slate-500 font-medium mt-0.5">
+              <p className="text-sm text-slate-500 font-medium mt-1">
                 {isVi
                   ? 'Đội ngũ hỗ trợ của chúng tôi hoạt động 7 ngày trong tuần.'
                   : 'Our support team operates seven days a week.'}
@@ -312,77 +312,77 @@ export const ContactView: React.FC<ContactViewProps> = ({
             </div>
 
             {/* List of contact channels */}
-            <div className="space-y-4 text-xs divide-y divide-slate-100">
+            <div className="space-y-4 divide-y divide-slate-100">
               {/* Phone */}
-              <div className="pt-2 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-pink-50 border border-pink-200 text-pink-600 flex items-center justify-center shrink-0">
-                  <Phone className="w-4 h-4" />
+              <div className="pt-2 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-pink-50 border border-pink-200 text-pink-600 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                     PHONE / HOTLINE
                   </span>
                   <a
                     href="tel:+84832320320"
-                    className="text-sm font-black text-slate-900 hover:text-indigo-600 transition-colors block"
+                    className="text-base sm:text-lg font-black text-slate-900 hover:text-indigo-600 transition-colors block"
                   >
                     +84 832 320 320
                   </a>
-                  <span className="text-[11px] text-slate-500">Hours: 08:00 to 21:00 (GMT+7)</span>
+                  <span className="text-xs text-slate-500 font-medium">Hours: 08:00 to 21:00 (GMT+7)</span>
                 </div>
               </div>
 
               {/* WhatsApp */}
-              <div className="pt-3 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
-                  <MessageSquare className="w-4 h-4" />
+              <div className="pt-3.5 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-5 h-5" />
                 </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                     WHATSAPP
                   </span>
                   <a
                     href="https://wa.me/84832320320"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-bold text-slate-900 hover:text-emerald-600 transition-colors flex items-center gap-1"
+                    className="text-sm font-extrabold text-slate-900 hover:text-emerald-600 transition-colors flex items-center gap-1"
                   >
                     <span>Free international calls & chat</span>
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                   </a>
-                  <p className="text-[11px] text-emerald-700 font-semibold">+84 832 320 320 (WhatsApp Support)</p>
+                  <p className="text-xs sm:text-sm text-emerald-700 font-bold">+84 832 320 320 (WhatsApp Support)</p>
                 </div>
               </div>
 
               {/* Email */}
-              <div className="pt-3 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0">
-                  <Mail className="w-4 h-4" />
+              <div className="pt-3.5 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                     EMAIL
                   </span>
                   <a
                     href="mailto:support@vietnamvisa.govt.vn"
-                    className="text-xs font-bold text-slate-900 hover:text-blue-600 transition-colors"
+                    className="text-sm font-bold text-slate-900 hover:text-blue-600 transition-colors block"
                   >
                     support@vietnamvisa.govt.vn
                   </a>
-                  <p className="text-[11px] text-slate-500">Average response time: 15 minutes</p>
+                  <p className="text-xs text-slate-500 font-medium">Average response time: 15 minutes</p>
                 </div>
               </div>
 
               {/* Office Address */}
-              <div className="pt-3 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4" />
+              <div className="pt-3.5 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                     OFFICE ADDRESS
                   </span>
-                  <p className="text-xs font-bold text-slate-900 leading-snug">
+                  <p className="text-sm font-bold text-slate-900 leading-relaxed">
                     BDA Building, Lo E50, Khu 3ha, Phú Diễn, Hà Nội 100000, Vietnam
                   </p>
                 </div>
@@ -390,14 +390,14 @@ export const ContactView: React.FC<ContactViewProps> = ({
             </div>
 
             {/* Timezone Switcher Footer */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs sm:text-sm">
               <span className="text-slate-500 font-medium">
                 {isVi ? 'Múi giờ làm việc:' : 'Show hours in your time zone:'}
               </span>
               <select
                 value={selectedTimezone}
                 onChange={(e) => setSelectedTimezone(e.target.value)}
-                className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer"
+                className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer"
               >
                 <option value="Vietnam (GMT+7)">Vietnam (GMT+7)</option>
                 <option value="London (GMT+0)">London (GMT+0)</option>
@@ -410,16 +410,16 @@ export const ContactView: React.FC<ContactViewProps> = ({
           </div>
 
           {/* Card 2: Flying within 24 hours? */}
-          <div className="bg-emerald-950 text-white rounded-2xl p-6 shadow-xl space-y-4 border border-emerald-800 relative overflow-hidden">
+          <div className="bg-emerald-950 text-white rounded-2xl p-6 sm:p-7 shadow-xl space-y-4 border border-emerald-800 relative overflow-hidden">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 bg-emerald-800/80 text-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                <Clock className="w-3 h-3 text-emerald-400" />
+              <div className="inline-flex items-center gap-1.5 bg-emerald-800/80 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full">
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
                 <span>URGENT VISA SERVICE</span>
               </div>
-              <h3 className="text-xl font-black text-white">
+              <h3 className="text-xl sm:text-2xl font-black text-white">
                 {isVi ? 'Bay trong vòng 24 giờ?' : 'Flying within 24 hours?'}
               </h3>
-              <p className="text-xs text-emerald-100/80 leading-relaxed">
+              <p className="text-sm text-emerald-100/90 leading-relaxed font-medium">
                 {isVi
                   ? 'Đối với chuyến đi khẩn cấp phút chót, hãy gọi hotline cho chúng tôi để xác nhận khả năng xử lý trước khi thanh toán. Gói Super Urgent hoàn thành trong 1 đến 4 giờ làm việc.'
                   : 'For last-minute travel, call our hotline directly so we can confirm capacity before you pay. Our Super Urgent tier delivers within 1 business day.'}
@@ -429,7 +429,7 @@ export const ContactView: React.FC<ContactViewProps> = ({
             {onStartApplication && (
               <button
                 onClick={onStartApplication}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm py-3 px-5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-indigo-500"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm py-3.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-indigo-500"
               >
                 <span>{isVi ? 'Bắt đầu nộp đơn ngay →' : 'Start your application →'}</span>
               </button>

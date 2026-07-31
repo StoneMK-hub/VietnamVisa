@@ -58,7 +58,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   ];
 
   return (
-    <div className="relative bg-gradient-to-br from-amber-50/90 via-slate-50 to-indigo-50/70 text-slate-900 overflow-hidden py-10 lg:py-14 border-b border-slate-200">
+    <div className="relative bg-gradient-to-br from-amber-50/90 via-slate-50 to-indigo-50/70 text-slate-900 overflow-hidden py-6 sm:py-10 lg:py-14 border-b border-slate-200">
       {/* Trống Đồng Đông Sơn Watermark Background Image Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
         <img
@@ -81,17 +81,17 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </svg>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12 items-center">
           {/* Left Hero Content */}
-          <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+          <div className="lg:col-span-7 space-y-3.5 sm:space-y-5 text-center lg:text-left">
             {/* Service Agency Badge */}
-            <div className="inline-flex items-center gap-2 bg-amber-100/90 border border-amber-300/80 px-3.5 py-1.5 rounded-full text-amber-900 text-xs font-bold shadow-xs backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-              <span>Fast Vietnam E-Visa Agency Service • Express 24/7 Processing</span>
+            <div className="inline-flex items-center gap-1.5 bg-amber-100/90 border border-amber-300/80 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-amber-900 text-[11px] sm:text-xs font-bold shadow-xs backdrop-blur-md">
+              <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+              <span>Fast Vietnam E-Visa Agency Service • Express 24/7</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-snug sm:leading-tight">
               {t.heroTitle}
             </h1>
 
@@ -100,12 +100,12 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 pt-1">
               <a
                 href="https://vietnamvisa.govt.vn/apply-online"
                 target="_blank"
                 rel="nofollow"
-                className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
+                className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
               >
                 <span>{t.heroCtaApply}</span>
                 <ArrowRight className="w-4 h-4 text-white" />
@@ -113,7 +113,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
               <button
                 onClick={onOpenCalculator}
-                className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-slate-300 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm px-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calculator className="w-4 h-4 text-indigo-600" />
                 <span>{t.heroCtaCalculate}</span>
@@ -121,30 +121,30 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             </div>
 
             {/* Trust Badges */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-slate-200/80 text-center lg:text-left">
+            <div className="pt-4 sm:pt-6 grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/80 text-center lg:text-left">
               <div>
-                <div className="text-xl sm:text-2xl font-black text-indigo-700">{t.statIssued}</div>
-                <div className="text-[11px] text-slate-600 font-semibold">{t.statIssuedLabel}</div>
+                <div className="text-lg sm:text-2xl font-black text-indigo-700">{t.statIssued}</div>
+                <div className="text-[10px] sm:text-[11px] text-slate-600 font-semibold">{t.statIssuedLabel}</div>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-black text-emerald-700">{t.statSuccess}</div>
-                <div className="text-[11px] text-slate-600 font-semibold">{t.statSuccessLabel}</div>
+                <div className="text-lg sm:text-2xl font-black text-emerald-700">{t.statSuccess}</div>
+                <div className="text-[10px] sm:text-[11px] text-slate-600 font-semibold">{t.statSuccessLabel}</div>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-black text-blue-700">{t.statSupport}</div>
-                <div className="text-[11px] text-slate-600 font-semibold">{t.statSupportLabel}</div>
+                <div className="text-lg sm:text-2xl font-black text-blue-700">{t.statSupport}</div>
+                <div className="text-[10px] sm:text-[11px] text-slate-600 font-semibold">{t.statSupportLabel}</div>
               </div>
             </div>
           </div>
 
           {/* Right Hero Feature Card: Get a Quick Quote */}
           <div className="lg:col-span-5">
-            <div className="bg-white/95 border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl relative overflow-hidden space-y-4">
+            <div className="bg-white/95 border border-slate-200/90 rounded-xl sm:rounded-2xl p-3.5 sm:p-6 shadow-lg backdrop-blur-xl relative overflow-hidden space-y-3 sm:space-y-4">
               <div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                <h3 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                   Get a Quick Quote
                 </h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
                   We're working late so you don't have to.
                 </p>
               </div>

@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
-import { Globe, ChevronDown, CheckCircle, FileText } from 'lucide-react';
+import { 
+  Globe, 
+  ChevronDown, 
+  CheckCircle, 
+  FileText, 
+  Menu, 
+  X, 
+  LayoutDashboard, 
+  Calculator, 
+  Globe2, 
+  Search, 
+  HelpCircle, 
+  PhoneCall,
+  Sparkles,
+  ArrowRight
+} from 'lucide-react';
 import { Language } from '../types';
 import { TRANSLATIONS } from '../data/translations';
 import { Logo } from './Logo';
@@ -7,8 +22,8 @@ import { Logo } from './Logo';
 interface HeaderProps {
   currentLang: Language;
   onLanguageChange: (lang: Language) => void;
-  activeTab: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq';
-  onNavigate: (tab: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq') => void;
+  activeTab: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'overview' | 'contact';
+  onNavigate: (tab: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'overview' | 'contact') => void;
   onOpenQuickTrack?: () => void;
 }
 
@@ -16,10 +31,14 @@ export const Header: React.FC<HeaderProps> = ({
   currentLang,
   onLanguageChange,
   activeTab,
-  onNavigate
+  onNavigate,
+  onOpenQuickTrack
 }) => {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isVi = currentLang === 'vi';
 
   const languages: { code: Language; name: string; flag: string }[] = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -30,23 +49,57 @@ export const Header: React.FC<HeaderProps> = ({
     { code: 'zh', name: '中文', flag: '🇨🇳' }
   ];
 
+  // Hidden mobile menu items (only shown when user clicks Menu button)
+  const hiddenMenuItems: {
+    id: 'requirements' | 'track' | 'faq' | 'contact';
+    label: string;
+    icon: React.ReactNode;
+  }[] = [
+    {
+      id: 'requirements',
+      label: t.navRequirements,
+      icon: <Globe2 className="w-4 h-4 text-indigo-600" />
+    },
+    {
+      id: 'track',
+      label: isVi ? 'Tra Cứu Hồ Sơ' : 'Track Application',
+      icon: <Search className="w-4 h-4 text-purple-600" />
+    },
+    {
+      id: 'faq',
+      label: t.navFaq,
+      icon: <HelpCircle className="w-4 h-4 text-amber-600" />
+    },
+    {
+      id: 'contact',
+      label: t.navContact || (isVi ? 'Liên Hệ' : 'Contact Us'),
+      icon: <PhoneCall className="w-4 h-4 text-emerald-600" />
+    }
+  ];
+
+  const handleNav = (id: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'overview' | 'contact') => {
+    onNavigate(id);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="w-full shadow-sm z-40 bg-white border-b border-slate-200">
-      {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
-        {/* Logo and Brand */}
+    <header className="w-full shadow-sm z-40 bg-white border-b border-slate-200 sticky top-0">
+      {/* Main Top Header Bar */}
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Brand Logo (Text hidden on mobile, showing circular flag badge) */}
         <Logo 
-          onClick={() => onNavigate('home')}
+          onClick={() => handleNav('home')}
           size="md"
+          hideTextOnMobile={true}
         />
 
-        {/* Desktop Nav Links */}
+        {/* Desktop Navigation Links (Visible on lg+ screens) */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
           <a
             href="/overview"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('overview');
+              handleNav('overview');
             }}
             className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'overview'
@@ -54,14 +107,14 @@ export const Header: React.FC<HeaderProps> = ({
                 : 'hover:bg-slate-100 text-slate-600'
             }`}
           >
-            {currentLang === 'vi' ? 'Tổng Quan' : 'Overview'}
+            {isVi ? 'Tổng Quan' : 'Overview'}
           </a>
           
           <a
             href="/how-to-apply"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('apply');
+              handleNav('apply');
             }}
             className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'apply'
@@ -76,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
             href="/visa-fee"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('calculator');
+              handleNav('calculator');
             }}
             className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'calculator'
@@ -91,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
             href="/visa-requirements"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('requirements');
+              handleNav('requirements');
             }}
             className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'requirements'
@@ -106,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
             href="/faqs"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('faq');
+              handleNav('faq');
             }}
             className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'faq' || activeTab === 'faqs'
@@ -121,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
             href="/contact-us"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('contact');
+              handleNav('contact');
             }}
             className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'contact'
@@ -133,19 +186,32 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
         </nav>
 
+        {/* Header Right Actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Quick Track Button (Desktop / Tablet) */}
+          {onOpenQuickTrack && (
+            <button
+              onClick={onOpenQuickTrack}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition-colors whitespace-nowrap"
+            >
+              <Search className="w-3.5 h-3.5 text-indigo-600" />
+              <span>{isVi ? 'Tra Cứu Hồ Sơ' : 'Track Status'}</span>
+            </button>
+          )}
 
-        {/* Right Actions: Language + Compact CTA */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Language Selector Dropdown */}
           <div className="relative">
             <button
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs sm:text-sm font-semibold text-slate-700 transition-colors whitespace-nowrap"
+              onClick={() => {
+                setLangMenuOpen(!langMenuOpen);
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors whitespace-nowrap"
             >
-              <Globe className="w-3.5 h-3.5 text-slate-500" />
+              <Globe className="w-3.5 h-3.5 text-slate-500 hidden sm:inline" />
               <span>{languages.find(l => l.code === currentLang)?.flag}</span>
               <span className="uppercase text-xs font-bold">{currentLang}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {langMenuOpen && (
@@ -172,65 +238,96 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Compact Apply Visa Primary Button */}
+          {/* Primary Apply Visa Button */}
           <a
             href="https://vietnamvisa.govt.vn/apply-online"
             target="_blank"
             rel="nofollow"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-3.5 py-1.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-1.5 border border-indigo-500 whitespace-nowrap shrink-0"
+            className="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5 border border-indigo-500 whitespace-nowrap shrink-0"
           >
-            <FileText className="w-3.5 h-3.5 text-white" />
-            <span>{t.heroCtaApply}</span>
+            <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+            <span>{isVi ? 'Nộp E-Visa' : 'Apply Online'}</span>
           </a>
         </div>
       </div>
 
-      {/* Mobile Nav Subbar */}
-      <div className="lg:hidden bg-slate-50 border-t border-slate-200 px-4 py-2.5 flex items-center justify-around text-sm font-semibold text-slate-700 overflow-x-auto">
-        <a 
-          href="/overview"
-          onClick={(e) => { e.preventDefault(); onNavigate('overview'); }} 
-          className={`py-1 px-2 rounded ${activeTab === 'overview' ? 'text-indigo-700 font-bold' : ''}`}
+      {/* Mobile Subbar Navigation (< lg) */}
+      <div className="lg:hidden bg-slate-50/90 border-t border-slate-200 px-2 py-1.5 flex items-center justify-between gap-1 text-xs font-bold text-slate-700">
+        {/* Primary 3 Mobile Menu Links */}
+        <div className="grid grid-cols-3 gap-1 flex-1 min-w-0">
+          <a 
+            href="/overview"
+            onClick={(e) => { e.preventDefault(); handleNav('overview'); }} 
+            className={`py-1 px-1 sm:px-2 rounded-lg transition-all text-center whitespace-nowrap text-xs ${activeTab === 'overview' ? 'bg-indigo-600 text-white font-extrabold shadow-2xs' : 'text-slate-700 hover:bg-slate-200/70'}`}
+          >
+            {isVi ? 'Tổng Quan' : 'Overview'}
+          </a>
+          <a 
+            href="/how-to-apply"
+            onClick={(e) => { e.preventDefault(); handleNav('apply'); }} 
+            className={`py-1 px-1 sm:px-2 rounded-lg transition-all text-center whitespace-nowrap text-xs ${activeTab === 'apply' ? 'bg-indigo-600 text-white font-extrabold shadow-2xs' : 'text-slate-700 hover:bg-slate-200/70'}`}
+          >
+            {isVi ? 'Xin Visa' : 'Apply'}
+          </a>
+          <a 
+            href="/visa-fee"
+            onClick={(e) => { e.preventDefault(); handleNav('calculator'); }} 
+            className={`py-1 px-1 sm:px-2 rounded-lg transition-all text-center whitespace-nowrap text-xs ${activeTab === 'calculator' ? 'bg-indigo-600 text-white font-extrabold shadow-2xs' : 'text-slate-700 hover:bg-slate-200/70'}`}
+          >
+            {isVi ? 'Bảng Phí' : 'Fees'}
+          </a>
+        </div>
+
+        {/* 3-Bars Hamburger Button for Hidden Menu Items */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className={`py-1 px-2 rounded-lg shrink-0 transition-all text-center flex items-center gap-1 border text-xs ${
+            mobileMenuOpen 
+              ? 'bg-indigo-600 border-indigo-600 text-white font-extrabold' 
+              : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-100 font-bold'
+          }`}
+          aria-label="Toggle Hidden Menu"
         >
-          {currentLang === 'vi' ? 'Tổng Quan' : 'Overview'}
-        </a>
-        <a 
-          href="/how-to-apply"
-          onClick={(e) => { e.preventDefault(); onNavigate('apply'); }} 
-          className={`py-1 px-2 rounded ${activeTab === 'apply' ? 'text-indigo-700 font-bold' : ''}`}
-        >
-          {t.navApply}
-        </a>
-        <a 
-          href="/visa-fee"
-          onClick={(e) => { e.preventDefault(); onNavigate('calculator'); }} 
-          className={`py-1 px-2 rounded ${activeTab === 'calculator' ? 'text-indigo-700 font-bold' : ''}`}
-        >
-          {t.navCalculator}
-        </a>
-        <a 
-          href="/visa-requirements"
-          onClick={(e) => { e.preventDefault(); onNavigate('requirements'); }} 
-          className={`py-1 px-2 rounded ${activeTab === 'requirements' ? 'text-indigo-700 font-bold' : ''}`}
-        >
-          {t.navRequirements}
-        </a>
-        <a 
-          href="/faqs"
-          onClick={(e) => { e.preventDefault(); onNavigate('faq'); }} 
-          className={`py-1 px-2 rounded ${activeTab === 'faq' || activeTab === 'faqs' ? 'text-indigo-700 font-bold' : ''}`}
-        >
-          {t.navFaq}
-        </a>
-        <a 
-          href="/contact-us"
-          onClick={(e) => { e.preventDefault(); onNavigate('contact'); }} 
-          className={`py-1 px-2 rounded ${activeTab === 'contact' ? 'text-indigo-700 font-bold' : ''}`}
-        >
-          {t.navContact || 'Contact'}
-        </a>
+          {mobileMenuOpen ? (
+            <X className="w-3.5 h-3.5 shrink-0" />
+          ) : (
+            <Menu className="w-3.5 h-3.5 shrink-0 text-slate-700" />
+          )}
+          <span className="text-[11px] font-black uppercase tracking-tight">Menu</span>
+        </button>
       </div>
 
+      {/* Simple Clean Mobile Dropdown Menu for Hidden Items */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-slate-200 bg-white shadow-xl animate-in fade-in slide-in-from-top-1 z-50">
+          <div className="p-2 space-y-1">
+            {hiddenMenuItems.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNav(item.id)}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center justify-between text-xs font-bold border ${
+                    isActive
+                      ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-extrabold'
+                      : 'bg-slate-50/70 border-slate-200/80 text-slate-800 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </div>
+                  {isActive ? (
+                    <CheckCircle className="w-4 h-4 text-indigo-600 shrink-0" />
+                  ) : (
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

@@ -58,57 +58,57 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
   };
 
   return (
-    <div id="visa-fee" className="max-w-7xl mx-auto py-8 sm:py-12 space-y-10 font-sans">
-      {/* 1. PAGE HEADER & SAPO - PRIMARILY ENGLISH */}
-      <article className="space-y-3 text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold px-4 py-1.5 rounded-full shadow-2xs">
+    <div id="visa-fee" className="max-w-6xl mx-auto py-6 sm:py-10 space-y-8 font-sans">
+      {/* 1. PAGE HEADER & SAPO */}
+      <article className="space-y-2.5 text-center max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold px-3.5 py-1 rounded-full shadow-2xs">
           <Calculator className="w-3.5 h-3.5 text-indigo-600" />
           <span>
             {isVi ? 'BẢNG GIÁ NIÊM YẾT E-VISA VIỆT NAM 2026' : 'TRANSPARENT VIETNAM E-VISA FEE SCHEDULE 2026'}
           </span>
         </div>
 
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
           {isVi
             ? 'Công Cụ Tính Phí & Bảng Lệ Phí E-Visa Việt Nam Trọn Gói'
             : 'Vietnam E-Visa Fee Calculator & Official Pricing Schedule'}
         </h1>
 
-        <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed text-center bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-2xs">
+        <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed text-center bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 sm:p-4 shadow-2xs">
           {isVi
             ? 'Tra cứu và tính toán chính xác tổng chi phí cấp Thị thực điện tử (E-Visa) Việt Nam. Bảng giá minh bạch đã bao gồm phí đóng dấu Chính phủ và phí dịch vụ thẩm định hồ sơ.'
             : 'Calculate the total cost for your Vietnam Electronic Visa (E-Visa). Our transparent breakdown includes government stamping fees and application processing with zero hidden charges.'}
         </p>
       </article>
 
-      {/* 2. COMPACT INTERACTIVE FEE CALCULATOR BOX WITH DROPDOWNS */}
-      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      {/* 2. COMPACT INTERACTIVE FEE CALCULATOR BOX */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7 space-y-5">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div>
-            <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs sm:text-sm uppercase tracking-wider mb-0.5">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
+            <div className="flex items-center gap-1.5 text-indigo-700 font-bold text-xs uppercase tracking-wider mb-0.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>{isVi ? 'Tính Phí Nhanh Trực Tuyến' : 'Live Fee Estimator'}</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {isVi ? 'Chọn Thông Tin Chuyến Đi Của Bạn' : 'Select Visa Options'}
             </h2>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* Controls Form - Sleek & Compact Dropdowns (7 Cols) */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="lg:col-span-7 space-y-3.5">
             {/* Number of Applicants Dropdown */}
             <div className="space-y-1">
-              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                <Users className="w-4 h-4 text-indigo-600" />
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-indigo-600" />
                 <span>{isVi ? 'Số lượng khách' : 'Applicants Count'}</span>
               </label>
               <div className="relative">
                 <select
                   value={applicantCount}
                   onChange={(e) => setApplicantCount(parseInt(e.target.value))}
-                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm sm:text-base font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                  className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pr-10 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                     <option key={num} value={num}>
@@ -116,21 +116,21 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
             {/* Visa Type Dropdown */}
             <div className="space-y-1">
-              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                <FileText className="w-4 h-4 text-indigo-600" />
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                <FileText className="w-3.5 h-3.5 text-indigo-600" />
                 <span>{isVi ? 'Loại thị thực (Visa Type & Duration)' : 'Visa Type & Duration'}</span>
               </label>
               <div className="relative">
                 <select
                   value={selectedVisaType}
                   onChange={(e) => setSelectedVisaType(e.target.value as VisaType)}
-                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm sm:text-base font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                  className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pr-10 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
                 >
                   <option value="tourist_30_single">1-month single (30 days - Single entry) — $54 / pax</option>
                   <option value="tourist_30_multi">1-month multiple (30 days - Multiple entry) — $84 / pax</option>
@@ -139,36 +139,36 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                   <option value="business_30_single">1-month business single (30 days) — $54 / pax</option>
                   <option value="business_90_multi">3-month business multiple (90 days) — $104 / pax</option>
                 </select>
-                <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
             {/* Processing Speed Dropdown */}
             <div className="space-y-1">
-              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                <Clock className="w-4 h-4 text-indigo-600" />
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-indigo-600" />
                 <span>{isVi ? 'Tốc độ xử lý (Processing Speed)' : 'Processing Speed Tier'}</span>
               </label>
               <div className="relative">
                 <select
                   value={selectedSpeed}
                   onChange={(e) => setSelectedSpeed(e.target.value as ProcessingTime)}
-                  className="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 pr-10 text-sm sm:text-base font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                  className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pr-10 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
                 >
                   <option value="standard">Normal (5 to 10 business days) — Included ($0)</option>
                   <option value="urgent_24h">Urgent (2 business days) — +$45 / pax</option>
                   <option value="emergency_4h">Super Urgent (1 business day) — +$85 / pax</option>
                 </select>
-                <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
             {/* Compact Add-ons Selection */}
             <div className="space-y-2 pt-2 border-t border-slate-100">
-              <label className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                 {isVi ? 'Dịch Vụ Bổ Sung Sân Bay (Tùy Chọn)' : 'Optional Airport Add-Ons'}
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {(['travel_insurance', 'fast_track', 'car_pickup'] as ExtraService[]).map((srvKey) => {
                   const srv = EXTRA_SERVICES_PRICING[srvKey];
                   const isChecked = selectedServices.includes(srvKey);
@@ -176,21 +176,21 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                     <label
                       key={srvKey}
                       onClick={() => toggleService(srvKey)}
-                      className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs sm:text-sm cursor-pointer transition-all ${
+                      className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
                         isChecked
-                          ? 'bg-emerald-50/90 border-emerald-500 text-emerald-950 font-bold shadow-2xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                          ? 'bg-emerald-50/90 border-emerald-500 text-emerald-950 font-bold'
+                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/80'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => {}}
-                        className="accent-emerald-600 w-4 h-4 rounded cursor-pointer shrink-0"
+                        className="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer shrink-0"
                       />
                       <div className="flex-1 truncate">
-                        <div className="truncate font-semibold text-xs sm:text-sm">{srv.labelEn}</div>
-                        <div className="text-xs text-emerald-700 font-extrabold">+${srv.feePerApplicantUsd}/pax</div>
+                        <div className="truncate font-semibold text-xs">{srv.labelEn}</div>
+                        <div className="text-[11px] text-emerald-700 font-extrabold">+${srv.feePerApplicantUsd}/pax</div>
                       </div>
                     </label>
                   );
@@ -200,16 +200,16 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           </div>
 
           {/* Results Summary Box - Clear Light Breakdown (5 Cols) */}
-          <div className="lg:col-span-5 bg-slate-50/90 text-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
-            <div className="space-y-3.5">
-              <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
-                <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-indigo-700">
-                  {isVi ? 'Bảng Chi Tiết Giá' : 'Fee Calculation Breakdown'}
+          <div className="lg:col-span-5 bg-slate-50 text-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
+                  {isVi ? 'Bảng Chi Tiết Giá' : 'Fee Breakdown'}
                 </span>
-                <span className="text-xs sm:text-sm text-slate-500 font-semibold">{applicantCount} Pax</span>
+                <span className="text-xs text-slate-500 font-semibold">{applicantCount} Pax</span>
               </div>
 
-              <div className="space-y-3 text-sm sm:text-base">
+              <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600">
                     {isVi ? 'Phí Visa Cơ Bản' : 'Base Visa Fee'} (${pricing.govFeePerPerson + pricing.serviceFeePerPerson} x {applicantCount}):
@@ -239,28 +239,28 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                 )}
               </div>
 
-              <div className="pt-3.5 border-t border-slate-200 space-y-1">
-                <div className="text-xs text-slate-500 uppercase tracking-wider font-bold">
+              <div className="pt-3 border-t border-slate-200 space-y-0.5">
+                <div className="text-[11px] text-slate-500 uppercase tracking-wider font-bold">
                   {isVi ? 'TỔNG CỘNG TRỌN GÓI' : 'GRAND TOTAL'}
                 </div>
-                <div className="text-3xl sm:text-4xl font-black text-indigo-700">
-                  ${pricing.grandTotalUsd} <span className="text-sm font-normal text-slate-500">USD</span>
+                <div className="text-2xl sm:text-3xl font-black text-indigo-700">
+                  ${pricing.grandTotalUsd} <span className="text-xs font-normal text-slate-500">USD</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2 pt-1">
               <a
                 href="https://vietnamvisa.govt.vn/apply-online"
                 target="_blank"
                 rel="nofollow"
-                className="w-full bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-extrabold text-sm sm:text-base py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 border border-orange-500 cursor-pointer"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
               >
                 <span>{isVi ? 'Bắt Đầu Nộp Đơn Ngay →' : 'Apply Online Now →'}</span>
               </a>
 
-              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>{isVi ? 'Không phụ phí ẩn • Cam kết hoàn 100%' : '100% Transparent Fee Guarantee'}</span>
               </div>
             </div>
@@ -268,13 +268,13 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         </div>
       </div>
 
-      {/* 3. OFFICIAL PRICING TABLES MATCHING EXACT USER IMAGES */}
-      <section className="space-y-8 bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8">
-        <div className="border-b border-slate-200 pb-3">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+      {/* 3. OFFICIAL PRICING TABLES */}
+      <section className="space-y-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
+        <div className="border-b border-slate-100 pb-2.5">
+          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
             {isVi ? 'Bảng Giá Niêm Yết Chi Tiết' : 'Visa Fee Schedules'}
           </h2>
-          <p className="text-xs text-slate-500 font-medium mt-1">
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
             {isVi
               ? 'Chi tiết bảng lệ phí e-Visa theo loại thị thực, tốc độ xử lý và các dịch vụ bổ sung tùy chọn.'
               : 'Refer to our itemized rates for visa types, processing speeds, and optional airport services.'}
@@ -282,46 +282,46 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         </div>
 
         {/* TABLE 1: VISA TYPE */}
-        <div className="space-y-2.5">
-          <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-            <FileText className="w-4.5 h-4.5 text-indigo-600" />
+        <div className="space-y-2">
+          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <FileText className="w-4 h-4 text-indigo-600" />
             <span>1. VISA TYPE & DURATION</span>
           </h3>
 
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
-            <table className="w-full text-left text-sm sm:text-base border-collapse">
+          <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-xs sm:text-sm">
-                  <th className="py-3 px-4 sm:px-6">VISA TYPE</th>
-                  <th className="py-3 px-4 sm:px-6">DURATION</th>
-                  <th className="py-3 px-4 sm:px-6">ENTRIES</th>
-                  <th className="py-3 px-4 sm:px-6 text-right">PER APPLICANT</th>
+                <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px] sm:text-xs">
+                  <th className="py-2.5 px-4">VISA TYPE</th>
+                  <th className="py-2.5 px-4">DURATION</th>
+                  <th className="py-2.5 px-4">ENTRIES</th>
+                  <th className="py-2.5 px-4 text-right">PER APPLICANT</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">1-month single</td>
-                  <td className="py-3.5 px-4 sm:px-6">30 days</td>
-                  <td className="py-3.5 px-4 sm:px-6">Single entry</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$54</td>
+              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">1-month single</td>
+                  <td className="py-2.5 px-4">30 days</td>
+                  <td className="py-2.5 px-4">Single entry</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$54</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">1-month multiple</td>
-                  <td className="py-3.5 px-4 sm:px-6">30 days</td>
-                  <td className="py-3.5 px-4 sm:px-6">Multiple entry</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$84</td>
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">1-month multiple</td>
+                  <td className="py-2.5 px-4">30 days</td>
+                  <td className="py-2.5 px-4">Multiple entry</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$84</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">3-month single</td>
-                  <td className="py-3.5 px-4 sm:px-6">90 days</td>
-                  <td className="py-3.5 px-4 sm:px-6">Single entry</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$94</td>
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">3-month single</td>
+                  <td className="py-2.5 px-4">90 days</td>
+                  <td className="py-2.5 px-4">Single entry</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$94</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">3-month multiple</td>
-                  <td className="py-3.5 px-4 sm:px-6">90 days</td>
-                  <td className="py-3.5 px-4 sm:px-6">Multiple entry</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800 text-sm sm:text-base">$104</td>
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">3-month multiple</td>
+                  <td className="py-2.5 px-4">90 days</td>
+                  <td className="py-2.5 px-4">Multiple entry</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$104</td>
                 </tr>
               </tbody>
             </table>
@@ -329,41 +329,41 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         </div>
 
         {/* TABLE 2: PROCESSING SPEED */}
-        <div className="space-y-2.5 pt-2">
+        <div className="space-y-2 pt-1">
           <div className="space-y-0.5">
-            <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-              <Clock className="w-4.5 h-4.5 text-indigo-600" />
+            <h3 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-600" />
               <span>2. PROCESSING SPEED</span>
             </h3>
-            <p className="text-sm text-slate-600 leading-relaxed font-normal">
-              Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration, typically within 2 business hours of payment.
+            <p className="text-xs text-slate-500 font-medium">
+              Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration.
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
-            <table className="w-full text-left text-sm sm:text-base border-collapse">
+          <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-xs sm:text-sm">
-                  <th className="py-3 px-4 sm:px-6">TIER</th>
-                  <th className="py-3 px-4 sm:px-6">DELIVERY</th>
-                  <th className="py-3 px-4 sm:px-6 text-right">SURCHARGE</th>
+                <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px] sm:text-xs">
+                  <th className="py-2.5 px-4">TIER</th>
+                  <th className="py-2.5 px-4">DELIVERY</th>
+                  <th className="py-2.5 px-4 text-right">SURCHARGE</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Normal</td>
-                  <td className="py-3.5 px-4 sm:px-6">5 to 10 business days</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">Included</td>
+              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">Normal</td>
+                  <td className="py-2.5 px-4">5 to 10 business days</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">Included</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Urgent</td>
-                  <td className="py-3.5 px-4 sm:px-6">2 business days</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">+$45 per applicant</td>
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">Urgent</td>
+                  <td className="py-2.5 px-4">2 business days</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">+$45 per applicant</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Super Urgent</td>
-                  <td className="py-3.5 px-4 sm:px-6">1 business day</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">+$85 per applicant</td>
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">Super Urgent</td>
+                  <td className="py-2.5 px-4">1 business day</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">+$85 per applicant</td>
                 </tr>
               </tbody>
             </table>
@@ -371,44 +371,44 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         </div>
 
         {/* TABLE 3: OPTIONAL ADD-ONS */}
-        <div className="space-y-2.5 pt-2">
+        <div className="space-y-2 pt-1">
           <div className="space-y-0.5">
-            <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-              <Zap className="w-4.5 h-4.5 text-indigo-600" />
+            <h3 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              <Zap className="w-4 h-4 text-indigo-600" />
               <span>3. OPTIONAL ADD-ONS</span>
             </h3>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
-            <table className="w-full text-left text-sm sm:text-base border-collapse">
+          <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-900 border-b border-slate-200 font-extrabold uppercase tracking-wider text-xs sm:text-sm">
-                  <th className="py-3 px-4 sm:px-6 min-w-[140px]">ADD-ON</th>
-                  <th className="py-3 px-4 sm:px-6">WHAT YOU GET</th>
-                  <th className="py-3 px-4 sm:px-6 text-right min-w-[130px]">PRICE</th>
+                <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px] sm:text-xs">
+                  <th className="py-2.5 px-4 min-w-[130px]">ADD-ON</th>
+                  <th className="py-2.5 px-4">WHAT YOU GET</th>
+                  <th className="py-2.5 px-4 text-right min-w-[120px]">PRICE</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Travel Insurance</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-600">
-                    Coverage for unexpected medical events (including Covid-19) and baggage issues, up to $10,000
+              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">Travel Insurance</td>
+                  <td className="py-2.5 px-4 text-slate-600">
+                    Medical & baggage issues coverage up to $10,000
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">$30 per applicant</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$30 / applicant</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Airport Fast-Track</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-600">
-                    Priority immigration lane on arrival, typically saves 30 to 60 minutes, and up to 2 hours during peak season and holidays
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">Airport Fast-Track</td>
+                  <td className="py-2.5 px-4 text-slate-600">
+                    Priority VIP immigration lane, saves 30–60+ mins
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">$35 per applicant</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$35 / applicant</td>
                 </tr>
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">Car Pickup</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-600">
-                    Meet & greet at the arrival hall, private transfer to your hotel
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-slate-900">Car Pickup</td>
+                  <td className="py-2.5 px-4 text-slate-600">
+                    Private airport transfer directly to your hotel
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-right font-black text-emerald-800">$35 per applicant</td>
+                  <td className="py-2.5 px-4 text-right font-extrabold text-emerald-700">$35 / applicant</td>
                 </tr>
               </tbody>
             </table>
@@ -416,27 +416,23 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         </div>
       </section>
 
-      {/* 4. LONG SEO CONTENT SECTION IN ENGLISH WITH COLLAPSIBLE READ MORE FOR MOBILE & DESKTOP */}
-      <section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-5 relative overflow-hidden">
-        <div className="border-b border-slate-100 pb-3">
-          <div className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-            <Info className="w-4 h-4 text-indigo-600" />
-            <span>SEO VISA FEE GUIDE & POLICIES</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+      {/* 4. GUIDANCE & POLICIES SECTION */}
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7 space-y-4 relative overflow-hidden">
+        <div className="border-b border-slate-100 pb-2.5">
+          <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
             {isVi ? 'Hướng Dẫn Chi Tiết Chi Phí & Quy Định Thị Thực Việt Nam 2026' : 'Comprehensive Guide to Vietnam E-Visa Fees & Payment Policies'}
           </h2>
         </div>
 
-        {/* Collapsible Article Body in English */}
+        {/* Collapsible Article Body */}
         <div
-          className={`relative transition-all duration-500 overflow-hidden text-sm sm:text-base text-slate-700 leading-relaxed space-y-5 ${
-            !isSeoExpanded ? 'max-h-[320px] sm:max-h-[400px]' : 'max-h-[5000px]'
+          className={`relative transition-all duration-500 overflow-hidden text-xs sm:text-sm text-slate-700 leading-relaxed space-y-4 ${
+            !isSeoExpanded ? 'max-h-[260px] sm:max-h-[300px]' : 'max-h-[5000px]'
           }`}
         >
           {/* Article Section 1 */}
-          <div className="space-y-1.5">
-            <h3 className="text-sm font-extrabold text-slate-900">
+          <div className="space-y-1">
+            <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
               1. What Do Vietnam E-Visa Fees Cover?
             </h3>
             <p className="text-slate-600 text-justify">
@@ -453,14 +449,14 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           </div>
 
           {/* Article Section 2 */}
-          <div className="space-y-1.5">
-            <h3 className="text-sm font-extrabold text-slate-900">
+          <div className="space-y-1">
+            <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
               2. Processing Speed Comparison: Normal vs Urgent Tiers
             </h3>
             <p className="text-slate-600 text-justify">
               Processing timelines depend directly on your scheduled departure date. For travelers with flexible travel itineraries, the <strong>Normal (5 to 10 business days)</strong> tier delivers maximum savings. However, if you have immediate flight arrangements or weekend emergencies, urgent tiers guarantee expedited issuance:
             </p>
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1.5 text-xs">
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 text-xs">
               <p>
                 <strong>Urgent (2 business days):</strong> Recommended for travelers requiring approved visa PDFs within 48 hours. Surcharge: +$45 per applicant.
               </p>
@@ -471,8 +467,8 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           </div>
 
           {/* Article Section 3 */}
-          <div className="space-y-1.5">
-            <h3 className="text-sm font-extrabold text-slate-900">
+          <div className="space-y-1">
+            <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
               3. Benefits of Airport Fast-Track Concierge Services
             </h3>
             <p className="text-slate-600 text-justify">
@@ -481,8 +477,8 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           </div>
 
           {/* Article Section 4 */}
-          <div className="space-y-1.5">
-            <h3 className="text-sm font-extrabold text-slate-900">
+          <div className="space-y-1">
+            <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
               4. 100% Money-Back Approval Guarantee & SSL Payment Security
             </h3>
             <p className="text-slate-600 text-justify">
@@ -492,16 +488,16 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
 
           {/* Bottom Fade Gradient Mask when collapsed */}
           {!isSeoExpanded && (
-            <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" />
           )}
         </div>
 
-        {/* Expand / Collapse Button for Mobile & Desktop */}
+        {/* Expand / Collapse Button */}
         <div className="pt-1 text-center">
           <button
             type="button"
             onClick={() => setIsSeoExpanded(!isSeoExpanded)}
-            className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-xs px-5 py-2.5 rounded-xl border border-slate-300 transition-all cursor-pointer shadow-2xs"
+            className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-xl border border-slate-300/80 transition-all cursor-pointer shadow-2xs"
           >
             <span>
               {isSeoExpanded
@@ -510,7 +506,7 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                   : 'Show Less ▲'
                 : isVi
                 ? 'Xem thêm nội dung hướng dẫn chi tiết ▼'
-                : 'Read Full SEO Guide & Details ▼'}
+                : 'Read Full Guide & Details ▼'}
             </span>
             {isSeoExpanded ? (
               <ChevronUp className="w-3.5 h-3.5 text-slate-600" />

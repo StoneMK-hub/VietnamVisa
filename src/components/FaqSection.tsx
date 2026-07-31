@@ -45,19 +45,19 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ currentLang }) => {
   ];
 
   return (
-    <div className="w-full space-y-8">
-      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 lg:p-10 space-y-6">
-        <div className="text-center max-w-xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-200">
-            <HelpCircle className="w-3.5 h-3.5 text-indigo-600" />
+    <div className="w-full space-y-4 sm:space-y-8">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 p-3.5 sm:p-8 lg:p-10 space-y-4 sm:space-y-6">
+        <div className="text-center max-w-xl mx-auto space-y-1.5 sm:space-y-2">
+          <div className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-[11px] sm:text-xs font-bold px-3 py-1 rounded-full border border-indigo-200">
+            <HelpCircle className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
             <span>24/7 Support Center</span>
           </div>
-          <h2 className="text-2xl font-extrabold text-slate-900">{t.navFaq}</h2>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">{t.navFaq}</h2>
           <p className="text-xs sm:text-sm text-slate-500">Find answers to common questions about Vietnam visa processing.</p>
         </div>
 
         {/* Accordion List */}
-        <div className="space-y-3 pt-2">
+        <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
 
@@ -69,18 +69,18 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ currentLang }) => {
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full text-left p-4 sm:p-5 bg-slate-50 hover:bg-slate-100 font-bold text-sm sm:text-base text-slate-900 flex items-center justify-between gap-4 transition-colors"
+                  className="w-full text-left p-3.5 sm:p-5 bg-slate-50 hover:bg-slate-100 font-bold text-xs sm:text-base text-slate-900 flex items-center justify-between gap-3 transition-colors"
                 >
-                  <span>{currentLang === 'vi' ? faq.qVi : faq.qEn}</span>
+                  <span className="leading-snug">{currentLang === 'vi' ? faq.qVi : faq.qEn}</span>
                   {isOpen ? (
-                    <ChevronUp className="w-4.5 h-4.5 text-indigo-600 shrink-0" />
+                    <ChevronUp className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-indigo-600 shrink-0" />
                   ) : (
-                    <ChevronDown className="w-4.5 h-4.5 text-slate-400 shrink-0" />
+                    <ChevronDown className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-400 shrink-0" />
                   )}
                 </button>
 
                 {isOpen && (
-                  <div className="p-4 sm:p-5 bg-white text-sm sm:text-base text-slate-700 leading-relaxed border-t border-slate-200">
+                  <div className="p-3.5 sm:p-5 bg-white text-xs sm:text-base text-slate-700 leading-relaxed border-t border-slate-200">
                     {currentLang === 'vi' ? faq.aVi : faq.aEn}
                   </div>
                 )}

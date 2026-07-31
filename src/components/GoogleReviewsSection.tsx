@@ -81,13 +81,13 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
   const isVi = currentLang === 'vi';
 
   return (
-    <section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 lg:p-10 space-y-8">
+    <section className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 p-3.5 sm:p-8 lg:p-10 space-y-4 sm:space-y-8">
       {/* Header Container */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100">
-        <div className="space-y-2">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 pb-4 sm:pb-6 border-b border-slate-100">
+        <div className="space-y-1.5 sm:space-y-2">
           {/* Google Brand Badge */}
-          <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-800 px-3.5 py-1.5 rounded-full text-xs font-bold">
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+          <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-800 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold">
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
@@ -108,7 +108,7 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
             <span>Google Reviews • Verified Business</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {isVi ? 'Đánh Giá Từ Khách Hàng Trên Google Maps' : 'Customer Reviews on Google Maps'}
           </h2>
 
@@ -120,17 +120,17 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
         </div>
 
         {/* Overall Rating Box + Direct Google Link Button */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 shrink-0">
-          <div className="text-center sm:text-left space-y-1">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 shrink-0">
+          <div className="text-center sm:text-left space-y-0.5">
             <div className="flex items-center justify-center sm:justify-start gap-2">
-              <span className="text-3xl font-black text-slate-900">4.9</span>
+              <span className="text-2xl sm:text-3xl font-black text-slate-900">4.9</span>
               <div className="flex items-center gap-0.5 text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-amber-400" />
+                  <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400" />
                 ))}
               </div>
             </div>
-            <p className="text-xs text-slate-500 font-semibold">
+            <p className="text-[11px] sm:text-xs text-slate-500 font-semibold">
               {isVi ? 'Dựa trên 520+ đánh giá 4* & 5*' : 'Based on 520+ verified 4* & 5* reviews'}
             </p>
           </div>
@@ -139,7 +139,7 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
             href={GOOGLE_MAPS_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-center shrink-0"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs px-4 py-2.5 sm:py-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 text-center shrink-0"
           >
             <span>{isVi ? 'Xem Trên Google Maps' : 'View on Google Maps'}</span>
             <ExternalLink className="w-3.5 h-3.5 text-indigo-200" />
@@ -148,8 +148,8 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
       </div>
 
       {/* 4* & 5* Star Filter Ribbon */}
-      <div className="flex items-center justify-between text-xs font-semibold text-slate-600 bg-amber-50/80 border border-amber-200/80 rounded-xl px-4 py-2.5">
-        <div className="flex items-center gap-2 text-amber-900 font-bold">
+      <div className="flex items-center justify-between text-xs font-semibold text-slate-600 bg-amber-50/80 border border-amber-200/80 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5">
+        <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
           <Award className="w-4 h-4 text-amber-600 shrink-0" />
           <span>
             {isVi
@@ -163,32 +163,32 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
       </div>
 
       {/* Reviews Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
         {REVIEWS_DATA.map((review) => (
           <div
             key={review.id}
-            className="bg-slate-50/80 hover:bg-slate-50 rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+            className="bg-slate-50/80 hover:bg-slate-50 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
           >
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {/* User Header */}
               <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-bold text-sm flex items-center justify-center shadow-sm shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center shadow-xs shrink-0">
                     {review.name.charAt(0)}
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
                       <h4 className="text-xs font-extrabold text-slate-900">{review.name}</h4>
-                      <span className="text-sm">{review.flag}</span>
+                      <span className="text-xs sm:text-sm">{review.flag}</span>
                     </div>
-                    <span className="text-[11px] text-slate-500 block">{review.country}</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-500 block">{review.country}</span>
                   </div>
                 </div>
 
                 {/* Rating Stars */}
                 <div className="flex items-center gap-0.5 text-amber-400 shrink-0">
                   {[...Array(review.rating)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                    <Star key={i} className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400" />
                   ))}
                 </div>
               </div>
@@ -205,10 +205,10 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
             </div>
 
             {/* Footer of Review Card */}
-            <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <div className="pt-2 sm:pt-3 border-t border-slate-200/60 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-medium">
               <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Verified Google Review</span>
+                <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500" />
+                <span>Verified Review</span>
               </span>
               <span>{review.date}</span>
             </div>

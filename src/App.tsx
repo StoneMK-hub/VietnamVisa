@@ -120,7 +120,7 @@ export default function App() {
       <main className="flex-1">
         {/* Certificate View Override */}
         {viewingCertificate && createdApplication ? (
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
+          <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
             <VisaApprovalCertificate
               currentLang={currentLang}
               application={createdApplication}
@@ -132,7 +132,7 @@ export default function App() {
           <>
             {/* HOME VIEW (Path: /) */}
             {activeTab === 'home' && (
-              <div className="space-y-12 pb-16">
+              <div className="space-y-5 sm:space-y-10 pb-8 sm:pb-16">
                 <HeroBanner
                   currentLang={currentLang}
                   onStartApplication={() => handleNavigate('apply')}
@@ -141,7 +141,7 @@ export default function App() {
                   onApplyWithOptions={handleApplyWithOptions}
                 />
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
                   <SeoContentSection
                     currentLang={currentLang}
                     onStartApplication={() => handleNavigate('apply')}
@@ -150,7 +150,7 @@ export default function App() {
                   />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
                   <RequirementsChecker
                     currentLang={currentLang}
                     isHome={true}
@@ -164,11 +164,11 @@ export default function App() {
                   />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
                   <GoogleReviewsSection currentLang={currentLang} />
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
                   <FaqSection currentLang={currentLang} />
                 </div>
               </div>
@@ -186,7 +186,7 @@ export default function App() {
 
             {/* CALCULATOR TAB (Path: /visa-fee) */}
             {activeTab === 'calculator' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
+              <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
                 <QuickFeeCalculator
                   currentLang={currentLang}
                   onApplyWithOptions={handleApplyWithOptions}
@@ -196,7 +196,7 @@ export default function App() {
 
             {/* REQUIREMENTS TAB (Path: /visa-requirements) */}
             {activeTab === 'requirements' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
+              <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
                 <RequirementsChecker
                   currentLang={currentLang}
                   onApplyForCountry={(cName) => {
@@ -211,7 +211,7 @@ export default function App() {
 
             {/* TRACKING TAB (Path: /track-application) */}
             {activeTab === 'track' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
+              <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
                 <StatusTrackerView
                   currentLang={currentLang}
                   onViewCertificate={(app) => {
@@ -224,7 +224,7 @@ export default function App() {
 
             {/* FAQ TAB (Path: /faqs) */}
             {activeTab === 'faqs' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
+              <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
                 <FaqSection currentLang={currentLang} />
               </div>
             )}

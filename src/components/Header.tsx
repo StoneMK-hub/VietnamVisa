@@ -194,16 +194,16 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Language Selector Dropdown */}
-          <div className="relative">
+          {/* Language Selector Dropdown (Hidden on mobile < lg) */}
+          <div className="relative hidden lg:block">
             <button
               onClick={() => {
                 setLangMenuOpen(!langMenuOpen);
                 setMobileMenuOpen(false);
               }}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors whitespace-nowrap cursor-pointer"
             >
-              <Globe className="w-3.5 h-3.5 text-slate-500 hidden sm:inline" />
+              <Globe className="w-3.5 h-3.5 text-slate-500" />
               <span>{languages.find(l => l.code === currentLang)?.flag}</span>
               <span className="uppercase text-xs font-bold">{currentLang}</span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -233,93 +233,138 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Primary Apply Visa Button */}
+          {/* Primary Apply Visa Button (Desktop only on lg+) */}
           <a
             href="https://vietnamvisa.govt.vn/apply-online"
             target="_blank"
             rel="nofollow"
-            className="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5 border border-indigo-500 whitespace-nowrap shrink-0"
+            className="hidden lg:flex bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-sm px-4 py-2 rounded-xl shadow-sm hover:shadow transition-all items-center gap-1.5 border border-indigo-500 whitespace-nowrap shrink-0"
           >
-            <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+            <FileText className="w-4 h-4 text-white" />
             <span>{isVi ? 'Nộp E-Visa' : 'Apply Online'}</span>
           </a>
+
+          {/* Mobile Menu Toggle Button (Replaces Apply Online & Language on mobile top right) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={`lg:hidden px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+              mobileMenuOpen
+                ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+                : 'bg-slate-900 border-slate-800 text-white hover:bg-slate-800'
+            }`}
+            aria-label="Toggle Mobile Menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="w-4 h-4" />
+            ) : (
+              <Menu className="w-4 h-4" />
+            )}
+            <span className="font-extrabold uppercase tracking-wide">Menu</span>
+          </button>
         </div>
       </div>
 
-      {/* Mobile Subbar Navigation (< lg) */}
-      <div className="lg:hidden bg-slate-50/90 border-t border-slate-200 px-2 py-1.5 flex items-center justify-between gap-1 text-xs font-bold text-slate-700">
-        {/* Primary 3 Mobile Menu Links */}
-        <div className="grid grid-cols-3 gap-1 flex-1 min-w-0">
-          <a 
-            href="/overview"
-            onClick={(e) => { e.preventDefault(); handleNav('overview'); }} 
-            className={`py-1 px-1 sm:px-2 rounded-lg transition-all text-center whitespace-nowrap text-xs ${activeTab === 'overview' ? 'bg-indigo-600 text-white font-extrabold shadow-2xs' : 'text-slate-700 hover:bg-slate-200/70'}`}
-          >
-            {isVi ? 'Tổng Quan' : 'Overview'}
-          </a>
-          <a 
-            href="/how-to-apply"
-            onClick={(e) => { e.preventDefault(); handleNav('apply'); }} 
-            className={`py-1 px-1 sm:px-2 rounded-lg transition-all text-center whitespace-nowrap text-xs ${activeTab === 'apply' ? 'bg-indigo-600 text-white font-extrabold shadow-2xs' : 'text-slate-700 hover:bg-slate-200/70'}`}
-          >
-            {isVi ? 'Xin Visa' : 'Apply'}
-          </a>
-          <a 
-            href="/visa-fee"
-            onClick={(e) => { e.preventDefault(); handleNav('calculator'); }} 
-            className={`py-1 px-1 sm:px-2 rounded-lg transition-all text-center whitespace-nowrap text-xs ${activeTab === 'calculator' ? 'bg-indigo-600 text-white font-extrabold shadow-2xs' : 'text-slate-700 hover:bg-slate-200/70'}`}
-          >
-            {isVi ? 'Bảng Phí' : 'Fees'}
-          </a>
-        </div>
-
-        {/* 3-Bars Hamburger Button for Hidden Menu Items */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className={`py-1 px-2 rounded-lg shrink-0 transition-all text-center flex items-center gap-1 border text-xs ${
-            mobileMenuOpen 
-              ? 'bg-indigo-600 border-indigo-600 text-white font-extrabold' 
-              : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-100 font-bold'
-          }`}
-          aria-label="Toggle Hidden Menu"
-        >
-          {mobileMenuOpen ? (
-            <X className="w-3.5 h-3.5 shrink-0" />
-          ) : (
-            <Menu className="w-3.5 h-3.5 shrink-0 text-slate-700" />
-          )}
-          <span className="text-[11px] font-black uppercase tracking-tight">Menu</span>
-        </button>
-      </div>
-
-      {/* Simple Clean Mobile Dropdown Menu for Hidden Items */}
+      {/* Complete Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white shadow-xl animate-in fade-in slide-in-from-top-1 z-50">
-          <div className="p-2 space-y-1">
-            {hiddenMenuItems.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNav(item.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center justify-between text-xs font-bold border ${
-                    isActive
-                      ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-extrabold'
-                      : 'bg-slate-50/70 border-slate-200/80 text-slate-800 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </div>
-                  {isActive ? (
-                    <CheckCircle className="w-4 h-4 text-indigo-600 shrink-0" />
-                  ) : (
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  )}
-                </button>
-              );
-            })}
+        <div className="lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-md shadow-2xl animate-in fade-in slide-in-from-top-1 z-50">
+          <div className="p-3.5 space-y-2 max-w-lg mx-auto">
+            {/* Primary Action inside Dropdown Menu */}
+            <a
+              href="https://vietnamvisa.govt.vn/apply-online"
+              target="_blank"
+              rel="nofollow"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-extrabold text-sm py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 border border-orange-500 mb-2 cursor-pointer"
+            >
+              <FileText className="w-4 h-4 text-white" />
+              <span>{isVi ? 'Nộp E-Visa Trực Tuyến' : 'Apply Online Now'}</span>
+            </a>
+
+            {/* Track Status inside Mobile Menu */}
+            {onOpenQuickTrack && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenQuickTrack();
+                }}
+                className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold text-xs sm:text-sm py-2.5 px-3.5 rounded-xl border border-indigo-200 transition-colors flex items-center justify-between cursor-pointer mb-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-indigo-600" />
+                  <span>{isVi ? 'Tra Cứu Hồ Sơ Visa' : 'Track Visa Application'}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-indigo-500" />
+              </button>
+            )}
+
+            {/* List of Navigation Links */}
+            <div className="grid grid-cols-1 gap-1.5 pt-1 border-t border-slate-100">
+              {[
+                {
+                  id: 'overview',
+                  label: isVi ? 'Tổng Quan' : 'Overview',
+                  href: '/overview',
+                  icon: <LayoutDashboard className="w-4 h-4 text-indigo-600" />
+                },
+                {
+                  id: 'apply',
+                  label: t.navApply || (isVi ? 'Xin Visa' : 'How to Apply'),
+                  href: '/how-to-apply',
+                  icon: <FileText className="w-4 h-4 text-blue-600" />
+                },
+                {
+                  id: 'calculator',
+                  label: t.navCalculator || (isVi ? 'Bảng Phí' : 'Visa Fees'),
+                  href: '/visa-fee',
+                  icon: <Calculator className="w-4 h-4 text-emerald-600" />
+                },
+                {
+                  id: 'requirements',
+                  label: t.navRequirements || (isVi ? 'Điều Kiện Visa' : 'Requirements'),
+                  href: '/visa-requirements',
+                  icon: <Globe2 className="w-4 h-4 text-purple-600" />
+                },
+                {
+                  id: 'faq',
+                  label: t.navFaq || (isVi ? 'Hỏi Đáp FAQs' : 'FAQs'),
+                  href: '/faqs',
+                  icon: <HelpCircle className="w-4 h-4 text-amber-600" />
+                },
+                {
+                  id: 'contact',
+                  label: t.navContact || (isVi ? 'Liên Hệ' : 'Contact Us'),
+                  href: '/contact-us',
+                  icon: <PhoneCall className="w-4 h-4 text-teal-600" />
+                }
+              ].map((item) => {
+                const isActive = activeTab === item.id || (item.id === 'faq' && activeTab === 'faqs');
+                return (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNav(item.id as any);
+                    }}
+                    className={`w-full text-left px-3.5 py-3 rounded-xl transition-all flex items-center justify-between text-xs sm:text-sm font-bold border ${
+                      isActive
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-extrabold shadow-2xs'
+                        : 'bg-slate-50/70 border-slate-200/80 text-slate-800 hover:bg-slate-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </div>
+                    {isActive ? (
+                      <CheckCircle className="w-4 h-4 text-indigo-600 shrink-0" />
+                    ) : (
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    )}
+                  </a>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

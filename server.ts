@@ -245,6 +245,399 @@ Your role:
   }
 });
 
+// API 5: WordPress REST API Posts Proxy for "Urgent Vietnam Visa Blog New" category
+app.get('/api/wordpress/posts', async (req, res) => {
+  try {
+    const wpBaseUrl = (process.env.WORDPRESS_URL || 'https://blog.vietnamevisaservice.com').replace(/\/$/, '');
+    const wpUser = process.env.WORDPRESS_USER || 'admin';
+    const wpPass = process.env.WORDPRESS_PASS || 'PEFy lSSb 2cb2 vzKY ebYs twp2';
+
+    const authHeader = 'Basic ' + Buffer.from(`${wpUser}:${wpPass}`).toString('base64');
+
+    // Helper to decode HTML entities like &#8211; &amp; &#8217;
+    const decodeHtml = (htmlStr: string) => {
+      if (!htmlStr) return '';
+      return htmlStr
+        .replace(/&#8211;/g, '–')
+        .replace(/&#8212;/g, '—')
+        .replace(/&#8216;/g, "'")
+        .replace(/&#8217;/g, "'")
+        .replace(/&#8220;/g, '"')
+        .replace(/&#8221;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'");
+    };
+
+    let categoryId: number | null = 16; // Default to 16 for blog.vietnamevisaservice.com
+    try {
+      const catRes = await fetch(`${wpBaseUrl}/wp-json/wp/v2/categories?per_page=100`, {
+        headers: {
+          'Authorization': authHeader,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        }
+      });
+
+      if (catRes.ok) {
+        const categories = await catRes.json();
+        if (Array.isArray(categories)) {
+          const matchedCat = categories.find((c: any) =>
+            c.id === 16 ||
+            c.name?.toLowerCase().includes('urgent vietnam visa blog new') ||
+            c.slug?.toLowerCase().includes('urgent-vietnam-visa')
+          );
+          if (matchedCat) {
+            categoryId = matchedCat.id;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('WP Category lookup warning:', e);
+    }
+
+    const postsUrl = categoryId
+      ? `${wpBaseUrl}/wp-json/wp/v2/posts?categories=${categoryId}&per_page=6&_embed=true`
+      : `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=6&_embed=true`;
+
+    const postsRes = await fetch(postsUrl, {
+      headers: {
+        'Authorization': authHeader,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    });
+
+    if (postsRes.ok) {
+      const wpPosts = await postsRes.json();
+      if (Array.isArray(wpPosts) && wpPosts.length > 0) {
+        const formattedPosts = wpPosts.map((p: any) => {
+          let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+          }
+
+          const rawTitle = p.title?.rendered || 'Urgent Vietnam Visa Update';
+          const cleanTitle = decodeHtml(rawTitle);
+
+          const rawExcerpt = p.excerpt?.rendered || p.content?.rendered || '';
+          const cleanExcerpt = decodeHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim()).substring(0, 165) + '...';
+
+          return {
+            id: p.id,
+            title: cleanTitle,
+            excerpt: cleanExcerpt,
+            content: p.content?.rendered || '',
+            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+            featuredImage,
+            category: 'Urgent Vietnam Visa Blog New',
+            readTime: '3 min read',
+            link: p.link || 'https://blog.vietnamevisaservice.com',
+            slug: p.slug || `post-${p.id}`
+          };
+        });
+
+        return res.json({ success: true, posts: formattedPosts, source: 'wordpress_rest_api' });
+      }
+    }
+
+    // Fallback if WP response is empty or unreachable
+    const { FALLBACK_BLOG_POSTS } = await import('./src/services/wordpressApi');
+    return res.json({ success: true, posts: FALLBACK_BLOG_POSTS, source: 'fallback_curated' });
+  } catch (err: any) {
+    console.error('WordPress API Proxy Error:', err);
+    const { FALLBACK_BLOG_POSTS } = await import('./src/services/wordpressApi');
+    return res.json({ success: true, posts: FALLBACK_BLOG_POSTS, source: 'fallback_error' });
+  }
+});
+
+// API 6: WordPress REST API FAQs Proxy for "FAQ" category (ID 71)
+app.get('/api/wordpress/faqs', async (req, res) => {
+  try {
+    const wpBaseUrl = (process.env.WORDPRESS_URL || 'https://blog.vietnamevisaservice.com').replace(/\/$/, '');
+    const wpUser = process.env.WORDPRESS_USER || 'admin';
+    const wpPass = process.env.WORDPRESS_PASS || 'PEFy lSSb 2cb2 vzKY ebYs twp2';
+
+    const authHeader = 'Basic ' + Buffer.from(`${wpUser}:${wpPass}`).toString('base64');
+
+    const decodeHtml = (htmlStr: string) => {
+      if (!htmlStr) return '';
+      return htmlStr
+        .replace(/&#8211;/g, '–')
+        .replace(/&#8212;/g, '—')
+        .replace(/&#8216;/g, "'")
+        .replace(/&#8217;/g, "'")
+        .replace(/&#8220;/g, '"')
+        .replace(/&#8221;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'");
+    };
+
+    let faqCategoryId: number | null = 71; // Default category ID for FAQ
+    try {
+      const catRes = await fetch(`${wpBaseUrl}/wp-json/wp/v2/categories?per_page=100`, {
+        headers: {
+          'Authorization': authHeader,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        }
+      });
+
+      if (catRes.ok) {
+        const categories = await catRes.json();
+        if (Array.isArray(categories)) {
+          const matchedCat = categories.find((c: any) =>
+            c.id === 71 ||
+            c.slug === 'faq' ||
+            c.name?.toLowerCase() === 'faq'
+          );
+          if (matchedCat) {
+            faqCategoryId = matchedCat.id;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('WP FAQ Category lookup warning:', e);
+    }
+
+    const faqsUrl = `${wpBaseUrl}/wp-json/wp/v2/posts?categories=${faqCategoryId}&per_page=100&_embed=true`;
+
+    const faqsRes = await fetch(faqsUrl, {
+      headers: {
+        'Authorization': authHeader,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    });
+
+    if (faqsRes.ok) {
+      const wpFaqs = await faqsRes.json();
+      if (Array.isArray(wpFaqs) && wpFaqs.length > 0) {
+        const formattedFaqs = wpFaqs.map((p: any) => {
+          let featuredImage = '';
+          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || '';
+          }
+
+          const rawTitle = p.title?.rendered || 'Vietnam Visa FAQ';
+          const cleanTitle = decodeHtml(rawTitle);
+
+          const rawExcerpt = p.excerpt?.rendered || p.content?.rendered || '';
+          const cleanExcerpt = decodeHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim());
+
+          return {
+            id: p.id,
+            question: cleanTitle,
+            answerSummary: cleanExcerpt.substring(0, 220) + (cleanExcerpt.length > 220 ? '...' : ''),
+            fullAnswerHtml: p.content?.rendered || '',
+            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+            author: p._embedded?.author?.[0]?.name || 'Vietnam Visa Advisory Team',
+            featuredImage,
+            link: p.link || 'https://blog.vietnamevisaservice.com',
+            slug: p.slug || `faq-${p.id}`
+          };
+        });
+
+        return res.json({ success: true, faqs: formattedFaqs, source: 'wordpress_rest_api' });
+      }
+    }
+
+    // Fallback if WP response is empty or unreachable
+    const { FALLBACK_FAQS } = await import('./src/services/wordpressApi');
+    return res.json({ success: true, faqs: FALLBACK_FAQS, source: 'fallback_curated' });
+  } catch (err: any) {
+    console.error('WordPress FAQ Proxy Error:', err);
+    const { FALLBACK_FAQS } = await import('./src/services/wordpressApi');
+    return res.json({ success: true, faqs: FALLBACK_FAQS, source: 'fallback_error' });
+  }
+});
+
+// API 7: WordPress REST API Requirements Proxy for "Visa Requirements" category
+app.get('/api/wordpress/requirements', async (req, res) => {
+  try {
+    const wpBaseUrl = (process.env.WORDPRESS_URL || 'https://blog.vietnamevisaservice.com').replace(/\/$/, '');
+    const wpUser = process.env.WORDPRESS_USER || 'admin';
+    const wpPass = process.env.WORDPRESS_PASS || 'PEFy lSSb 2cb2 vzKY ebYs twp2';
+
+    const authHeader = 'Basic ' + Buffer.from(`${wpUser}:${wpPass}`).toString('base64');
+
+    const decodeHtml = (htmlStr: string) => {
+      if (!htmlStr) return '';
+      return htmlStr
+        .replace(/&#8211;/g, '–')
+        .replace(/&#8212;/g, '—')
+        .replace(/&#8216;/g, "'")
+        .replace(/&#8217;/g, "'")
+        .replace(/&#8220;/g, '"')
+        .replace(/&#8221;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'");
+    };
+
+    let reqCategoryId: number | null = null;
+    try {
+      const catRes = await fetch(`${wpBaseUrl}/wp-json/wp/v2/categories?per_page=100`, {
+        headers: {
+          'Authorization': authHeader,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        }
+      });
+
+      if (catRes.ok) {
+        const categories = await catRes.json();
+        if (Array.isArray(categories)) {
+          const matchedCat = categories.find((c: any) =>
+            c.slug?.toLowerCase().includes('visa-requirement') ||
+            c.slug?.toLowerCase().includes('requirement') ||
+            c.name?.toLowerCase().includes('visa requirement') ||
+            c.name?.toLowerCase().includes('requirement')
+          );
+          if (matchedCat) {
+            reqCategoryId = matchedCat.id;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('WP Requirement Category lookup warning:', e);
+    }
+
+    const reqUrl = reqCategoryId
+      ? `${wpBaseUrl}/wp-json/wp/v2/posts?categories=${reqCategoryId}&per_page=100&_embed=true`
+      : `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=100&_embed=true`;
+
+    const postsRes = await fetch(reqUrl, {
+      headers: {
+        'Authorization': authHeader,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    });
+
+    if (postsRes.ok) {
+      const wpPosts = await postsRes.json();
+      if (Array.isArray(wpPosts) && wpPosts.length > 0) {
+        const formattedPosts = wpPosts.map((p: any) => {
+          let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+          }
+
+          const rawTitle = p.title?.rendered || 'Vietnam Visa Requirements';
+          const cleanTitle = decodeHtml(rawTitle);
+
+          const rawExcerpt = p.excerpt?.rendered || p.content?.rendered || '';
+          const cleanExcerpt = decodeHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim());
+
+          return {
+            id: p.id,
+            title: cleanTitle,
+            excerpt: cleanExcerpt.substring(0, 220) + (cleanExcerpt.length > 220 ? '...' : ''),
+            content: p.content?.rendered || '',
+            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+            featuredImage,
+            category: 'Visa Requirements',
+            readTime: '4 min read',
+            link: p.link || 'https://blog.vietnamevisaservice.com',
+            slug: p.slug || `req-${p.id}`
+          };
+        });
+
+        return res.json({ success: true, posts: formattedPosts, source: 'wordpress_rest_api' });
+      }
+    }
+
+    const { FALLBACK_REQUIREMENT_POSTS } = await import('./src/services/wordpressApi');
+    return res.json({ success: true, posts: FALLBACK_REQUIREMENT_POSTS, source: 'fallback_curated' });
+  } catch (err: any) {
+    console.error('WordPress Requirements Proxy Error:', err);
+    const { FALLBACK_REQUIREMENT_POSTS } = await import('./src/services/wordpressApi');
+    return res.json({ success: true, posts: FALLBACK_REQUIREMENT_POSTS, source: 'fallback_error' });
+  }
+});
+
+// API 8: Fetch individual WordPress post by slug
+app.get('/api/wordpress/post-by-slug', async (req, res) => {
+  try {
+    const slug = (req.query.slug as string || '').trim().toLowerCase();
+    if (!slug) {
+      return res.status(400).json({ success: false, error: 'Slug parameter is required' });
+    }
+
+    const wpBaseUrl = (process.env.WORDPRESS_URL || 'https://blog.vietnamevisaservice.com').replace(/\/$/, '');
+    const wpUser = process.env.WORDPRESS_USER || 'admin';
+    const wpPass = process.env.WORDPRESS_PASS || 'PEFy lSSb 2cb2 vzKY ebYs twp2';
+
+    const authHeader = 'Basic ' + Buffer.from(`${wpUser}:${wpPass}`).toString('base64');
+
+    const decodeHtml = (htmlStr: string) => {
+      if (!htmlStr) return '';
+      return htmlStr
+        .replace(/&#8211;/g, '–')
+        .replace(/&#8212;/g, '—')
+        .replace(/&#8216;/g, "'")
+        .replace(/&#8217;/g, "'")
+        .replace(/&#8220;/g, '"')
+        .replace(/&#8221;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'");
+    };
+
+    const postRes = await fetch(`${wpBaseUrl}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=true`, {
+      headers: {
+        'Authorization': authHeader,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    });
+
+    if (postRes.ok) {
+      const posts = await postRes.json();
+      if (Array.isArray(posts) && posts.length > 0) {
+        const p = posts[0];
+        let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+        if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+          featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+        }
+
+        const rawTitle = p.title?.rendered || 'Vietnam Visa Requirements';
+        const cleanTitle = decodeHtml(rawTitle);
+
+        const rawExcerpt = p.excerpt?.rendered || '';
+        const cleanExcerpt = decodeHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim());
+
+        return res.json({
+          success: true,
+          post: {
+            id: p.id,
+            title: cleanTitle,
+            excerpt: cleanExcerpt,
+            content: p.content?.rendered || '',
+            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+            featuredImage,
+            category: 'Visa Requirements',
+            readTime: '4 min read',
+            link: p.link || `https://blog.vietnamevisaservice.com/${slug}/`,
+            slug: p.slug || slug
+          }
+        });
+      }
+    }
+
+    return res.status(404).json({ success: false, message: 'Post not found on WordPress' });
+  } catch (err: any) {
+    console.error('Error fetching WP post by slug:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // SEO Endpoint 1: Dynamic XML Sitemap for Search Engine Crawlers
 app.get('/sitemap.xml', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;

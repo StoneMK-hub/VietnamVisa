@@ -19,6 +19,7 @@ import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { AboutView } from './components/AboutView';
 import { OverviewView } from './components/OverviewView';
 import { NotFoundView } from './components/NotFoundView';
+import { BlogSection } from './components/BlogSection';
 
 import {
   Language,
@@ -170,7 +171,11 @@ export default function App() {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
-                  <FaqSection currentLang={currentLang} />
+                  <BlogSection currentLang={currentLang} onStartApplication={() => handleNavigate('apply')} />
+                </div>
+
+                <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+                  <FaqSection currentLang={currentLang} variant="accordion" onStartApplication={() => handleNavigate('apply')} />
                 </div>
               </div>
             )}
@@ -226,7 +231,7 @@ export default function App() {
             {/* FAQ TAB (Path: /faqs) */}
             {activeTab === 'faqs' && (
               <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
-                <FaqSection currentLang={currentLang} />
+                <FaqSection currentLang={currentLang} variant="grid" onStartApplication={() => handleNavigate('apply')} />
               </div>
             )}
 

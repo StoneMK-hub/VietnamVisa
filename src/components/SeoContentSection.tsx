@@ -49,7 +49,7 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
             : 'Fast, Guaranteed & Seamless Vietnam E-Visa Application Service'}
         </h2>
 
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
           {isVi
             ? 'Cung cấp dịch vụ tư vấn, kiểm tra hồ sơ và xử lý thị thực điện tử (E-Visa) Việt Nam cho khách quốc tế, Việt kiều và doanh nhân. Cam kết duyệt nhanh từ 1 giờ, hỗ trợ trọn gói không phát sinh phí.'
             : 'Trusted processing portal for 30-day & 90-day Vietnam e-Visas. We verify your passport details and photo compliance before government submission to prevent delays and rejections.'}
@@ -63,10 +63,10 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
             <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">
+          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">
             {isVi ? 'Đảm Bảo Duyệt 100%' : '100% Approval Guarantee'}
           </h3>
-          <p className="text-[11px] sm:text-xs text-slate-600 leading-normal sm:leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             {isVi
               ? 'Kiểm tra họ tên, số hộ chiếu & ảnh chuẩn 100% trước khi nộp. Hoàn tiền nếu trễ.'
               : 'Every passport & photo is checked for 100% compliance. Full refund guarantee.'}
@@ -78,10 +78,10 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
             <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">
+          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">
             {isVi ? 'Xử Lý Khẩn Cấp 1H' : 'Super Urgent 1-Hour Express'}
           </h3>
-          <p className="text-[11px] sm:text-xs text-slate-600 leading-normal sm:leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             {isVi
               ? 'Cần visa gấp? Gói Super Urgent duyệt công văn trong 1 - 4 giờ làm việc.'
               : 'Emergency express lane processes urgent approvals in 1 to 4 working hours.'}
@@ -93,10 +93,10 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
             <Plane className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">
+          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">
             {isVi ? 'Fast-Track Sân Bay' : 'Airport Fast-Track VIP'}
           </h3>
-          <p className="text-[11px] sm:text-xs text-slate-600 leading-normal sm:leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             {isVi
               ? 'Bỏ qua xếp hàng chờ tại Tân Sơn Nhất, Nội Bài, Đà Nẵng. Ưu tiên nhập cảnh.'
               : 'Skip 2-hour airport lines at HAN, SGN & DAD. Officer greets you at gate.'}
@@ -108,10 +108,10 @@ export const SeoContentSection: React.FC<SeoContentSectionProps> = ({
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
             <Headphones className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">
+          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">
             {isVi ? 'Hỗ Trợ 24/7 Đa Ngôn Ngữ' : '24/7 Human Support'}
           </h3>
-          <p className="text-[11px] sm:text-xs text-slate-600 leading-normal sm:leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             {isVi
               ? 'Hỗ trợ WhatsApp, Email, Live chat 24/7 bằng tiếng Việt, Anh, Pháp, Đức, Nhật, Trung.'
               : 'Dedicated care via WhatsApp (+84 832 320 320) & chat in EN, VI, FR, DE, JA, ZH.'}

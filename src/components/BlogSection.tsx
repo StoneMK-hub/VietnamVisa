@@ -50,18 +50,18 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ currentLang, onStartAp
           {/* Category Badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-extrabold tracking-wide shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
-            <span>Urgent Vietnam Visa Blog New</span>
+            <span>Visa Blog</span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             {isVi 
-              ? 'Tin Tức & Cẩm Nang Xin Visa Khẩn Cấp' 
-              : 'Urgent Vietnam Visa Blog & Official Updates'}
+              ? 'Blog Visa' 
+              : 'Visa Blog'}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl font-normal leading-relaxed">
             {isVi 
-              ? 'Cập nhật trực tiếp các bài viết mới nhất từ chuyên gia về thủ tục nhập cảnh gấp 1h - 24h, giải pháp xử lý sự cố sân bay.' 
-              : 'Latest insights, emergency 1-hour processing guides, and official immigration updates from our 24/7 advisory team.'}
+              ? 'Cập nhật bài viết Blog Visa Việt Nam hàng ngày' 
+              : 'Vietnam Visa Blog Update Daily new'}
           </p>
         </div>
 
@@ -148,23 +148,11 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ currentLang, onStartAp
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                   <button
                     onClick={() => setSelectedPost(post)}
-                    className="text-xs sm:text-sm font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center gap-1 cursor-pointer"
+                    className="w-full text-xs sm:text-sm font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center justify-between cursor-pointer"
                   >
-                    <span>{isVi ? 'Xem bài viết' : 'Read Article'}</span>
+                    <span>{isVi ? 'Xem bài viết chi tiết' : 'Read Full Article'}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </button>
-
-                  {post.link && (
-                    <a
-                      href={post.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-slate-600 hover:text-slate-800 p-1"
-                      title={isVi ? 'Mở bài viết trên WordPress' : 'Open post on WordPress'}
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
                 </div>
               </div>
             </article>
@@ -250,25 +238,13 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ currentLang, onStartAp
               </div>
 
               {/* Modal Footer */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
                 <button
                   onClick={() => setSelectedPost(null)}
-                  className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+                  className="text-xs font-bold text-slate-700 hover:text-slate-900 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
                 >
-                  {isVi ? 'Đóng' : 'Close'}
+                  {isVi ? 'Đóng bài viết' : 'Close Article'}
                 </button>
-
-                {selectedPost.link && (
-                  <a
-                    href={selectedPost.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:underline"
-                  >
-                    <span>{isVi ? 'Xem trên WordPress' : 'View on WordPress'}</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
               </div>
             </div>
           </div>

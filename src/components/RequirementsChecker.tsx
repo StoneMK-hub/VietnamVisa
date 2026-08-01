@@ -74,8 +74,9 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
     // Set of country codes that have matching posts in WordPress REST API
     const wpMatchedCodes = new Set<string>();
+    const extraSynthesized: typeof COUNTRIES_DATA[0][] = [];
 
-    wpPosts.forEach(post => {
+    wpPosts.forEach((post, idx) => {
       const titleLower = post.title.toLowerCase();
       const slugLower = post.slug.toLowerCase();
 
@@ -93,11 +94,38 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
       if (matched) {
         wpMatchedCodes.add(matched.code);
+      } else {
+        // Extract country name from post title e.g., "Vietnam Visa Requirements for [Country] Citizens"
+        const matchTitle = post.title.match(/for\s+([A-Za-z\s]+?)\s+(citizens|passport|national|travelers|202\d|$)/i);
+        if (matchTitle && matchTitle[1]) {
+          const rawCountry = matchTitle[1].trim();
+          if (rawCountry.length > 2) {
+            const cleanCountryName = rawCountry.charAt(0).toUpperCase() + rawCountry.slice(1);
+            const synCode = `WP${post.id || idx}`;
+            if (!extraSynthesized.some(e => e.countryName.toLowerCase() === cleanCountryName.toLowerCase())) {
+              const synCountry: typeof COUNTRIES_DATA[0] = {
+                code: synCode,
+                countryName: cleanCountryName,
+                countryNameVi: cleanCountryName,
+                flagEmoji: '🌐',
+                exemptionDays: 0,
+                eVisaEligible: true,
+                visaOnArrivalEligible: true,
+                notes: 'Eligible for 30-day and 90-day e-Visa.',
+                notesVi: 'Được cấp e-Visa 30-90 ngày.'
+              };
+              extraSynthesized.push(synCountry);
+              wpMatchedCodes.add(synCode);
+            }
+          }
+        }
       }
     });
 
+    const combinedList = [...list, ...extraSynthesized];
+
     // Re-order list so countries with live WordPress category posts are prioritized first
-    return list.sort((a, b) => {
+    return combinedList.sort((a, b) => {
       const aHasWp = wpMatchedCodes.has(a.code);
       const bHasWp = wpMatchedCodes.has(b.code);
       if (aHasWp && !bHasWp) return -1;
@@ -144,7 +172,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     if (existingPost && existingPost.content && existingPost.content.length > 300) {
       setSelectedPost({
         ...existingPost,
-        link: exactUrl
+        link: `#req-${c.code.toLowerCase()}`
       });
       setLoadingCode(null);
       return;
@@ -156,7 +184,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
       if (livePost && livePost.content) {
         setSelectedPost({
           ...livePost,
-          link: exactUrl
+          link: `#req-${c.code.toLowerCase()}`
         });
         setLoadingCode(null);
         return;
@@ -174,6 +202,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
       currentLang,
       wpPosts
     );
+    fallbackPost.link = `#req-${c.code.toLowerCase()}`;
     setSelectedPost(fallbackPost);
     setLoadingCode(null);
   };
@@ -307,11 +336,10 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
                 {COUNTRIES_DATA.slice(0, 16).map((c) => {
-                  const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
                   return (
                     <a
                       key={c.code}
-                      href={exactUrl}
+                      href={`#req-${c.code.toLowerCase()}`}
                       onClick={(e) => {
                         e.preventDefault();
                         handleOpenCountryPost(c);
@@ -375,8 +403,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
             <div className="text-xs sm:text-sm font-bold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shrink-0">
               {isVi
-                ? `Hiển thị ${filteredCountries.length} / ${COUNTRIES_DATA.length} quốc gia`
-                : `Showing ${filteredCountries.length} of ${COUNTRIES_DATA.length} countries`}
+                ? `Hiển thị ${filteredCountries.length} / ${dynamicCountries.length} quốc gia`
+                : `Showing ${filteredCountries.length} of ${dynamicCountries.length} countries`}
             </div>
           </div>
         )}
@@ -388,48 +416,54 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
             return (
               <div
                 key={c.code}
-                onClick={() => handleOpenCountryPost(c)}
-                className={`${isHiddenOnMobileForHome ? 'hidden sm:flex' : 'flex'} bg-slate-50 hover:bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200/90 hover:border-indigo-300 hover:shadow-md transition-all flex-col justify-between space-y-2.5 group cursor-pointer relative`}
+                onClick={isHome ? undefined : () => handleOpenCountryPost(c)}
+                className={`${isHiddenOnMobileForHome ? 'hidden sm:flex' : 'flex'} bg-slate-50 ${
+                  isHome ? '' : 'hover:bg-white hover:border-indigo-300 hover:shadow-md cursor-pointer group'
+                } rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200/90 transition-all flex-col justify-between space-y-2.5 relative`}
               >
                 <div>
-                  <div className="flex items-center justify-between pb-1.5 sm:pb-2 border-b border-slate-200/70 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1.5 sm:pb-2 border-b border-slate-200/70 gap-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <img
-                        src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
+                        src={c.code.startsWith('WP') ? 'https://flagcdn.com/w40/un.png' : `https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
                         alt={`${c.countryName} flag`}
                         className="w-4.5 h-3 sm:w-5 sm:h-3.5 object-cover rounded-[2px] border border-slate-200/80 shrink-0 shadow-2xs"
                         loading="lazy"
                       />
-                      <span className="font-bold text-slate-900 text-xs sm:text-sm truncate group-hover:text-indigo-600 transition-colors">
+                      <span className={`font-bold text-slate-900 text-xs sm:text-sm leading-tight line-clamp-2 sm:line-clamp-1 sm:truncate ${isHome ? '' : 'group-hover:text-indigo-600'} transition-colors`}>
                         {isVi ? c.countryNameVi : c.countryName}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-1.5 shrink-0 pt-0.5 sm:pt-0">
                       {c.exemptionDays > 0 ? (
-                        <span className="bg-emerald-100 text-emerald-800 text-[9px] sm:text-xs font-black px-1.5 sm:px-2 py-0.5 rounded border border-emerald-300/80">
+                        <span className="bg-emerald-100 text-emerald-800 text-[9px] sm:text-xs font-black px-1.5 sm:px-2 py-0.5 rounded border border-emerald-300/80 shrink-0">
                           {c.exemptionDays}D EXEMPT
                         </span>
                       ) : (
-                        <span className="bg-blue-100 text-blue-800 text-[9px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded border border-blue-200">
+                        <span className="bg-blue-100 text-blue-800 text-[9px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded border border-blue-200 shrink-0">
                           E-VISA
                         </span>
                       )}
 
-                      <a
-                        href={getExactCountryRequirementUrl(c.code, c.countryName)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
-                        title={isVi ? `Mở bài viết WordPress cho ${c.countryNameVi}` : `Open WordPress guide for ${c.countryName}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
+                      {!isHome && (
+                        <a
+                          href={`#req-${c.code.toLowerCase()}`}
+                          className="p-0.5 sm:p-1 rounded-md text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors flex items-center justify-center shrink-0"
+                          title={isVi ? `Xem chi tiết quy định visa ${c.countryNameVi}` : `View visa guide for ${c.countryName}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleOpenCountryPost(c);
+                          }}
+                        >
+                          <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        </a>
+                      )}
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed line-clamp-2">
+                  <p className="text-xs sm:text-sm text-slate-600 mt-2 sm:mt-2.5 leading-relaxed line-clamp-2">
                     {isVi ? c.notesVi : c.notes}
                   </p>
                 </div>

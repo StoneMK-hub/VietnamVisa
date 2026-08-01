@@ -82,28 +82,28 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </svg>
       </div>
 
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-8 relative z-10 pt-2 pb-8 sm:py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-8 lg:gap-12 items-center">
           {/* Left Hero Content */}
-          <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left">
+          <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left mb-8 lg:mb-0">
             {/* Service Agency Badge */}
             <div className="inline-flex items-center gap-1.5 bg-emerald-100/90 border border-emerald-300/80 px-3.5 py-1 rounded-full text-emerald-950 text-xs sm:text-sm font-bold tracking-wider uppercase shadow-2xs backdrop-blur-md">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
               <span>{isVi ? 'DỊCH VỤ E-VISA VIỆT NAM' : 'VIETNAM EVISA SERVICE'}</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-snug sm:leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-snug sm:leading-tight py-0.5">
               {isVi ? 'e-Visa Việt Nam: Nhanh Chóng, Đơn Giản, Trọn Gói' : 'Vietnam eVisa: Fast, Simple, Done'}
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-700 max-w-xl leading-relaxed font-medium">
+            <p className="text-sm sm:text-base text-slate-700 max-w-xl leading-relaxed sm:leading-relaxed font-medium py-1">
               {isVi
                 ? 'Chúng tôi hỗ trợ du khách nước ngoài đăng ký Thị thực điện tử (e-Visa) Việt Nam nhanh chóng, an toàn và bảo mật với sự hướng dẫn chuyên nghiệp trong suốt quá trình.'
                 : 'We help foreign travelers apply for a Vietnam e-Visa quickly and securely with professional guidance throughout the process.'}
             </p>
 
             {/* CTA Buttons - Orange Apply Now + Outline See Pricing */}
-            <div className="flex flex-row items-center gap-3 pt-1">
+            <div className="flex flex-row items-center gap-3 pt-2">
               <a
                 href="https://vietnamvisa.govt.vn/apply-online"
                 target="_blank"
@@ -122,7 +122,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             </div>
 
             {/* Feature Bullets with Checkmarks (1 per row on mobile) */}
-            <div className="pt-1 flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-x-4 sm:gap-y-2 text-sm sm:text-base font-bold text-slate-800">
+            <div className="pt-3 sm:pt-2 flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-3 sm:gap-x-4 sm:gap-y-2 text-sm sm:text-base font-bold text-slate-800">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{isVi ? 'Hỗ trợ xử lý khẩn 24h' : '24-hour rush available'}</span>
@@ -138,7 +138,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             </div>
 
             {/* Trust Badges */}
-            <div className="pt-2 sm:pt-4 grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/80 text-left">
+            <div className="pt-3 sm:pt-4 grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/80 text-left">
               <div>
                 <div className="text-xl sm:text-2xl font-black text-indigo-700">{t.statIssued}</div>
                 <div className="text-xs text-slate-600 font-semibold">{t.statIssuedLabel}</div>

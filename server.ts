@@ -506,21 +506,43 @@ app.get('/api/wordpress/requirements', async (req, res) => {
       console.warn('WP Requirement Category lookup warning:', e);
     }
 
-    const reqUrl = reqCategoryId
+    const reqUrlBase = reqCategoryId
       ? `${wpBaseUrl}/wp-json/wp/v2/posts?categories=${reqCategoryId}&per_page=100&_embed=true`
       : `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=100&_embed=true`;
 
-    const postsRes = await fetch(reqUrl, {
-      headers: {
-        'Authorization': authHeader,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
-    });
+    let rawWpPosts: any[] = [];
+    let page = 1;
+    let totalPages = 1;
 
-    if (postsRes.ok) {
-      const wpPosts = await postsRes.json();
-      if (Array.isArray(wpPosts) && wpPosts.length > 0) {
-        const formattedPosts = wpPosts.map((p: any) => {
+    do {
+      const pageUrl = `${reqUrlBase}&page=${page}`;
+      const postsRes = await fetch(pageUrl, {
+        headers: {
+          'Authorization': authHeader,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        }
+      });
+
+      if (postsRes.ok) {
+        const totalPagesHeader = postsRes.headers.get('X-WP-TotalPages');
+        if (totalPagesHeader) {
+          totalPages = parseInt(totalPagesHeader, 10) || 1;
+        }
+
+        const pagePosts = await postsRes.json();
+        if (Array.isArray(pagePosts) && pagePosts.length > 0) {
+          rawWpPosts.push(...pagePosts);
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+      page++;
+    } while (page <= totalPages && page <= 5);
+
+    if (rawWpPosts.length > 0) {
+      const formattedPosts = rawWpPosts.map((p: any) => {
           let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
           if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
             featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
@@ -549,7 +571,6 @@ app.get('/api/wordpress/requirements', async (req, res) => {
 
         return res.json({ success: true, posts: formattedPosts, source: 'wordpress_rest_api' });
       }
-    }
 
     const { FALLBACK_REQUIREMENT_POSTS } = await import('./src/services/wordpressApi');
     return res.json({ success: true, posts: FALLBACK_REQUIREMENT_POSTS, source: 'fallback_curated' });

@@ -286,7 +286,30 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ currentLang, onNavig
           </h2>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile View: Cards (sm:hidden) */}
+        <div className="grid grid-cols-1 gap-2.5 sm:hidden">
+          {[
+            { option: '1-month single', validity: '30 days from arrival', entries: '1 entry', fee: '$54' },
+            { option: '1-month multiple', validity: '30 days from arrival', entries: 'Multiple entries', fee: '$84' },
+            { option: '3-month single', validity: '90 days from arrival', entries: '1 entry', fee: '$94' },
+            { option: '3-month multiple', validity: '90 days from arrival', entries: 'Multiple entries', fee: '$104' },
+          ].map((item, idx) => (
+            <div key={idx} className="bg-slate-50/90 border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-2 shadow-2xs">
+              <div className="space-y-0.5 min-w-0">
+                <div className="font-extrabold text-xs text-slate-900">{item.option}</div>
+                <div className="text-[11px] text-slate-600 font-medium">
+                  {item.validity} • <span className="text-slate-500">{item.entries}</span>
+                </div>
+              </div>
+              <div className="text-right font-black text-indigo-700 text-sm shrink-0">
+                {item.fee}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop View: Table (hidden sm:block) */}
+        <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80">
           <table className="w-full text-left text-sm sm:text-base border-collapse">
             <thead>
               <tr className="bg-slate-100 border-b border-slate-200 text-slate-800 uppercase tracking-wider text-xs sm:text-sm">
@@ -614,7 +637,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ currentLang, onNavig
 
       {/* SECTION 11: Policy References Footer */}
       <footer className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-xs sm:text-sm text-slate-600 space-y-2">
-        <p className="font-bold text-slate-800">Official Policy References:</p>
+        <p className="font-bold text-slate-800">Policy References:</p>
         <p className="leading-relaxed">
           <strong>Resolution 127/NQ-CP (15 August 2023)</strong> expanded eVisa eligibility to citizens of every country and territory worldwide (replacing the earlier 80-nation list); <strong>Resolution 229/NQ-CP (11 August 2025)</strong> extended 45-day visa-free entry to 12 additional European countries through 14 August 2028; <strong>Resolution 389/NQ-CP (2 December 2025)</strong> expanded accepted entry points from 42 to 83. We update this page whenever Vietnam's eVisa policy changes.
         </p>

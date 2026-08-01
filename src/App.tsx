@@ -18,6 +18,7 @@ import { PaymentGuidelinesView, TermsAndConditionsView, PrivacyPolicyView } from
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { AboutView } from './components/AboutView';
 import { OverviewView } from './components/OverviewView';
+import { NotFoundView } from './components/NotFoundView';
 
 import {
   Language,
@@ -268,6 +269,14 @@ export default function App() {
                 onNavigate={handleNavigate}
               />
             )}
+
+            {/* NOT FOUND TAB (404 Page) */}
+            {activeTab === 'not-found' && (
+              <NotFoundView
+                currentLang={currentLang}
+                onNavigate={handleNavigate}
+              />
+            )}
           </>
         )}
       </main>
@@ -280,7 +289,7 @@ export default function App() {
         onCloseForceOpen={() => setForceOpenCookieBanner(false)}
       />
 
-      {/* Official Footer */}
+      {/* Main Footer */}
       <Footer
         currentLang={currentLang}
         onNavigate={handleNavigate}

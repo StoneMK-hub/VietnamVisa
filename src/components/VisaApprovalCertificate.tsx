@@ -61,7 +61,7 @@ export const VisaApprovalCertificate: React.FC<VisaApprovalCertificateProps> = (
         </div>
       </div>
 
-      {/* Official Certificate Sheet Container */}
+      {/* Certificate Sheet Container */}
       <div 
         ref={certificateRef}
         className="bg-white rounded-2xl shadow-2xl border-4 border-indigo-900 p-8 sm:p-12 relative overflow-hidden print:p-0 print:border-none print:shadow-none"
@@ -93,7 +93,7 @@ export const VisaApprovalCertificate: React.FC<VisaApprovalCertificateProps> = (
               THỊ THỰC ĐIỆN TỬ VIỆT NAM (VIETNAM E-VISA)
             </h1>
             <p className="text-xs text-slate-600 font-semibold mt-0.5">
-              OFFICIAL ELECTRONIC VISA APPROVAL CERTIFICATE
+              ELECTRONIC VISA APPROVAL CERTIFICATE
             </p>
           </div>
         </div>
@@ -217,7 +217,7 @@ export const VisaApprovalCertificate: React.FC<VisaApprovalCertificateProps> = (
           </div>
         </div>
 
-        {/* Official Seal & Signature Stamp */}
+        {/* Seal & Signature Stamp */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs">
           <div className="text-slate-500 max-w-xs space-y-1 text-center sm:text-left">
             <p className="font-bold text-slate-700">Important Instructions:</p>

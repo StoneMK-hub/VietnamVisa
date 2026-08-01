@@ -83,7 +83,7 @@ export const StatusTrackerView: React.FC<StatusTrackerViewProps> = ({
         date: isApproved ? 'Ready' : `Est: ${app.estimatedApprovalDate}`,
         completed: isApproved,
         current: isApproved,
-        desc: isApproved ? 'Official approval letter issued.' : 'Document generation pending.'
+        desc: isApproved ? 'Approval letter issued.' : 'Document generation pending.'
       }
     ];
   };

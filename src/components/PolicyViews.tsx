@@ -29,7 +29,7 @@ export const PaymentGuidelinesView: React.FC<PolicyProps> = ({ currentLang, onNa
           </h1>
           <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
             {isVi
-              ? 'Chi tiết các phương thức thanh toán hợp lệ, cấu trúc lệ phí chính thức, quy trình bảo mật SSL 256-bit và chính sách hoàn tiền 100%.'
+              ? 'Chi tiết các phương thức thanh toán hợp lệ, cấu trúc lệ phí niêm yết, quy trình bảo mật SSL 256-bit và chính sách hoàn tiền 100%.'
               : 'Complete overview of accepted payment methods, fee structure, 256-bit SSL encryption standards, and transparent refund policies.'}
           </p>
           <p className="text-xs text-slate-400 pt-2 border-t border-slate-800">
@@ -160,7 +160,7 @@ export const PaymentGuidelinesView: React.FC<PolicyProps> = ({ currentLang, onNa
               <li>
                 {isVi
                   ? 'Lệ phí tem Nhà nước ($25/$50 USD) sẽ không được phía Cục Xuất nhập cảnh hoàn trả một khi hồ sơ đã được tiếp nhận thụ lý.'
-                  : 'Government stamp fees ($25/$50 USD) are non-refundable by the Immigration Department once processing has officially begun.'}
+                  : 'Government stamp fees ($25/$50 USD) are non-refundable by the Immigration Department once processing has formally begun.'}
               </li>
             </ul>
           </div>
@@ -206,7 +206,7 @@ export const TermsAndConditionsView: React.FC<PolicyProps> = ({ currentLang, onN
           <p className="text-slate-600">
             {isVi
               ? 'VietnamVisa là một đơn vị cung cấp dịch vụ hỗ trợ tư vấn và nộp hồ sơ visa thương mại độc lập. Chúng tôi KHÔNG phải là cơ quan đại diện thuộc Chính phủ Việt Nam hoặc Cục Quản lý Xuất nhập cảnh. Quý khách hoàn toàn có thể tự nộp trực tiếp tại Cổng thông tin Chính phủ nếu muốn.'
-              : 'VietnamVisa is an independent commercial service agency providing visa application assistance and fast-track processing. We are NOT an official government department or embassy. Applicants may choose to apply directly through official government portals independently.'}
+              : 'VietnamVisa is an independent commercial service agency providing visa application assistance and fast-track processing. We are NOT a government department or embassy. Applicants may choose to apply directly through government portals independently.'}
           </p>
         </section>
 
@@ -216,7 +216,7 @@ export const TermsAndConditionsView: React.FC<PolicyProps> = ({ currentLang, onN
           </h2>
           <ul className="list-disc pl-5 space-y-1.5 text-slate-700">
             <li>{isVi ? 'Rà soát tính chính xác của thông tin hộ chiếu và ảnh chụp cá nhân.' : 'Review and verification of passport data and compliance of uploaded photos.'}</li>
-            <li>{isVi ? 'Chuẩn hóa định dạng hồ sơ đúng yêu cầu kỹ thuật của Xuất nhập cảnh.' : 'Formatting and translating application entries according to official standards.'}</li>
+            <li>{isVi ? 'Chuẩn hóa định dạng hồ sơ đúng yêu cầu kỹ thuật của Xuất nhập cảnh.' : 'Formatting and translating application entries according to required immigration standards.'}</li>
             <li>{isVi ? 'Xử lý các gói nộp khẩn 1 giờ, 4 giờ, 24 giờ và hỗ trợ đón nhanh tại cửa khẩu.' : 'Processing express 1-hour, 4-hour, and 24-hour fast-track concierge services at airports.'}</li>
             <li>{isVi ? 'Hỗ trợ giải đáp và xử lý sự cố trong suốt quá trình nhập cảnh.' : 'Providing 24/7 support throughout the entry process until clearance.'}</li>
           </ul>
@@ -295,7 +295,7 @@ export const PrivacyPolicyView: React.FC<PolicyProps> = ({ currentLang, onNaviga
           <p className="text-slate-600">
             {isVi
               ? 'Thông tin của quý khách CHỈ được sử dụng cho mục đích duy nhất là kê khai và nộp hồ sơ xin E-Visa tới Cục Quản lý Xuất nhập cảnh Việt Nam, cũng như thông báo kết quả qua Email. Chúng tôi cam kết KHÔNG bán hoặc chia sẻ thông tin cho bất kỳ bên thứ ba nào vì mục đích quảng cáo.'
-              : 'Your data is strictly used for submitting your visa application to the official Vietnam Immigration Department and delivering support regarding your entry. We never sell, lease, or distribute personal information to third parties for marketing purposes.'}
+              : 'Your data is strictly used for submitting your visa application to the Vietnam Immigration Department and delivering support regarding your entry. We never sell, lease, or distribute personal information to third parties for marketing purposes.'}
           </p>
         </section>
 

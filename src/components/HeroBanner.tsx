@@ -24,6 +24,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   onApplyWithOptions
 }) => {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  const isVi = currentLang === 'vi';
 
   const [quoteVisaType, setQuoteVisaType] = useState<VisaType>('tourist_30_single');
   const [quoteSpeed, setQuoteSpeed] = useState<ProcessingTime>('standard');
@@ -84,44 +85,75 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       <div className="max-w-7xl mx-auto px-2.5 sm:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12 items-center">
           {/* Left Hero Content */}
-          <div className="lg:col-span-7 space-y-3.5 sm:space-y-5 text-center lg:text-left">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left">
             {/* Service Agency Badge */}
-            <div className="inline-flex items-center gap-1.5 bg-amber-100/90 border border-amber-300/80 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-amber-900 text-[11px] sm:text-xs font-bold shadow-xs backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-              <span>Fast Vietnam E-Visa Agency Service • Express 24/7</span>
+            <div className="inline-flex items-center gap-1.5 bg-emerald-100/90 border border-emerald-300/80 px-3 py-1 rounded-full text-emerald-950 text-[11px] sm:text-xs font-bold tracking-wider uppercase shadow-2xs backdrop-blur-md">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+              <span>{isVi ? 'DỊCH VỤ E-VISA VIỆT NAM' : 'VIETNAM EVISA SERVICE'}</span>
             </div>
 
-            <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-snug sm:leading-tight">
-              {t.heroTitle}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 leading-snug sm:leading-tight">
+              {isVi ? 'e-Visa Việt Nam: Nhanh Chóng, Đơn Giản, Trọn Gói' : 'Vietnam eVisa: Fast, Simple, Done'}
             </h1>
 
-            <p className="text-xs sm:text-sm text-slate-700 max-w-2xl leading-relaxed font-medium">
-              {t.heroSubtitle}
+            <p className="text-xs sm:text-sm text-slate-700 max-w-xl leading-relaxed font-medium">
+              {isVi
+                ? 'Chúng tôi thay mặt bạn nộp hồ sơ tới Cục Xuất nhập cảnh Việt Nam. Nhanh hơn, dễ dàng hơn và có đội ngũ hỗ trợ thực sự đồng hành khi xảy ra sự cố.'
+                : 'We apply to Vietnam Immigration on your behalf. Faster, easier, and with a real support team behind you when something goes wrong.'}
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 pt-1">
+            {/* CTA Buttons - Matching Screenshot (Indigo Apply Now + Outline See Pricing) */}
+            <div className="flex flex-row items-center gap-3 pt-1">
               <a
                 href="https://vietnamvisa.govt.vn/apply-online"
                 target="_blank"
                 rel="nofollow"
-                className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-2.5 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
+                className="flex-1 sm:flex-initial bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm px-5 sm:px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
               >
-                <span>{t.heroCtaApply}</span>
-                <ArrowRight className="w-4 h-4 text-white" />
+                <span>{isVi ? 'Xin Visa Ngay →' : 'Apply Now →'}</span>
               </a>
 
               <button
                 onClick={onOpenCalculator}
-                className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm px-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-1 sm:flex-initial bg-white/95 hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm px-4 sm:px-5 py-3 rounded-xl border border-slate-300/90 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Calculator className="w-4 h-4 text-indigo-600" />
-                <span>{t.heroCtaCalculate}</span>
+                <span>{isVi ? 'Xem Bảng Giá' : 'See Pricing'}</span>
               </button>
             </div>
 
+            {/* Feature Bullets with Checkmarks */}
+            <div className="pt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-bold text-slate-800">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{isVi ? 'Hỗ trợ xử lý khẩn 24h' : '24-hour rush available'}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{isVi ? 'Chuyên viên hỗ trợ, không dùng bot' : 'Human support, not a bot'}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{isVi ? 'Hoàn tiền nếu từ chối' : 'Refund if denied'}</span>
+              </div>
+            </div>
+
+            {/* Disclaimer / Transparency Box (Matching Screenshot Layout) */}
+            <div className="bg-white/90 border border-slate-300/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-4 text-xs text-slate-700 leading-relaxed font-normal shadow-2xs">
+              <p className="leading-relaxed">
+                {isVi ? (
+                  <>
+                    <strong className="font-bold text-slate-900">Vietnam Visa thuộc BDA</strong> không thuộc cơ quan nhà nước Việt Nam. Với mức phí dịch vụ phù hợp, chúng tôi xử lý trọn gói quy trình cho bạn: rà soát hồ sơ, sửa lỗi, hỗ trợ tiếng Anh & tiếng Việt, tùy chọn nộp khẩn và theo dõi sát sao.
+                  </>
+                ) : (
+                  <>
+                    <strong className="font-bold text-slate-900">Vietnam Visa by BDA</strong> is not affiliated with the Vietnamese government. For a small nominal fee, we handle the whole process for you: application review, error correction, English-language support, urgent processing options, and human follow-up.
+                  </>
+                )}
+              </p>
+            </div>
+
             {/* Trust Badges */}
-            <div className="pt-4 sm:pt-6 grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/80 text-center lg:text-left">
+            <div className="pt-2 sm:pt-4 grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/80 text-left">
               <div>
                 <div className="text-lg sm:text-2xl font-black text-indigo-700">{t.statIssued}</div>
                 <div className="text-[10px] sm:text-[11px] text-slate-600 font-semibold">{t.statIssuedLabel}</div>

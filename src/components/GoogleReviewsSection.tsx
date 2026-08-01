@@ -28,7 +28,7 @@ const REVIEWS_DATA = [
     rating: 5,
     date: '1 week ago',
     service: '90-Day Multiple Entry Visa',
-    text: 'Très service professionnel! Direct support on WhatsApp in English & French. Submitted my passport copy and photo, they checked everything before processing. Got the official 90-day multi-entry visa in 2 business days. Smooth and stress-free experience.',
+    text: 'Très service professionnel! Direct support on WhatsApp in English & French. Submitted my passport copy and photo, they checked everything before processing. Got my 90-day multi-entry visa in 2 business days. Smooth and stress-free experience.',
     verified: true,
   },
   {

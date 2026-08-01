@@ -34,14 +34,14 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
     // 2. Standard Meta Tags
     setMetaTag('meta[name="description"]', 'name', 'description', description);
     setMetaTag('meta[name="keywords"]', 'name', 'keywords', keywords);
-    setMetaTag('meta[name="robots"]', 'name', 'robots', 'index, follow, max-image-preview:large');
+    setMetaTag('meta[name="robots"]', 'name', 'robots', activeTab === 'not-found' ? 'noindex, nofollow' : 'index, follow, max-image-preview:large');
 
     // 3. Open Graph Social Tags
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', title);
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', description);
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
     setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
-    setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Vietnam E-Visa Official Services');
+    setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Vietnam E-Visa Agency Services');
 
     // 4. Canonical URL Link
     let linkCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -67,7 +67,7 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
         {
           '@type': 'GovernmentService',
           '@id': `${canonicalUrl}#service`,
-          'name': 'Vietnam Official E-Visa Facilitation & Fast-Track Service',
+          'name': 'Vietnam E-Visa Facilitation & Fast-Track Agency Service',
           'serviceType': 'Immigration & Visa Processing',
           'provider': {
             '@type': 'Organization',

@@ -22,8 +22,8 @@ import { Logo } from './Logo';
 interface HeaderProps {
   currentLang: Language;
   onLanguageChange: (lang: Language) => void;
-  activeTab: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'overview' | 'contact';
-  onNavigate: (tab: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'overview' | 'contact') => void;
+  activeTab: string;
+  onNavigate: (tab: any) => void;
   onOpenQuickTrack?: () => void;
 }
 
@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Hidden mobile menu items (only shown when user clicks Menu button)
   const hiddenMenuItems: {
-    id: 'requirements' | 'track' | 'faq' | 'contact';
+    id: 'requirements' | 'faq' | 'contact';
     label: string;
     icon: React.ReactNode;
   }[] = [
@@ -59,11 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
       id: 'requirements',
       label: t.navRequirements,
       icon: <Globe2 className="w-4 h-4 text-indigo-600" />
-    },
-    {
-      id: 'track',
-      label: isVi ? 'Tra Cứu Hồ Sơ' : 'Track Application',
-      icon: <Search className="w-4 h-4 text-purple-600" />
     },
     {
       id: 'faq',
@@ -86,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="w-full shadow-sm z-40 bg-white border-b border-slate-200 sticky top-0">
       {/* Main Top Header Bar */}
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Brand Logo (Text hidden on mobile, showing circular flag badge) */}
+        {/* Brand Logo (Full text on desktop, icon emblem on mobile) */}
         <Logo 
           onClick={() => handleNav('home')}
           size="md"

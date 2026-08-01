@@ -77,7 +77,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ currentLang, onNavigate })
           <p className="text-slate-500 text-xs sm:text-sm">
             {isVi
               ? 'Thông tin vận hành, quy trình xử lý hồ sơ và đội ngũ chuyên viên thuộc BDA Tech & Media JSC.'
-              : 'Official operational background, application handling process, and team details for BDA Tech & Media JSC.'}
+              : 'Agency operational background, application handling process, and team details for BDA Tech & Media JSC.'}
           </p>
         </header>
 
@@ -195,14 +195,14 @@ export const AboutView: React.FC<AboutViewProps> = ({ currentLang, onNavigate })
             <li className="pl-1">
               <strong>{isVi ? 'Khắc phục sự cố trước khi nộp:' : 'Pre-filing Error Correction:'}</strong>{' '}
               {isVi
-                ? 'Nếu phát hiện bất kỳ thông tin nào chưa chính xác hoặc thiếu sót, chúng tôi sẽ chủ động gửi email để bạn điều chỉnh trước khi gửi chính thức. Đây là giá trị quan trọng nhất mà chúng tôi mang lại, bởi vì Cục Xuất nhập cảnh có thể từ chối hồ sơ lỗi mà không giải thích lý do, và việc phát hiện sự cố sớm tiết kiệm rất nhiều thời gian và chi phí cho du khách.'
+                ? 'Nếu phát hiện bất kỳ thông tin nào chưa chính xác hoặc thiếu sót, chúng tôi sẽ chủ động gửi email để bạn điều chỉnh trước khi gửi hồ sơ. Đây là giá trị quan trọng nhất mà chúng tôi mang lại, bởi vì Cục Xuất nhập cảnh có thể từ chối hồ sơ lỗi mà không giải thích lý do, và việc phát hiện sự cố sớm tiết kiệm rất nhiều thời gian và chi phí cho du khách.'
                 : 'If anything is off, we email you to fix it before we submit. This is the single most useful thing we do, since Immigration rejects flawed applications without explanation, and catching issues at this stage is worth more than the entire service fee.'}
             </li>
             <li className="pl-1">
-              <strong>{isVi ? 'Nộp hồ sơ chính thức:' : 'Official Channel Submission:'}</strong>{' '}
+              <strong>{isVi ? 'Nộp hồ sơ Xuất nhập cảnh:' : 'Immigration Submission:'}</strong>{' '}
               {isVi
-                ? 'Sau khi toàn bộ thông tin đã được kiểm định chính xác 100%, chúng tôi thực hiện đăng ký hồ sơ của bạn với Cục Xuất nhập cảnh Việt Nam thông qua cổng dịch vụ chính thức.'
-                : 'Once clean, we file your application with the Vietnam Immigration Department through the official channels.'}
+                ? 'Sau khi toàn bộ thông tin đã được kiểm định chính xác 100%, chúng tôi thực hiện đăng ký hồ sơ của bạn với Cục Xuất nhập cảnh Việt Nam qua hệ thống của đại lý.'
+                : 'Once clean, we file your application with the Vietnam Immigration Department through agency channels.'}
             </li>
             <li className="pl-1">
               <strong>{isVi ? 'Chuyển giao eVisa & Theo dõi sát sao:' : 'eVisa Forwarding & Delay Tracking:'}</strong>{' '}
@@ -222,8 +222,8 @@ export const AboutView: React.FC<AboutViewProps> = ({ currentLang, onNavigate })
           </h2>
           <p className="text-slate-700">
             {isVi
-              ? 'Quy trình tự nộp chính thức vẫn hoạt động, tuy nhiên chưa được tối ưu cho những khách hàng cần visa gấp hoặc những người muốn có đội ngũ chuyên gia kiểm tra kỹ lưỡng hồ sơ trước khi nộp. Chúng tôi là đơn vị dịch vụ độc lập đứng ra xử lý trọn gói từ A đến Z với mức phí dịch vụ phù hợp. Khách hàng thường chọn dịch vụ của chúng tôi bao gồm:'
-              : 'The official process works, but it isn’t built for people in a hurry or for those who’d like a second set of eyes on their application. We’re the independent service that handles it end to end for a small nominal fee. Our customers tend to be:'}
+              ? 'Quy trình tự nộp trực tiếp vẫn hoạt động, tuy nhiên chưa được tối ưu cho những khách hàng cần visa gấp hoặc những người muốn có đội ngũ chuyên gia kiểm tra kỹ lưỡng hồ sơ trước khi nộp. Chúng tôi là đơn vị dịch vụ độc lập đứng ra xử lý trọn gói từ A đến Z với mức phí dịch vụ phù hợp. Khách hàng thường chọn dịch vụ của chúng tôi bao gồm:'
+              : 'The direct government process works, but it isn’t built for people in a hurry or for those who’d like a second set of eyes on their application. We’re the independent service agency that handles it end to end for a small nominal fee. Our customers tend to be:'}
           </p>
 
           <ul className="list-disc list-outside ml-5 space-y-2 text-slate-700">

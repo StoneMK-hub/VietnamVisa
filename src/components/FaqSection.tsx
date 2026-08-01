@@ -33,7 +33,7 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ currentLang }) => {
     {
       qEn: 'What is the Airport Fast-Track Concierge Service?',
       qVi: 'Dịch vụ đón nhanh Fast-Track tại sân bay là gì?',
-      aEn: 'An official representative greets you right at the arrival gate before immigration, assists with passport line prioritization, and guides you through the express lane in under 5 minutes.',
+      aEn: 'An airport concierge representative greets you right at the arrival gate before immigration, assists with passport line prioritization, and guides you through the express lane in under 5 minutes.',
       aVi: 'Chuyên viên đón quý khách ngay tại cửa ống lồng, hỗ trợ ưu tiên qua cửa Hải quan khẩn cấp chỉ trong dưới 5 phút.'
     },
     {

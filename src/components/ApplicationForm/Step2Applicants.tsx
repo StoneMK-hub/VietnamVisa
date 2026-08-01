@@ -71,7 +71,7 @@ export const Step2Applicants: React.FC<Step2ApplicantsProps> = ({
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{t.step2Title}</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Provide passport particulars exactly as printed on the official passport document.
+            Provide passport particulars exactly as printed on your passport document.
           </p>
         </div>
 

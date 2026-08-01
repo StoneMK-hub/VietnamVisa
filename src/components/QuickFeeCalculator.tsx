@@ -71,7 +71,7 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
           {isVi
             ? 'Công Cụ Tính Phí & Bảng Lệ Phí E-Visa Việt Nam Trọn Gói'
-            : 'Vietnam E-Visa Fee Calculator & Official Pricing Schedule'}
+            : 'Vietnam E-Visa Fee Calculator & Pricing Schedule'}
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed text-center bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 sm:p-4 shadow-2xs">
@@ -168,17 +168,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                 {isVi ? 'Dịch Vụ Bổ Sung Sân Bay (Tùy Chọn)' : 'Optional Airport Add-Ons'}
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {(['travel_insurance', 'fast_track', 'car_pickup'] as ExtraService[]).map((srvKey) => {
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
+                {(['travel_insurance', 'fast_track', 'car_pickup'] as ExtraService[]).map((srvKey, idx) => {
                   const srv = EXTRA_SERVICES_PRICING[srvKey];
                   const isChecked = selectedServices.includes(srvKey);
                   return (
                     <label
                       key={srvKey}
                       onClick={() => toggleService(srvKey)}
-                      className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
+                      className={`flex items-center gap-1.5 p-2 sm:p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
+                        idx === 2 ? 'col-span-2 sm:col-span-1' : ''
+                      } ${
                         isChecked
-                          ? 'bg-emerald-50/90 border-emerald-500 text-emerald-950 font-bold'
+                          ? 'bg-emerald-50/90 border-emerald-500 text-emerald-950 font-bold shadow-2xs'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/80'
                       }`}
                     >
@@ -188,9 +190,9 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                         onChange={() => {}}
                         className="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer shrink-0"
                       />
-                      <div className="flex-1 truncate">
-                        <div className="truncate font-semibold text-xs">{srv.labelEn}</div>
-                        <div className="text-[11px] text-emerald-700 font-extrabold">+${srv.feePerApplicantUsd}/pax</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate font-semibold text-[11px] sm:text-xs text-slate-900">{srv.labelEn}</div>
+                        <div className="text-[10px] sm:text-[11px] text-emerald-700 font-extrabold leading-none mt-0.5">+${srv.feePerApplicantUsd}/pax</div>
                       </div>
                     </label>
                   );
@@ -268,7 +270,7 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         </div>
       </div>
 
-      {/* 3. OFFICIAL PRICING TABLES */}
+      {/* 3. PRICING TABLES */}
       <section className="space-y-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
         <div className="border-b border-slate-100 pb-2.5">
           <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
@@ -288,7 +290,31 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             <span>1. VISA TYPE & DURATION</span>
           </h3>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+          {/* Mobile View: Cards Layout (sm:hidden) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:hidden">
+            {[
+              { type: '1-month single', duration: '30 days', entries: 'Single entry', price: '$54' },
+              { type: '1-month multiple', duration: '30 days', entries: 'Multiple entry', price: '$84' },
+              { type: '3-month single', duration: '90 days', entries: 'Single entry', price: '$94' },
+              { type: '3-month multiple', duration: '90 days', entries: 'Multiple entry', price: '$104' },
+            ].map((item, idx) => (
+              <div key={idx} className="bg-slate-50/90 border border-slate-200/90 rounded-xl p-3 flex items-center justify-between gap-2 shadow-2xs">
+                <div className="space-y-0.5 min-w-0">
+                  <div className="font-extrabold text-xs text-slate-900">{item.type}</div>
+                  <div className="text-[11px] text-slate-600 font-medium">
+                    {item.duration} • <span className="text-slate-500">{item.entries}</span>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm font-black text-emerald-700">{item.price}</div>
+                  <div className="text-[10px] text-slate-400 font-normal">{isVi ? 'mỗi khách' : 'per applicant'}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View: Table (hidden sm:block) */}
+          <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px] sm:text-xs">
@@ -336,11 +362,33 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
               <span>2. PROCESSING SPEED</span>
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration.
+              {isVi
+                ? 'Lựa chọn tốc độ xử lý phù hợp với ngày khởi hành của bạn. Thời gian tính từ khi hồ sơ gửi lên Cục Xuất Nhập Cảnh.'
+                : 'Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration.'}
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+          {/* Mobile View: Cards Layout (sm:hidden) */}
+          <div className="grid grid-cols-1 gap-2 sm:hidden">
+            {[
+              { tier: 'Normal', delivery: '5 to 10 business days', surcharge: 'Included' },
+              { tier: 'Urgent', delivery: '2 business days', surcharge: '+$45 per applicant' },
+              { tier: 'Super Urgent', delivery: '1 business day', surcharge: '+$85 per applicant' },
+            ].map((item, idx) => (
+              <div key={idx} className="bg-slate-50/90 border border-slate-200/90 rounded-xl p-3 flex items-center justify-between gap-2 shadow-2xs">
+                <div className="space-y-0.5 min-w-0">
+                  <div className="font-extrabold text-xs text-slate-900">{item.tier}</div>
+                  <div className="text-[11px] text-slate-600 font-normal">{item.delivery}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-xs font-extrabold text-emerald-700">{item.surcharge}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View: Table (hidden sm:block) */}
+          <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px] sm:text-xs">
@@ -379,7 +427,25 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             </h3>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+          {/* Mobile View: Cards Layout (sm:hidden) */}
+          <div className="grid grid-cols-1 gap-2 sm:hidden">
+            {[
+              { name: 'Travel Insurance', desc: 'Medical & baggage issues coverage up to $10,000', price: '$30 / applicant' },
+              { name: 'Airport Fast-Track', desc: 'Priority VIP immigration lane, saves 30–60+ mins', price: '$35 / applicant' },
+              { name: 'Car Pickup', desc: 'Private airport transfer directly to your hotel', price: '$35 / applicant' },
+            ].map((item, idx) => (
+              <div key={idx} className="bg-slate-50/90 border border-slate-200/90 rounded-xl p-3 space-y-1 shadow-2xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-extrabold text-xs text-slate-900">{item.name}</span>
+                  <span className="text-xs font-black text-emerald-700 shrink-0">{item.price}</span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-normal font-normal">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View: Table (hidden sm:block) */}
+          <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px] sm:text-xs">

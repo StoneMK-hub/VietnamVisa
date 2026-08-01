@@ -206,7 +206,7 @@ export const Footer: React.FC<FooterProps> = ({ currentLang, onNavigate, onOpenC
               <div className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-slate-900">HQ:</strong> BDA Building, Cầu Diễn, Nam Từ Liêm, Hà Nội
+                  <strong className="text-slate-900">HQ:</strong> BDA Building, Lo E50, Khu 3ha, Phú Diễn, Hà Nội 100000, Vietnam
                 </span>
               </div>
 
@@ -236,9 +236,12 @@ export const Footer: React.FC<FooterProps> = ({ currentLang, onNavigate, onOpenC
         </div>
 
         {/* Disclaimer & Copyright */}
-        <div className="text-center text-xs text-slate-600 space-y-1">
+        <div className="text-center text-xs text-slate-600 space-y-1.5">
           <p className="max-w-3xl mx-auto leading-relaxed text-[11px] sm:text-xs">
-            <strong className="text-slate-800">Disclaimer:</strong> VietnamVisa is a commercial visa service facilitator. We assist international travelers with e-Visa applications and expedited airport concierge.
+            <strong className="text-slate-800">Disclaimer:</strong>{' '}
+            {isVi
+              ? 'Vietnamevisaservice.com là trang web thương mại tư nhân, KHÔNG phải là trang web chính thức của chính phủ. Chúng tôi hoạt động như một đơn vị cung cấp dịch vụ tư nhân và thu phí hỗ trợ nộp hồ sơ. Nếu quý khách không muốn sử dụng các biểu mẫu rút gọn và dịch vụ hỗ trợ của chúng tôi, quý khách có thể nộp trực tiếp qua trang web chính thức của chính phủ.'
+              : 'Vietnamevisaservice.com is a private commercial website, NOT an official government website. We operate as a private service provider and charge fees for application assistance services. If you do not wish to use our simplified forms and visa application support services, you may submit your application directly via the official government website.'}
           </p>
           <p className="text-[11px] sm:text-xs">© {new Date().getFullYear()} Vietnam Visa Services. All rights reserved.</p>
         </div>

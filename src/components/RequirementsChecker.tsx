@@ -150,7 +150,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
         )}
       </div>
 
-      {/* Vietnam Visa Exemption Summary List matching Official Resolutions (Only on full Requirements page) */}
+      {/* Vietnam Visa Exemption Summary List matching Government Resolutions (Only on full Requirements page) */}
       {!isHome && (
         <div className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 text-slate-900 rounded-3xl p-6 sm:p-8 lg:p-10 space-y-6 shadow-xl border border-emerald-100">
           {/* Header */}

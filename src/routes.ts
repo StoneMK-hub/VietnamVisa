@@ -12,7 +12,8 @@ export type TabType =
   | 'about'
   | 'payment-guidelines'
   | 'terms-and-conditions'
-  | 'privacy-policy';
+  | 'privacy-policy'
+  | 'not-found';
 
 export interface RouteConfig {
   tab: TabType;
@@ -31,9 +32,9 @@ export const ROUTES: Record<TabType, RouteConfig> = {
   home: {
     tab: 'home',
     path: '/',
-    titleEn: 'Vietnam Visa Online 2026 | Official Fast-Track E-Visa Portal',
+    titleEn: 'Vietnam Visa Online 2026 | Fast-Track E-Visa Agency Portal',
     titleVi: 'Cổng Thông Tin E-Visa Việt Nam 2026 | Xin Visa Trực Tuyến Nhanh',
-    descEn: 'Apply for official Vietnam E-Visa online in 2026. Fast 1-hour to 24-hour urgent processing, 99.9% approval guarantee, 24/7 immigration advisory.',
+    descEn: 'Apply for Vietnam E-Visa online in 2026. Fast 1-hour to 24-hour urgent processing, 99.9% approval guarantee, 24/7 immigration advisory.',
     descVi: 'Xin visa điện tử Việt Nam trực tuyến 2026. Xử lý khẩn từ 1 giờ đến 24 giờ, tỷ lệ đậu 99.9%, hỗ trợ tư vấn nhập cảnh 24/7.',
     keywordsEn: 'vietnam visa, vietnam evisa online, apply vietnam visa, urgent vietnam visa, vietnam visa 2026, vietnam visa exemption, vietnam airport fast track',
     keywordsVi: 'visa viet nam, evisa viet nam, xin visa viet nam online, visa khan viet nam, mien thi thuc viet nam 2026, dich vu lam visa nhanh',
@@ -57,8 +58,8 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     path: '/how-to-apply',
     titleEn: 'How to Apply for Vietnam E-Visa Online 2026 | Application Guide',
     titleVi: 'Hướng Dẫn Xin E-Visa Việt Nam Trực Tuyến 2026 | Đăng Ký Nhanh',
-    descEn: 'Complete guide on how to apply for official Vietnam e-Visa in 3 simple steps. Instant price transparency, express options, and official link.',
-    descVi: 'Hướng dẫn chi tiết cách xin e-Visa Việt Nam chính thức qua 3 bước đơn giản. Minh bạch chi phí và xử lý khẩn tại sân bay.',
+    descEn: 'Complete guide on how to apply for Vietnam e-Visa in 3 simple steps. Instant price transparency, express options, and application portal.',
+    descVi: 'Hướng dẫn chi tiết cách xin e-Visa Việt Nam qua 3 bước đơn giản. Minh bạch chi phí và xử lý khẩn tại sân bay.',
     keywordsEn: 'how to apply vietnam visa, vietnam visa application guide, apply vietnam evisa online 2026, 90 day vietnam evisa',
     keywordsVi: 'huong dan xin visa viet nam, cach dang ky evisa, huong dan lam visa nhap canh',
     breadcrumbEn: 'How to Apply',
@@ -69,8 +70,8 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     path: '/visa-fee',
     titleEn: 'Vietnam Visa Fee Calculator 2026 | E-Visa & Speed Pricing',
     titleVi: 'Bảng Tính Phí Visa Việt Nam 2026 | Tính Phí E-Visa & Nhanh',
-    descEn: 'Calculate official government stamp fees, service fees, and urgent processing rates for 30-day and 90-day single or multiple entry Vietnam visas.',
-    descVi: 'Tra cứu bảng phí chính thức gồm phí nhà nước, phí dịch vụ và phí làm khẩn cho các loại e-Visa 30 ngày, 90 ngày 1 lần hoặc nhiều lần.',
+    descEn: 'Calculate government stamp fees, service fees, and urgent processing rates for 30-day and 90-day single or multiple entry Vietnam visas.',
+    descVi: 'Tra cứu bảng phí niêm yết gồm phí nhà nước, phí dịch vụ và phí làm khẩn cho các loại e-Visa 30 ngày, 90 ngày 1 lần hoặc nhiều lần.',
     keywordsEn: 'vietnam visa fee calculator, how much is vietnam visa, vietnam evisa price 2026, urgent visa cost, fast track price',
     keywordsVi: 'bang gia visa viet nam, le phi evisa viet nam 2026, tinh phi visa viet nam, gia visa khan',
     breadcrumbEn: 'Visa Fee',
@@ -93,8 +94,8 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     path: '/track-application',
     titleEn: 'Track Vietnam Visa Status Online | Real-Time Reference Checker',
     titleVi: 'Tra Cứu Tình Trạng Hồ Sơ Visa Việt Nam | Theo Dõi Mã VNV',
-    descEn: 'Check your Vietnam e-Visa status instantly using your VNV reference code or passport number. View approval progress and download official letters.',
-    descVi: 'Tra cứu tiến độ hồ sơ e-Visa Việt Nam tức thì bằng mã tham chiếu VNV hoặc số hộ chiếu. Tải công văn nhập cảnh chính thức online.',
+    descEn: 'Check your Vietnam e-Visa status instantly using your VNV reference code or passport number. View approval progress and download approval letters.',
+    descVi: 'Tra cứu tiến độ hồ sơ e-Visa Việt Nam tức thì bằng mã tham chiếu VNV hoặc số hộ chiếu. Tải công văn nhập cảnh online.',
     keywordsEn: 'track vietnam visa, check vietnam evisa status, vnv visa tracker, check visa application status, download vietnam approval letter',
     keywordsVi: 'tra cuu visa viet nam, kiem tra tinh trang evisa, theo doi ho so vnv, tai cong van nhap canh',
     breadcrumbEn: 'Track Application',
@@ -129,7 +130,7 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     path: '/payment-guidelines',
     titleEn: 'Payment Guidelines & Fee Transparency | Vietnam E-Visa Services',
     titleVi: 'Hướng Dẫn Thanh Toán & Minh Bạch Lệ Phí | Visa Việt Nam',
-    descEn: 'Official payment terms, accepted payment methods (Credit/Debit, Wire, PayPal), refund policies, and fee breakdown for Vietnam e-Visa processing.',
+    descEn: 'Payment terms, accepted payment methods (Credit/Debit, Wire, PayPal), refund policies, and fee breakdown for Vietnam e-Visa processing.',
     descVi: 'Quy định thanh toán, các phương thức thanh toán hợp lệ (Thẻ Visa/Master, Chuyển khoản), chính sách hoàn tiền và bảng kê chi phí visa.',
     keywordsEn: 'vietnam visa payment guidelines, visa payment methods, refund policy, vietnam evisa fee breakdown',
     keywordsVi: 'huong dan thanh toan visa, phuong thuc thanh toan, chinh sach hoan tien evisa, le phi nhap canh',
@@ -151,7 +152,7 @@ export const ROUTES: Record<TabType, RouteConfig> = {
   'privacy-policy': {
     tab: 'privacy-policy',
     path: '/privacy-policy',
-    titleEn: 'Privacy Policy & Data Security | Official Vietnam Visa Services',
+    titleEn: 'Privacy Policy & Data Security | Vietnam Visa Agency Services',
     titleVi: 'Chính Sách Bảo Mật & An Toàn Dữ Liệu | Visa Việt Nam',
     descEn: 'Learn how we collect, protect, and encrypt your passport and personal data for Vietnam e-Visa submission under 256-Bit SSL standards.',
     descVi: 'Cam kết bảo mật thông tin cá nhân, mã hóa dữ liệu hộ chiếu theo chuẩn 256-Bit SSL và quy định lưu trữ dữ liệu người dùng.',
@@ -167,10 +168,22 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     titleVi: 'Về Chúng Tôi | Vietnam Visa by BDA Tech & Media JSC',
     descEn: 'Learn about Vietnam Visa by BDA Tech & Media JSC - operating since 2007 in Hanoi with over 100 dedicated travel & visa technology specialists.',
     descVi: 'Giới thiệu về dịch vụ Vietnam Visa vận hành bởi BDA Tech & Media JSC từ năm 2007 tại Hà Nội với đội ngũ hơn 100 chuyên viên hỗ trợ visa.',
-    keywordsEn: 'about vietnam visa bda, bda tech & media jsc, vietnam visa team hanoi, official visa service agency',
+    keywordsEn: 'about vietnam visa bda, bda tech & media jsc, vietnam visa team hanoi, visa service agency',
     keywordsVi: 'gioi thieu vietnam visa bda, bda tech and media, doi ngu ho tro visa ha noi',
     breadcrumbEn: 'About Us',
     breadcrumbVi: 'Giới Thệu'
+  },
+  'not-found': {
+    tab: 'not-found',
+    path: '/404',
+    titleEn: '404 Page Not Found | Vietnam E-Visa Agency Services',
+    titleVi: '404 Không Tìm Thấy Trang | Dịch Vụ E-Visa Việt Nam',
+    descEn: 'The page you requested does not exist or has been moved. Explore our Vietnam e-visa application, pricing, and tracking services.',
+    descVi: 'Trang bạn tìm kiếm không tồn tại hoặc đã được chuyển dời. Khám phá dịch vụ xin visa, bảng tính phí và tra cứu tiến độ hồ sơ.',
+    keywordsEn: '404 not found, vietnam visa 404',
+    keywordsVi: '404 khong tim thay trang, visa viet nam 404',
+    breadcrumbEn: '404 Not Found',
+    breadcrumbVi: '404 Không Tìm Thấy Trang'
   }
 };
 
@@ -183,7 +196,7 @@ export function getTabFromPath(pathname: string): TabType {
     if (config.path === normalized) return config.tab;
   }
 
-  return 'home';
+  return 'not-found';
 }
 
 /** Get RouteConfig from TabType */

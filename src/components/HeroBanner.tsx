@@ -98,8 +98,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
             <p className="text-sm sm:text-base text-slate-700 max-w-xl leading-relaxed font-medium">
               {isVi
-                ? 'Chúng tôi thay mặt bạn nộp hồ sơ tới Cục Xuất nhập cảnh Việt Nam. Nhanh hơn, dễ dàng hơn và có đội ngũ hỗ trợ thực sự đồng hành khi xảy ra sự cố.'
-                : 'We apply to Vietnam Immigration on your behalf. Faster, easier, and with a real support team behind you when something goes wrong.'}
+                ? 'Chúng tôi hỗ trợ du khách nước ngoài đăng ký Thị thực điện tử (e-Visa) Việt Nam nhanh chóng, an toàn và bảo mật với sự hướng dẫn chuyên nghiệp trong suốt quá trình.'
+                : 'We help foreign travelers apply for a Vietnam e-Visa quickly and securely with professional guidance throughout the process.'}
             </p>
 
             {/* CTA Buttons - Orange Apply Now + Outline See Pricing */}
@@ -121,8 +121,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               </button>
             </div>
 
-            {/* Feature Bullets with Checkmarks */}
-            <div className="pt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm sm:text-base font-bold text-slate-800">
+            {/* Feature Bullets with Checkmarks (1 per row on mobile) */}
+            <div className="pt-1 flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-x-4 sm:gap-y-2 text-sm sm:text-base font-bold text-slate-800">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{isVi ? 'Hỗ trợ xử lý khẩn 24h' : '24-hour rush available'}</span>
@@ -135,15 +135,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{isVi ? 'Hoàn tiền nếu từ chối' : 'Refund if denied'}</span>
               </div>
-            </div>
-
-            {/* Disclaimer / Transparency Box */}
-            <div className="bg-white/90 border border-slate-300/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm text-slate-700 leading-relaxed font-normal shadow-2xs">
-              <p className="leading-relaxed">
-                {isVi
-                  ? 'Chúng tôi hỗ trợ du khách nước ngoài đăng ký Thị thực điện tử (e-Visa) Việt Nam nhanh chóng, an toàn và bảo mật với sự hướng dẫn chuyên nghiệp trong suốt quá trình.'
-                  : 'We help foreign travelers apply for a Vietnam e-Visa quickly and securely with professional guidance throughout the process.'}
-              </p>
             </div>
 
             {/* Trust Badges */}

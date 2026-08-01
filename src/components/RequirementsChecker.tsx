@@ -5,6 +5,8 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   ArrowRight, 
+  ArrowLeft,
+  ChevronRight,
   Sparkles, 
   BookOpen, 
   X, 
@@ -63,12 +65,74 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     loadReqPosts();
   }, []);
 
-  const handleOpenCountryPost = async (c: typeof COUNTRIES_DATA[0]) => {
+  // Dynamically derive and order countries list based on WordPress Category "Visa Requirements" (wpPosts)
+  const dynamicCountries = React.useMemo(() => {
+    const list = [...COUNTRIES_DATA];
+    if (!wpPosts || wpPosts.length === 0) {
+      return list;
+    }
+
+    // Set of country codes that have matching posts in WordPress REST API
+    const wpMatchedCodes = new Set<string>();
+
+    wpPosts.forEach(post => {
+      const titleLower = post.title.toLowerCase();
+      const slugLower = post.slug.toLowerCase();
+
+      const matched = list.find(c => {
+        const cNameLower = c.countryName.toLowerCase();
+        const cViLower = c.countryNameVi.toLowerCase();
+        return (
+          titleLower.includes(cNameLower) ||
+          slugLower.includes(cNameLower) ||
+          titleLower.includes(cViLower) ||
+          (c.code === 'US' && (titleLower.includes('united states') || titleLower.includes('us ') || titleLower.includes('american'))) ||
+          (c.code === 'GB' && (titleLower.includes('united kingdom') || titleLower.includes('uk ') || titleLower.includes('british')))
+        );
+      });
+
+      if (matched) {
+        wpMatchedCodes.add(matched.code);
+      }
+    });
+
+    // Re-order list so countries with live WordPress category posts are prioritized first
+    return list.sort((a, b) => {
+      const aHasWp = wpMatchedCodes.has(a.code);
+      const bHasWp = wpMatchedCodes.has(b.code);
+      if (aHasWp && !bHasWp) return -1;
+      if (!aHasWp && bHasWp) return 1;
+      return 0;
+    });
+  }, [wpPosts]);
+
+  useEffect(() => {
+    const handleHashCheck = async () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash && hash.startsWith('#req-')) {
+        const code = hash.replace('#req-', '').toUpperCase();
+        const country = dynamicCountries.find(c => c.code.toUpperCase() === code) || COUNTRIES_DATA.find(c => c.code.toUpperCase() === code);
+        if (country) {
+          await handleOpenCountryPost(country, false);
+        }
+      }
+    };
+    handleHashCheck();
+    window.addEventListener('hashchange', handleHashCheck);
+    return () => window.removeEventListener('hashchange', handleHashCheck);
+  }, [wpPosts, dynamicCountries]);
+
+  const handleOpenCountryPost = async (c: typeof COUNTRIES_DATA[0], updateHash = true) => {
     const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
     const slug = exactUrl.split('/').filter(Boolean).pop() || '';
 
     setSelectedCountryName(c.countryName);
     setLoadingCode(c.code);
+
+    if (updateHash) {
+      window.history.pushState({}, '', `#req-${c.code.toLowerCase()}`);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // 1. Try finding in pre-fetched wpPosts array
     const existingPost = wpPosts.find(p => 
@@ -116,16 +180,167 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
   // Top 8 featured countries ordered by traveler volume to Vietnam for homepage
   const top8Countries = TOP_FEATURED_CODES
-    .map(code => COUNTRIES_DATA.find(c => c.code === code))
+    .map(code => dynamicCountries.find(c => c.code === code) || COUNTRIES_DATA.find(c => c.code === code))
     .filter((c): c is typeof COUNTRIES_DATA[0] => c !== undefined);
 
-  const filteredCountries = COUNTRIES_DATA.filter(c =>
+  const filteredCountries = dynamicCountries.filter(c =>
     c.countryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.countryNameVi.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const countriesToDisplay = isHome ? top8Countries : filteredCountries;
+
+  if (selectedPost) {
+    return (
+      <div id="requirement-article-view" className="space-y-6 sm:space-y-8 animate-fade-in pb-12">
+        {/* Top Breadcrumb & Navigation Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
+            <button
+              onClick={() => {
+                setSelectedPost(null);
+                window.history.pushState({}, '', window.location.pathname);
+              }}
+              className="inline-flex items-center gap-1.5 font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{isVi ? 'Tất Cả Quy Định Visa' : 'All Visa Requirements'}</span>
+            </button>
+            <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
+            <span className="font-semibold text-slate-800 truncate max-w-[200px] sm:max-w-md">
+              {selectedCountryName || selectedPost.title}
+            </span>
+          </div>
+
+          <button
+            onClick={() => {
+              setSelectedPost(null);
+              window.history.pushState({}, '', window.location.pathname);
+            }}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+            <span>{isVi ? 'Đóng Bài Viết' : 'Close Article'}</span>
+          </button>
+        </div>
+
+        {/* Article Reader Card */}
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-200/90 overflow-hidden">
+          {/* Header Banner Image */}
+          <div className="relative h-60 sm:h-80 md:h-96 bg-slate-950 overflow-hidden">
+            <img
+              src={selectedPost.featuredImage}
+              alt={selectedPost.title}
+              className="w-full h-full object-cover opacity-80 scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+
+            <div className="absolute bottom-6 left-6 right-6 space-y-3 text-white max-w-4xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="bg-indigo-600 text-white text-[11px] font-black px-3 py-1 rounded-lg uppercase tracking-wider shadow-md">
+                  {selectedPost.category || 'Visa Requirements'}
+                </span>
+                <span className="bg-emerald-500/90 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg flex items-center gap-1 backdrop-blur-md">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {isVi ? 'Dữ Liệu Trực Tiếp 2026' : 'Direct 2026 Data'}
+                </span>
+              </div>
+
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-black text-white leading-tight tracking-tight">
+                {selectedPost.title}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
+                <span className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
+                  <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                  {selectedPost.date}
+                </span>
+                <span className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
+                  <User className="w-3.5 h-3.5 text-emerald-400" />
+                  {selectedPost.author}
+                </span>
+                <span className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
+                  <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                  {selectedPost.readTime || '4 min read'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Article Body Content */}
+          <div className="p-6 sm:p-10 md:p-12 space-y-8">
+            <div 
+              className="prose prose-slate lg:prose-lg max-w-none text-slate-800 leading-relaxed space-y-5"
+              dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
+            />
+
+            {/* Application Callout Banner */}
+            <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="space-y-1 text-center sm:text-left">
+                <h3 className="text-lg sm:text-xl font-black text-white">
+                  {isVi ? `Nộp Hồ Sơ Visa Cho ${selectedCountryName || 'Quốc Gia Của Bạn'}` : `Apply Vietnam Visa Online for ${selectedCountryName || 'Your Country'}`}
+                </h3>
+                <p className="text-xs sm:text-sm text-indigo-200">
+                  {isVi ? 'Xử lý trực tuyến nhanh chóng trong 1 giờ - 24 giờ. Đảm bảo đậu 99.9%.' : 'Fast 1-hour to 24-hour urgent approval. 99.9% approval guarantee.'}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (onApplyForCountry && selectedCountryName) {
+                    onApplyForCountry(selectedCountryName);
+                  }
+                }}
+                className="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-6 py-3 rounded-xl transition-all cursor-pointer shadow-lg hover:shadow-xl shrink-0 flex items-center justify-center gap-2 text-sm"
+              >
+                <span>{isVi ? 'Xin Visa Ngay' : 'Apply Online Now'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* SEO Country Link Directory Grid */}
+            <div className="pt-8 border-t border-slate-200 space-y-4">
+              <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-indigo-600" />
+                <span>{isVi ? 'Quy Định Visa Các Quốc Gia Khác (Headless App Index)' : 'Requirement Guides for Other Nationalities'}</span>
+              </h3>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
+                {COUNTRIES_DATA.slice(0, 16).map((c) => {
+                  const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
+                  return (
+                    <a
+                      key={c.code}
+                      href={exactUrl}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOpenCountryPost(c);
+                      }}
+                      className="p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/80 border border-slate-200/80 hover:border-indigo-300 transition-all flex items-center gap-2.5 group cursor-pointer"
+                    >
+                      <img
+                        src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
+                        alt={c.countryName}
+                        className="w-6 h-4 object-cover rounded shadow-2xs"
+                      />
+                      <div className="overflow-hidden">
+                        <p className="font-extrabold text-xs text-slate-800 group-hover:text-indigo-600 truncate">
+                          {isVi ? c.countryNameVi : c.countryName}
+                        </p>
+                        <p className="text-[10px] text-slate-500 truncate">
+                          {c.exemptionDays > 0 ? (isVi ? `Miễn ${c.exemptionDays}d` : `${c.exemptionDays}d Free`) : 'E-Visa Req'}
+                        </p>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-4 sm:space-y-8">
@@ -173,7 +388,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
             return (
               <div
                 key={c.code}
-                className={`${isHiddenOnMobileForHome ? 'hidden sm:flex' : 'flex'} bg-slate-50 hover:bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200/90 hover:border-indigo-300 hover:shadow-md transition-all flex-col justify-between space-y-2.5 group`}
+                onClick={() => handleOpenCountryPost(c)}
+                className={`${isHiddenOnMobileForHome ? 'hidden sm:flex' : 'flex'} bg-slate-50 hover:bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200/90 hover:border-indigo-300 hover:shadow-md transition-all flex-col justify-between space-y-2.5 group cursor-pointer relative`}
               >
                 <div>
                   <div className="flex items-center justify-between pb-1.5 sm:pb-2 border-b border-slate-200/70 gap-1">
@@ -216,22 +432,6 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                   <p className="text-xs sm:text-sm text-slate-600 mt-2.5 leading-relaxed line-clamp-2">
                     {isVi ? c.notesVi : c.notes}
                   </p>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    onClick={() => handleOpenCountryPost(c)}
-                    disabled={loadingCode === c.code}
-                    className="w-full bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 font-extrabold text-xs sm:text-sm py-2.5 px-3 rounded-xl border border-indigo-200/80 hover:border-indigo-600 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 disabled:opacity-60"
-                    title={isVi ? `Xem chi tiết quy định visa ${c.countryNameVi}` : `More view for ${c.countryName}`}
-                  >
-                    {loadingCode === c.code ? (
-                      <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin shrink-0" />
-                    ) : (
-                      <BookOpen className="w-4 h-4 shrink-0" />
-                    )}
-                    <span>{loadingCode === c.code ? (isVi ? 'Đang Tải...' : 'Loading...') : 'More View'}</span>
-                  </button>
                 </div>
               </div>
             );
@@ -529,80 +729,6 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                 <p className="text-[11px] text-slate-500 mt-0.5">
                   {currentLang === 'vi' ? 'Công dân 190+ nước đều được cấp E-Visa 30/90 ngày 1 lần hoặc nhiều lần.' : 'Citizens of 190+ countries can apply for 30/90 days single/multiple E-Visa.'}
                 </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Article Reader Overlay Modal for Country Visa Requirements */}
-      {selectedPost && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 relative space-y-6">
-            {/* Modal Header Image */}
-            <div className="relative h-48 sm:h-64 bg-slate-900 overflow-hidden rounded-t-3xl">
-              <img
-                src={selectedPost.featuredImage}
-                alt={selectedPost.title}
-                className="w-full h-full object-cover opacity-80"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
-
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedPost(null)}
-                className="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white p-2 rounded-full backdrop-blur-md transition-all cursor-pointer border border-white/20 z-10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="absolute bottom-4 left-4 right-4 space-y-1.5 text-white">
-                <span className="bg-indigo-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
-                  {selectedPost.category || 'Visa Requirements'}
-                </span>
-                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight">
-                  {selectedPost.title}
-                </h2>
-                <div className="flex items-center gap-4 text-xs text-slate-300 pt-1">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                    {selectedPost.date}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-emerald-400" />
-                    {selectedPost.author}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 sm:p-8 space-y-6">
-              <div 
-                className="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700 space-y-4"
-                dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
-              />
-
-              {/* Modal Footer */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
-                >
-                  {isVi ? 'Đóng' : 'Close'}
-                </button>
-
-                {selectedPost.link && (
-                  <a
-                    href={selectedPost.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:underline"
-                  >
-                    <span>{isVi ? 'Xem trên WordPress' : 'View on WordPress'}</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
               </div>
             </div>
           </div>

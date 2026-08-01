@@ -83,10 +83,29 @@ export const FALLBACK_BLOG_POSTS: BlogPost[] = [
   }
 ];
 
+function decodeHtmlEntities(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8212;/g, '—')
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'");
+}
+
+const DIRECT_WP_BASE = 'https://blog.vietnamevisaservice.com';
+
 /**
- * Fetch Blog Posts from backend API or direct WordPress REST API
+ * Fetch Blog Posts from backend API or direct WordPress REST API (static host fallback)
  */
 export async function fetchUrgentBlogPosts(): Promise<BlogPost[]> {
+  // 1. Try backend API proxy first
   try {
     const res = await fetch('/api/wordpress/posts', {
       headers: {
@@ -101,7 +120,38 @@ export async function fetchUrgentBlogPosts(): Promise<BlogPost[]> {
       }
     }
   } catch (err) {
-    console.warn('Backend WordPress API fetch failed, falling back to cached blog posts:', err);
+    console.warn('Backend WordPress API fetch failed, trying direct REST API:', err);
+  }
+
+  // 2. Direct fetch from WordPress REST API (for static hosting environments without Node server)
+  try {
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=30&_embed=true`);
+    if (directRes.ok) {
+      const posts = await directRes.json();
+      if (Array.isArray(posts) && posts.length > 0) {
+        return posts.map((p: any) => {
+          let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+          }
+          return {
+            id: p.id,
+            title: decodeHtmlEntities(p.title?.rendered || ''),
+            excerpt: decodeHtmlEntities((p.excerpt?.rendered || '').replace(/<[^>]+>/g, '').trim()),
+            content: p.content?.rendered || '',
+            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+            featuredImage,
+            category: 'Urgent Vietnam Visa Blog New',
+            readTime: '4 min read',
+            link: p.link || `${DIRECT_WP_BASE}/${p.slug}/`,
+            slug: p.slug || ''
+          };
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('Direct WordPress REST API fetch failed:', err);
   }
 
   return FALLBACK_BLOG_POSTS;
@@ -281,7 +331,38 @@ export async function fetchWpRequirementPosts(): Promise<BlogPost[]> {
       }
     }
   } catch (err) {
-    console.warn('Backend WordPress Requirement Posts fetch failed, using fallback:', err);
+    console.warn('Backend WordPress Requirement Posts fetch failed, trying direct REST API:', err);
+  }
+
+  // Direct WP REST API fallback for static hosts
+  try {
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=100&_embed=true`);
+    if (directRes.ok) {
+      const posts = await directRes.json();
+      if (Array.isArray(posts) && posts.length > 0) {
+        return posts.map((p: any) => {
+          let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+          }
+          return {
+            id: p.id,
+            title: decodeHtmlEntities(p.title?.rendered || ''),
+            excerpt: decodeHtmlEntities((p.excerpt?.rendered || '').replace(/<[^>]+>/g, '').trim()),
+            content: p.content?.rendered || '',
+            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+            featuredImage,
+            category: 'Visa Requirements',
+            readTime: '4 min read',
+            link: p.link || `${DIRECT_WP_BASE}/${p.slug}/`,
+            slug: p.slug || ''
+          };
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('Direct WordPress REST API requirement posts fetch failed:', err);
   }
 
   return FALLBACK_REQUIREMENT_POSTS;
@@ -381,9 +462,10 @@ export function getRequirementPostForCountry(
 }
 
 /**
- * Fetch a single post by slug directly from the backend proxy
+ * Fetch a single post by slug directly from the backend proxy or direct WP REST API
  */
 export async function fetchWpPostBySlug(slug: string): Promise<BlogPost | null> {
+  // 1. Try backend API proxy
   try {
     const res = await fetch(`/api/wordpress/post-by-slug?slug=${encodeURIComponent(slug)}`, {
       headers: {
@@ -398,7 +480,38 @@ export async function fetchWpPostBySlug(slug: string): Promise<BlogPost | null> 
       }
     }
   } catch (err) {
-    console.warn('Error fetching WP post by slug:', err);
+    console.warn('Backend fetch by slug failed, trying direct REST API:', err);
+  }
+
+  // 2. Direct fetch from WordPress REST API (for static hosts like cPanel, Netlify, Vercel)
+  try {
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=true`);
+    if (directRes.ok) {
+      const posts = await directRes.json();
+      if (Array.isArray(posts) && posts.length > 0) {
+        const p = posts[0];
+        let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+        if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+          featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+        }
+
+        return {
+          id: p.id,
+          title: decodeHtmlEntities(p.title?.rendered || ''),
+          excerpt: decodeHtmlEntities((p.excerpt?.rendered || '').replace(/<[^>]+>/g, '').trim()),
+          content: p.content?.rendered || '',
+          date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+          featuredImage,
+          category: 'Visa Requirements',
+          readTime: '4 min read',
+          link: p.link || `${DIRECT_WP_BASE}/${slug}/`,
+          slug: p.slug || slug
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('Direct WP fetch by slug failed:', err);
   }
 
   return null;

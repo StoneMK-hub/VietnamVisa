@@ -81,8 +81,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ currentLang, onStartAp
 
       {/* Loading Skeleton */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="bg-slate-100 rounded-2xl h-80 animate-pulse border border-slate-200" />
           ))}
         </div>
@@ -92,8 +92,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ currentLang, onStartAp
         </div>
       ) : (
         /* Blog Cards Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {posts.map((post) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {posts.slice(0, 4).map((post) => (
             <article
               key={post.id}
               className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-indigo-300 transition-all duration-200 flex flex-col overflow-hidden group"

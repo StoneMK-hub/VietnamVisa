@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Globe, 
   ChevronDown, 
@@ -37,6 +37,39 @@ export const Header: React.FC<HeaderProps> = ({
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // If mobile menu is open, always keep header visible
+      if (mobileMenuOpen) {
+        setIsVisible(true);
+        return;
+      }
+
+      // Always show if near top of page (< 60px)
+      if (currentScrollY < 60) {
+        setIsVisible(true);
+      } else {
+        // If scrolling down, hide header
+        if (currentScrollY > lastScrollY && currentScrollY - lastScrollY > 5) {
+          setIsVisible(false);
+        } 
+        // If scrolling up, show header
+        else if (lastScrollY - currentScrollY > 5) {
+          setIsVisible(true);
+        }
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY, mobileMenuOpen]);
 
   const isVi = currentLang === 'vi';
 
@@ -78,14 +111,14 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full shadow-sm z-40 bg-white border-b border-slate-200 sticky top-0">
+    <header className={`w-full shadow-sm z-40 bg-white border-b border-slate-200 sticky top-0 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       {/* Main Top Header Bar */}
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Brand Logo (Full text on desktop, icon emblem on mobile) */}
+        {/* Brand Logo (Full text on mobile and desktop) */}
         <Logo 
           onClick={() => handleNav('home')}
           size="md"
-          hideTextOnMobile={true}
+          hideTextOnMobile={false}
         />
 
         {/* Desktop Navigation Links (Visible on lg+ screens) */}

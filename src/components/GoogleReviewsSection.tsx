@@ -163,8 +163,8 @@ export const GoogleReviewsSection: React.FC<GoogleReviewsSectionProps> = ({ curr
       </div>
 
       {/* Reviews Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-        {REVIEWS_DATA.map((review) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {REVIEWS_DATA.slice(0, 4).map((review) => (
           <div
             key={review.id}
             className="bg-slate-50/80 hover:bg-slate-50 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"

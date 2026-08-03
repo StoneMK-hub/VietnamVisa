@@ -6,6 +6,7 @@ export type TabType =
   | 'apply' 
   | 'calculator' 
   | 'requirements' 
+  | 'blog'
   | 'track' 
   | 'faqs' 
   | 'contact'
@@ -88,6 +89,18 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     keywordsVi: 'quy dinh visa viet nam, mien visa viet nam 45 ngay, danh sach mien thi thuc 2026, ho chieu nhap canh viet nam',
     breadcrumbEn: 'Visa Requirements',
     breadcrumbVi: 'Quy Định Visa'
+  },
+  blog: {
+    tab: 'blog',
+    path: '/blog',
+    titleEn: 'Vietnam Visa Blog 2026 | Daily Travel News & Entry Updates',
+    titleVi: 'Blog Visa Việt Nam 2026 | Tin Tức Du Lịch & Hướng Dẫn Nhập Cảnh',
+    descEn: 'Read the latest updates on Vietnam e-Visa regulations, urgent processing tips, travel advice, and official immigration announcements.',
+    descVi: 'Cập nhật tin tức mới nhất về quy định e-Visa Việt Nam, bí quyết xin visa khẩn, lời khuyên du lịch và thông báo xuất nhập cảnh chính thức.',
+    keywordsEn: 'vietnam visa blog, vietnam travel news, urgent visa tips, vietnam evisa updates 2026',
+    keywordsVi: 'blog visa viet nam, tin tuc du lich viet nam, kinh nghiem xin evisa, tin tuc xuat nhap canh',
+    breadcrumbEn: 'Blog',
+    breadcrumbVi: 'Blog Visa'
   },
   track: {
     tab: 'track',
@@ -196,7 +209,60 @@ export function getTabFromPath(pathname: string): TabType {
     if (config.path === normalized) return config.tab;
   }
 
+  // Handle /vietnam-visa-requirements or sub-slugs or legacy country post URLs
+  if (
+    normalized === '/vietnam-visa-requirements' ||
+    normalized.startsWith('/vietnam-visa-requirements/') ||
+    normalized.startsWith('/visa-requirements/') ||
+    normalized.startsWith('/vietnam-visa-requirements-for-') ||
+    normalized.startsWith('/vietnam-e-visa-for-')
+  ) {
+    return 'requirements';
+  }
+
+  // Handle /blog or sub-slugs
+  if (
+    normalized === '/blog' ||
+    normalized.startsWith('/blog/') ||
+    normalized.startsWith('/blog-posts/')
+  ) {
+    return 'blog';
+  }
+
   return 'not-found';
+}
+
+/** Extract requirement post slug from pathname if present */
+export function getRequirementSlugFromPath(pathname: string): string | null {
+  const normalized = pathname.toLowerCase().replace(/\/$/, '');
+  if (!normalized) return null;
+
+  if (normalized.startsWith('/vietnam-visa-requirements/')) {
+    return normalized.replace('/vietnam-visa-requirements/', '');
+  }
+  if (normalized.startsWith('/visa-requirements/')) {
+    return normalized.replace('/visa-requirements/', '');
+  }
+  if (normalized.startsWith('/vietnam-visa-requirements-for-') || normalized.startsWith('/vietnam-e-visa-for-')) {
+    return normalized.replace(/^\//, '');
+  }
+
+  return null;
+}
+
+/** Extract blog post slug from pathname if present */
+export function getBlogSlugFromPath(pathname: string): string | null {
+  const normalized = pathname.toLowerCase().replace(/\/$/, '');
+  if (!normalized) return null;
+
+  if (normalized.startsWith('/blog/')) {
+    return normalized.replace('/blog/', '');
+  }
+  if (normalized.startsWith('/blog-posts/')) {
+    return normalized.replace('/blog-posts/', '');
+  }
+
+  return null;
 }
 
 /** Get RouteConfig from TabType */

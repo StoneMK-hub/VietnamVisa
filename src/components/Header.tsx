@@ -184,6 +184,21 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           <a
+            href="/blog"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNav('blog' as any);
+            }}
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
+              activeTab === 'blog'
+                ? 'bg-indigo-50 text-indigo-700 font-bold'
+                : 'hover:bg-slate-100 text-slate-600'
+            }`}
+          >
+            Blog
+          </a>
+
+          <a
             href="/faqs"
             onClick={(e) => {
               e.preventDefault();

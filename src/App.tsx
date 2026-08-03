@@ -10,7 +10,7 @@ import { ContactView } from './components/ContactView';
 import { SeoContentSection } from './components/SeoContentSection';
 import { GoogleReviewsSection } from './components/GoogleReviewsSection';
 import { ApplyOnlineGuideView } from './components/ApplyOnlineGuideView';
-import { SEOMetadata } from './components/SEOMetadata';
+import { SEOMetadata, CustomSEOData } from './components/SEOMetadata';
 import { SEOBreadcrumb } from './components/SEOBreadcrumb';
 import { TabType, getTabFromPath, getRouteFromTab } from './routes';
 import { VisaApprovalCertificate } from './components/VisaApprovalCertificate';
@@ -35,6 +35,7 @@ import {
 export default function App() {
   const [currentLang, setCurrentLang] = useState<Language>('en');
   const [activeTab, setActiveTab] = useState<TabType>(() => getTabFromPath(window.location.pathname));
+  const [customSEO, setCustomSEO] = useState<CustomSEOData | null>(null);
 
   // Handle URL changes & Browser Back/Forward buttons (SEO Routing)
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function App() {
       const tabFromUrl = getTabFromPath(window.location.pathname);
       setActiveTab(tabFromUrl);
       setViewingCertificate(false);
+      setCustomSEO(null);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -55,6 +57,7 @@ export default function App() {
     const targetTab: TabType = tab === 'faq' ? 'faqs' : (tab as TabType);
     setActiveTab(targetTab);
     setViewingCertificate(false);
+    setCustomSEO(null);
 
     const route = getRouteFromTab(targetTab);
     if (window.location.pathname !== route.path) {
@@ -108,7 +111,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-800 antialiased selection:bg-indigo-600 selection:text-white">
       {/* SEO Head Metadata & OpenGraph/JSON-LD Dynamic Tags */}
-      <SEOMetadata activeTab={activeTab} currentLang={currentLang} />
+      <SEOMetadata activeTab={activeTab} currentLang={currentLang} customSEO={customSEO} />
 
       {/* Top Navigation */}
       <Header
@@ -171,7 +174,7 @@ export default function App() {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
-                  <BlogSection currentLang={currentLang} onStartApplication={() => handleNavigate('apply')} />
+                  <BlogSection currentLang={currentLang} isHome={true} onSEOChange={setCustomSEO} onStartApplication={() => handleNavigate('apply')} />
                 </div>
 
                 <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
@@ -205,12 +208,24 @@ export default function App() {
               <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
                 <RequirementsChecker
                   currentLang={currentLang}
+                  onSEOChange={setCustomSEO}
                   onApplyForCountry={(cName) => {
                     if (applicants.length > 0) {
                       setApplicants([{ ...applicants[0], nationality: cName }]);
                     }
                     handleNavigate('apply');
                   }}
+                />
+              </div>
+            )}
+
+            {/* BLOG TAB (Path: /blog) */}
+            {activeTab === 'blog' && (
+              <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10">
+                <BlogSection
+                  currentLang={currentLang}
+                  onSEOChange={setCustomSEO}
+                  onStartApplication={() => handleNavigate('apply')}
                 />
               </div>
             )}

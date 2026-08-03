@@ -3,3 +3,32 @@
 html {
   font-size: 17px;
 }
+
+/* Ensure WordPress HTML content images, tables, and embeds stay strictly within container boundaries */
+.prose img,
+.wp-content img,
+.blog-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.75rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.prose table,
+.wp-content table,
+.blog-content table {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto;
+}
+
+.prose iframe,
+.wp-content iframe,
+.blog-content iframe {
+  max-width: 100% !important;
+  border-radius: 0.5rem;
+}
+

@@ -125,7 +125,7 @@ export async function fetchUrgentBlogPosts(): Promise<BlogPost[]> {
 
   // 2. Direct fetch from WordPress REST API (for static hosting environments without Node server)
   try {
-    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=30&_embed=true`);
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=100&_embed=true`);
     if (directRes.ok) {
       const posts = await directRes.json();
       if (Array.isArray(posts) && posts.length > 0) {

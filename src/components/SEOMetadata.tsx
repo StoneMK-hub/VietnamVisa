@@ -2,19 +2,37 @@ import React, { useEffect } from 'react';
 import { Language } from '../types';
 import { TabType, getRouteFromTab } from '../routes';
 
+export interface CustomSEOData {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  ogType?: string;
+  articleAuthor?: string;
+}
+
 interface SEOMetadataProps {
   activeTab: TabType;
   currentLang: Language;
+  customSEO?: CustomSEOData | null;
 }
 
-export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang }) => {
+export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang, customSEO }) => {
   const route = getRouteFromTab(activeTab);
   const isVi = currentLang === 'vi';
 
-  const title = isVi ? route.titleVi : route.titleEn;
-  const description = isVi ? route.descVi : route.descEn;
-  const keywords = isVi ? route.keywordsVi : route.keywordsEn;
-  const canonicalUrl = `${window.location.origin}${route.path}`;
+  const defaultTitle = isVi ? route.titleVi : route.titleEn;
+  const defaultDescription = isVi ? route.descVi : route.descEn;
+  const defaultKeywords = isVi ? route.keywordsVi : route.keywordsEn;
+  const defaultCanonicalUrl = `${window.location.origin}${route.path}`;
+
+  const title = customSEO?.title || defaultTitle;
+  const description = customSEO?.description || defaultDescription;
+  const keywords = customSEO?.keywords || defaultKeywords;
+  const canonicalUrl = customSEO?.canonicalUrl || defaultCanonicalUrl;
+  const ogImage = customSEO?.ogImage || `${window.location.origin}/logo.png`;
+  const ogType = customSEO?.ogType || 'website';
 
   useEffect(() => {
     // 1. Dynamic Document Title
@@ -40,7 +58,8 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', title);
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', description);
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
-    setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
+    setMetaTag('meta[property="og:type"]', 'property', 'og:type', ogType);
+    setMetaTag('meta[property="og:image"]', 'property', 'og:image', ogImage);
     setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Vietnam E-Visa Agency Services');
 
     // 4. Canonical URL Link
@@ -105,6 +124,25 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
               : [])
           ]
         },
+        ...(customSEO
+          ? [
+              {
+                '@type': 'Article',
+                'headline': title,
+                'description': description,
+                'image': ogImage,
+                'author': {
+                  '@type': 'Organization',
+                  'name': customSEO.articleAuthor || 'Vietnam Visa Advisory Team'
+                },
+                'publisher': {
+                  '@type': 'Organization',
+                  'name': 'Vietnam Visa Online Services Portal'
+                },
+                'mainEntityOfPage': canonicalUrl
+              }
+            ]
+          : []),
         ...(activeTab === 'faqs'
           ? [
               {
@@ -134,7 +172,7 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
     };
 
     jsonLdScript.textContent = JSON.stringify(structuredData);
-  }, [activeTab, currentLang, title, description, keywords, canonicalUrl, isVi, route]);
+  }, [activeTab, currentLang, title, description, keywords, canonicalUrl, isVi, route, customSEO, ogImage, ogType]);
 
   return null;
 };

@@ -298,8 +298,8 @@ app.get('/api/wordpress/posts', async (req, res) => {
     }
 
     const postsUrl = categoryId
-      ? `${wpBaseUrl}/wp-json/wp/v2/posts?categories=${categoryId}&per_page=6&_embed=true`
-      : `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=6&_embed=true`;
+      ? `${wpBaseUrl}/wp-json/wp/v2/posts?categories=${categoryId}&per_page=100&_embed=true`
+      : `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=100&_embed=true`;
 
     const postsRes = await fetch(postsUrl, {
       headers: {

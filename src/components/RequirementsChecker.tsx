@@ -27,11 +27,15 @@ import {
 } from '../services/wordpressApi';
 import { getExactCountryRequirementUrl } from '../data/countryUrls';
 
+import { CustomSEOData } from './SEOMetadata';
+import { getRequirementSlugFromPath } from '../routes';
+
 interface RequirementsCheckerProps {
   currentLang: Language;
   onApplyForCountry: (countryName: string) => void;
   isHome?: boolean;
   onViewAll?: () => void;
+  onSEOChange?: (seoData: CustomSEOData | null) => void;
 }
 
 // Top featured countries for homepage display (top visitor volume to Vietnam)
@@ -43,7 +47,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   currentLang,
   onApplyForCountry,
   isHome = false,
-  onViewAll
+  onViewAll,
+  onSEOChange
 }) => {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
   const isVi = currentLang === 'vi';
@@ -134,33 +139,22 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     });
   }, [wpPosts]);
 
-  useEffect(() => {
-    const handleHashCheck = async () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash && hash.startsWith('#req-')) {
-        const code = hash.replace('#req-', '').toUpperCase();
-        const country = dynamicCountries.find(c => c.code.toUpperCase() === code) || COUNTRIES_DATA.find(c => c.code.toUpperCase() === code);
-        if (country) {
-          await handleOpenCountryPost(country, false);
-        }
-      }
-    };
-    handleHashCheck();
-    window.addEventListener('hashchange', handleHashCheck);
-    return () => window.removeEventListener('hashchange', handleHashCheck);
-  }, [wpPosts, dynamicCountries]);
-
-  const handleOpenCountryPost = async (c: typeof COUNTRIES_DATA[0], updateHash = true) => {
+  const handleOpenCountryPost = async (c: typeof COUNTRIES_DATA[0], updateUrl = true) => {
     const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
     const slug = exactUrl.split('/').filter(Boolean).pop() || '';
 
     setSelectedCountryName(c.countryName);
     setLoadingCode(c.code);
 
-    if (updateHash) {
-      window.history.pushState({}, '', `#req-${c.code.toLowerCase()}`);
+    if (updateUrl) {
+      const targetPath = `/vietnam-visa-requirements/${slug}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({}, '', targetPath);
+      }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    let postToDisplay: BlogPost | null = null;
 
     // 1. Try finding in pre-fetched wpPosts array
     const existingPost = wpPosts.find(p => 
@@ -170,42 +164,121 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     );
 
     if (existingPost && existingPost.content && existingPost.content.length > 300) {
-      setSelectedPost({
+      postToDisplay = {
         ...existingPost,
-        link: `#req-${c.code.toLowerCase()}`
-      });
-      setLoadingCode(null);
-      return;
-    }
-
-    // 2. Fetch live post directly from WordPress API by slug
-    if (slug) {
+        link: `${window.location.origin}/vietnam-visa-requirements/${slug}`
+      };
+    } else if (slug) {
+      // 2. Fetch live post directly from WordPress API by slug
       const livePost = await fetchWpPostBySlug(slug);
       if (livePost && livePost.content) {
-        setSelectedPost({
+        postToDisplay = {
           ...livePost,
-          link: `#req-${c.code.toLowerCase()}`
-        });
-        setLoadingCode(null);
-        return;
+          link: `${window.location.origin}/vietnam-visa-requirements/${slug}`
+        };
       }
     }
 
-    // 3. Fallback to structured article if WP API has no specific post yet
-    const fallbackPost = getRequirementPostForCountry(
-      c.countryName,
-      c.countryNameVi,
-      c.code,
-      c.exemptionDays,
-      c.notes,
-      c.notesVi,
-      currentLang,
-      wpPosts
-    );
-    fallbackPost.link = `#req-${c.code.toLowerCase()}`;
-    setSelectedPost(fallbackPost);
+    if (!postToDisplay) {
+      // 3. Fallback to structured article if WP API has no specific post yet
+      const fallbackPost = getRequirementPostForCountry(
+        c.countryName,
+        c.countryNameVi,
+        c.code,
+        c.exemptionDays,
+        c.notes,
+        c.notesVi,
+        currentLang,
+        wpPosts
+      );
+      postToDisplay = {
+        ...fallbackPost,
+        link: `${window.location.origin}/vietnam-visa-requirements/${slug}`
+      };
+    }
+
+    setSelectedPost(postToDisplay);
     setLoadingCode(null);
+
+    // Update dynamic SEO metadata for head tag injection
+    if (onSEOChange && postToDisplay) {
+      onSEOChange({
+        title: postToDisplay.title,
+        description: postToDisplay.excerpt,
+        canonicalUrl: `${window.location.origin}/vietnam-visa-requirements/${slug}`,
+        ogImage: postToDisplay.featuredImage,
+        ogType: 'article',
+        articleAuthor: postToDisplay.author || 'Vietnam Visa Advisory Team'
+      });
+    }
   };
+
+  const handleCloseArticle = () => {
+    setSelectedPost(null);
+    setSelectedCountryName('');
+    window.history.pushState({}, '', '/vietnam-visa-requirements');
+    if (onSEOChange) {
+      onSEOChange(null);
+    }
+  };
+
+  useEffect(() => {
+    const checkUrlRoute = async () => {
+      const pathname = window.location.pathname;
+      const slugFromPath = getRequirementSlugFromPath(pathname);
+      const hash = window.location.hash.toLowerCase();
+
+      if (slugFromPath) {
+        const matchedCountry = dynamicCountries.find(c => {
+          const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
+          const cSlug = exactUrl.split('/').filter(Boolean).pop();
+          return cSlug === slugFromPath || slugFromPath.includes(c.countryName.toLowerCase().replace(/\s+/g, '-'));
+        }) || COUNTRIES_DATA.find(c => {
+          const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
+          const cSlug = exactUrl.split('/').filter(Boolean).pop();
+          return cSlug === slugFromPath || slugFromPath.includes(c.countryName.toLowerCase().replace(/\s+/g, '-'));
+        });
+
+        if (matchedCountry) {
+          await handleOpenCountryPost(matchedCountry, false);
+          return;
+        }
+
+        // Direct slug lookup if not in local list
+        setLoadingCode('slug');
+        const livePost = await fetchWpPostBySlug(slugFromPath);
+        if (livePost) {
+          setSelectedPost(livePost);
+          setSelectedCountryName(livePost.title);
+          if (onSEOChange) {
+            onSEOChange({
+              title: livePost.title,
+              description: livePost.excerpt,
+              canonicalUrl: `${window.location.origin}/vietnam-visa-requirements/${slugFromPath}`,
+              ogImage: livePost.featuredImage,
+              ogType: 'article',
+              articleAuthor: livePost.author || 'Vietnam Visa Advisory Team'
+            });
+          }
+        }
+        setLoadingCode(null);
+      } else if (hash && hash.startsWith('#req-')) {
+        const code = hash.replace('#req-', '').toUpperCase();
+        const country = dynamicCountries.find(c => c.code.toUpperCase() === code) || COUNTRIES_DATA.find(c => c.code.toUpperCase() === code);
+        if (country) {
+          await handleOpenCountryPost(country, false);
+        }
+      }
+    };
+
+    checkUrlRoute();
+    window.addEventListener('popstate', checkUrlRoute);
+    window.addEventListener('hashchange', checkUrlRoute);
+    return () => {
+      window.removeEventListener('popstate', checkUrlRoute);
+      window.removeEventListener('hashchange', checkUrlRoute);
+    };
+  }, [wpPosts, dynamicCountries]);
 
   // Top 8 featured countries ordered by traveler volume to Vietnam for homepage
   const top8Countries = TOP_FEATURED_CODES
@@ -224,13 +297,10 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     return (
       <div id="requirement-article-view" className="space-y-6 sm:space-y-8 animate-fade-in pb-12">
         {/* Top Breadcrumb & Navigation Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+        <div className="sticky top-16 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-md border border-slate-200">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
             <button
-              onClick={() => {
-                setSelectedPost(null);
-                window.history.pushState({}, '', window.location.pathname);
-              }}
+              onClick={handleCloseArticle}
               className="inline-flex items-center gap-1.5 font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -243,11 +313,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
           </div>
 
           <button
-            onClick={() => {
-              setSelectedPost(null);
-              window.history.pushState({}, '', window.location.pathname);
-            }}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+            onClick={handleCloseArticle}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 hover:bg-indigo-600 px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-xs"
           >
             <X className="w-4 h-4" />
             <span>{isVi ? 'Đóng Bài Viết' : 'Close Article'}</span>

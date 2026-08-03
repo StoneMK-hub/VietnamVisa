@@ -399,17 +399,15 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                   {isVi ? 'Xử lý trực tuyến nhanh chóng trong 1 giờ - 24 giờ. Đảm bảo đậu 99.9%.' : 'Fast 1-hour to 24-hour urgent approval. 99.9% approval guarantee.'}
                 </p>
               </div>
-              <button
-                onClick={() => {
-                  if (onApplyForCountry && selectedCountryName) {
-                    onApplyForCountry(selectedCountryName);
-                  }
-                }}
+              <a
+                href="https://vietnamvisa.govt.vn/apply-online"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-6 py-3 rounded-xl transition-all cursor-pointer shadow-lg hover:shadow-xl shrink-0 flex items-center justify-center gap-2 text-sm"
               >
                 <span>{isVi ? 'Xin Visa Ngay' : 'Apply Online Now'}</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </a>
             </div>
 
             {/* SEO Country Link Directory Grid */}

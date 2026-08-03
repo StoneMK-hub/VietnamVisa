@@ -249,14 +249,14 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {onStartApplication && (
-              <button
-                onClick={onStartApplication}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition-all cursor-pointer shadow-sm"
-              >
-                <span>{isVi ? 'Xin Visa Khẩn' : 'Apply Visa'}</span>
-              </button>
-            )}
+            <a
+              href="https://vietnamvisa.govt.vn/apply-online"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition-all cursor-pointer shadow-sm"
+            >
+              <span>{isVi ? 'Xin Visa Khẩn' : 'Apply Visa'}</span>
+            </a>
 
             <button
               onClick={handleCloseArticle}
@@ -332,15 +332,15 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                 </p>
               </div>
 
-              {onStartApplication && (
-                <button
-                  onClick={onStartApplication}
-                  className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer shrink-0 shadow-lg flex items-center justify-center gap-2 border border-orange-400/30"
-                >
-                  <span>{isVi ? 'Nộp Hồ Sơ Khẩn Ngay' : 'Apply Urgent Visa Now'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              )}
+              <a
+                href="https://vietnamvisa.govt.vn/apply-online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer shrink-0 shadow-lg flex items-center justify-center gap-2 border border-orange-400/30"
+              >
+                <span>{isVi ? 'Nộp Hồ Sơ Khẩn Ngay' : 'Apply Urgent Visa Now'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </article>
@@ -750,15 +750,14 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                   </div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    handleCloseArticle();
-                    if (onStartApplication) onStartApplication();
-                  }}
-                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all cursor-pointer shrink-0 shadow-md border border-orange-500"
+                <a
+                  href="https://vietnamvisa.govt.vn/apply-online"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all cursor-pointer shrink-0 shadow-md border border-orange-500 text-center"
                 >
                   {isVi ? 'Xin Visa Khẩn Ngay' : 'Apply Urgent Visa'}
-                </button>
+                </a>
               </div>
 
               {/* Modal Footer Controls */}

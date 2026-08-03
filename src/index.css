@@ -4,16 +4,67 @@ html {
   font-size: 17px;
 }
 
-/* Ensure WordPress HTML content images, tables, and embeds stay strictly within container boundaries */
+/* Ensure WordPress HTML content images, tables, figures, and embeds stay strictly within container boundaries and display full width */
+.prose,
+.wp-content,
+.blog-content,
+div[dangerouslySetInnerHTML] {
+  width: 100%;
+}
+
+.prose figure,
+.wp-content figure,
+.blog-content figure,
+.wp-block-image,
+div[dangerouslySetInnerHTML] figure,
+div[dangerouslySetInnerHTML] .wp-block-image,
+div[dangerouslySetInnerHTML] div.wp-block-image {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  display: block !important;
+  clear: both !important;
+  float: none !important;
+}
+
 .prose img,
 .wp-content img,
-.blog-content img {
+.blog-content img,
+article img,
+div[dangerouslySetInnerHTML] img {
+  width: 100% !important;
   max-width: 100% !important;
   height: auto !important;
-  border-radius: 0.75rem;
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
+  max-height: none !important;
+  min-height: 0 !important;
+  object-fit: cover !important;
+  border-radius: 1rem !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  display: block !important;
+  cursor: zoom-in !important;
+  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prose img:hover,
+div[dangerouslySetInnerHTML] img:hover {
+  transform: scale(1.008);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+}
+
+.prose figcaption,
+.wp-content figcaption,
+.blog-content figcaption,
+div[dangerouslySetInnerHTML] figcaption {
+  text-align: center !important;
+  font-size: 0.85rem !important;
+  color: #64748b !important;
+  margin-top: 0.5rem !important;
+  font-style: italic !important;
 }
 
 .prose table,

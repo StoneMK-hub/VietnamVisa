@@ -14,7 +14,9 @@ import {
   User, 
   ExternalLink, 
   ShieldAlert, 
-  FileText 
+  FileText,
+  ZoomIn,
+  ZoomOut
 } from 'lucide-react';
 import { Language } from '../types';
 import { COUNTRIES_DATA } from '../data/countries';
@@ -57,6 +59,21 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [selectedCountryName, setSelectedCountryName] = useState<string>('');
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
+
+  // Interactive Image Lightbox Zoom state
+  const [lightboxImage, setLightboxImage] = useState<{ src: string; alt: string } | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+
+  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'IMG') {
+      const img = target as HTMLImageElement;
+      if (img.src) {
+        setLightboxImage({ src: img.src, alt: img.alt || selectedPost?.title || '' });
+        setZoomLevel(1);
+      }
+    }
+  };
 
   useEffect(() => {
     async function loadReqPosts() {
@@ -216,7 +233,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   const handleCloseArticle = () => {
     setSelectedPost(null);
     setSelectedCountryName('');
-    window.history.pushState({}, '', '/vietnam-visa-requirements');
+    window.history.pushState({}, '', isHome ? '/' : '/vietnam-visa-requirements');
     if (onSEOChange) {
       onSEOChange(null);
     }
@@ -296,8 +313,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   if (selectedPost) {
     return (
       <div id="requirement-article-view" className="space-y-6 sm:space-y-8 animate-fade-in pb-12">
-        {/* Top Breadcrumb & Navigation Bar */}
-        <div className="sticky top-16 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-md border border-slate-200">
+        {/* Top Breadcrumb & Navigation Bar (Static Flow) */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
             <button
               onClick={handleCloseArticle}
@@ -367,7 +384,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
           {/* Article Body Content */}
           <div className="p-6 sm:p-10 md:p-12 space-y-8">
             <div 
-              className="prose prose-slate lg:prose-lg max-w-none text-slate-800 leading-relaxed space-y-5"
+              onClick={handleContentClick}
+              className="prose prose-slate lg:prose-lg max-w-none text-slate-800 leading-relaxed space-y-5 break-words cursor-pointer [&_img]:w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:max-h-none [&_img]:object-contain [&_img]:rounded-2xl [&_img]:mx-auto [&_img]:my-6 [&_figure]:w-full [&_figure]:max-w-full [&_figure]:mx-auto [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
               dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
             />
 
@@ -832,6 +850,80 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Image Lightbox Modal */}
+      {lightboxImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-between p-3 sm:p-6 animate-fade-in select-none"
+          onClick={() => setLightboxImage(null)}
+        >
+          {/* Lightbox Header Bar */}
+          <div 
+            className="w-full max-w-5xl flex flex-wrap items-center justify-between gap-3 text-white z-10 bg-slate-900/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold truncate max-w-sm sm:max-w-md">
+              <ZoomIn className="w-4 h-4 text-indigo-400 shrink-0" />
+              <span className="truncate">{lightboxImage.alt || (isVi ? 'Hình ảnh hướng dẫn' : 'Requirement Image')}</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.25))}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all cursor-pointer"
+                title={isVi ? 'Thu nhỏ' : 'Zoom Out'}
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+
+              <span className="text-xs font-mono font-bold px-2 text-slate-300 min-w-[50px] text-center">
+                {Math.round(zoomLevel * 100)}%
+              </span>
+
+              <button
+                onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.25))}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all cursor-pointer"
+                title={isVi ? 'Phóng to' : 'Zoom In'}
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setZoomLevel(1)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all cursor-pointer text-xs font-bold px-3 hidden sm:inline"
+              >
+                Reset
+              </button>
+
+              <button
+                onClick={() => setLightboxImage(null)}
+                className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all cursor-pointer ml-1 sm:ml-2 flex items-center gap-1 text-xs font-bold"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">{isVi ? 'Đóng' : 'Close'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Lightbox Image Stage */}
+          <div 
+            className="flex-1 w-full max-w-5xl flex items-center justify-center overflow-auto py-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
+              style={{ transform: `scale(${zoomLevel})` }}
+              className="max-w-full max-h-[78vh] object-contain rounded-xl shadow-2xl transition-transform duration-200 ease-out cursor-zoom-in"
+            />
+          </div>
+
+          {/* Footer Instruction */}
+          <div className="text-slate-400 text-xs text-center z-10 pb-1">
+            {isVi ? 'Nhấp ngoài hoặc bấm nút Đóng để thoát xem ảnh' : 'Click outside or press Close to exit'}
           </div>
         </div>
       )}

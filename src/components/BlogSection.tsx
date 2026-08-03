@@ -15,7 +15,10 @@ import {
   ChevronRight,
   ChevronLeft,
   Filter,
-  FileText
+  FileText,
+  ZoomIn,
+  ZoomOut,
+  Maximize2
 } from 'lucide-react';
 import { Language } from '../types';
 import { BlogPost, fetchUrgentBlogPosts, fetchWpPostBySlug } from '../services/wordpressApi';
@@ -41,6 +44,21 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // Interactive Image Lightbox Zoom state
+  const [lightboxImage, setLightboxImage] = useState<{ src: string; alt: string } | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+
+  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'IMG') {
+      const img = target as HTMLImageElement;
+      if (img.src) {
+        setLightboxImage({ src: img.src, alt: img.alt || selectedPost?.title || '' });
+        setZoomLevel(1);
+      }
+    }
+  };
   
   // Pagination State & Responsive Layout
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -108,8 +126,12 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
 
   const handleCloseArticle = () => {
     setSelectedPost(null);
-    if (window.location.pathname.startsWith('/blog/')) {
-      window.history.pushState({}, '', '/blog');
+    if (isHome) {
+      window.history.pushState({}, '', '/');
+    } else {
+      if (window.location.pathname.startsWith('/blog/')) {
+        window.history.pushState({}, '', '/blog');
+      }
     }
     if (onSEOChange) {
       onSEOChange(null);
@@ -139,7 +161,10 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
         if (livePost) {
           handleOpenPost(livePost, false);
         }
-      } else if (pathname === '/blog' && selectedPost) {
+      } else if (pathname === '/' && selectedPost && isHome) {
+        setSelectedPost(null);
+        if (onSEOChange) onSEOChange(null);
+      } else if (pathname === '/blog' && selectedPost && !isHome) {
         setSelectedPost(null);
         if (onSEOChange) onSEOChange(null);
       }
@@ -148,7 +173,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
     checkUrlRoute();
     window.addEventListener('popstate', checkUrlRoute);
     return () => window.removeEventListener('popstate', checkUrlRoute);
-  }, [posts]);
+  }, [posts, isHome, selectedPost]);
 
   // Categories list
   const categories = useMemo(() => {
@@ -207,8 +232,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
 
     return (
       <div className="space-y-6 sm:space-y-8 animate-fade-in pb-12">
-        {/* Top Sticky Navigation Bar */}
-        <div className="sticky top-16 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-md border border-slate-200">
+        {/* Top Navigation Bar (Static Flow) */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
             <button
               onClick={handleCloseArticle}
@@ -289,7 +314,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
           {/* Article Body Content */}
           <div className="p-6 sm:p-10 md:p-12 space-y-8">
             <div 
-              className="prose prose-slate lg:prose-lg max-w-none text-slate-800 leading-relaxed space-y-5 overflow-hidden break-words [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-2xl [&_img]:mx-auto [&_img]:my-6 [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
+              onClick={handleContentClick}
+              className="prose prose-slate lg:prose-lg max-w-none text-slate-800 leading-relaxed space-y-5 break-words cursor-pointer title-hover [&_img]:w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:max-h-none [&_img]:object-contain [&_img]:rounded-2xl [&_img]:mx-auto [&_img]:my-6 [&_figure]:w-full [&_figure]:max-w-full [&_figure]:mx-auto [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
               dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
             />
 
@@ -661,20 +687,20 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 relative space-y-6 scrollbar-thin">
             
-            {/* FLOATING STICKY CLOSE BUTTON BAR */}
-            <div className="sticky top-2 right-2 z-50 flex justify-end pointer-events-none p-2 pr-3">
-              <button
-                onClick={handleCloseArticle}
-                className="pointer-events-auto bg-slate-900/90 hover:bg-red-600 text-white p-2.5 rounded-full shadow-2xl border border-white/40 backdrop-blur-md transition-all hover:scale-105 cursor-pointer group flex items-center gap-1.5"
-                title={isVi ? 'Đóng cửa sổ xem nhanh' : 'Close quick view'}
-              >
-                <X className="w-5 h-5" />
-                <span className="text-xs font-bold pr-1 hidden sm:inline">{isVi ? 'Đóng' : 'Close'}</span>
-              </button>
-            </div>
+            {/* Modal Header Image with Top-Right Close Button */}
+            <div className="relative h-52 sm:h-64 bg-slate-900 overflow-hidden rounded-t-3xl">
+              {/* Close Button */}
+              <div className="absolute top-3 right-3 z-30 flex justify-end">
+                <button
+                  onClick={handleCloseArticle}
+                  className="bg-slate-900/80 hover:bg-red-600 text-white p-2 sm:p-2.5 rounded-full shadow-lg border border-white/30 backdrop-blur-md transition-all hover:scale-105 cursor-pointer flex items-center gap-1.5"
+                  title={isVi ? 'Đóng cửa sổ xem nhanh' : 'Close quick view'}
+                >
+                  <X className="w-5 h-5" />
+                  <span className="text-xs font-bold pr-1 hidden sm:inline">{isVi ? 'Đóng' : 'Close'}</span>
+                </button>
+              </div>
 
-            {/* Modal Header Image */}
-            <div className="relative -mt-14 h-52 sm:h-64 bg-slate-900 overflow-hidden rounded-t-3xl">
               <img
                 src={selectedPost.featuredImage}
                 alt={selectedPost.title}
@@ -705,7 +731,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             {/* Modal Content Body */}
             <div className="p-6 sm:p-8 space-y-6">
               <div 
-                className="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700 space-y-4 overflow-hidden break-words [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:mx-auto [&_img]:my-4 [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
+                onClick={handleContentClick}
+                className="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700 space-y-4 break-words cursor-pointer [&_img]:w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:max-h-none [&_img]:object-contain [&_img]:rounded-xl [&_img]:mx-auto [&_img]:my-4 [&_figure]:w-full [&_figure]:max-w-full [&_figure]:mx-auto [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
                 dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
               />
 
@@ -756,6 +783,80 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Image Lightbox Modal */}
+      {lightboxImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-between p-3 sm:p-6 animate-fade-in select-none"
+          onClick={() => setLightboxImage(null)}
+        >
+          {/* Lightbox Header Bar */}
+          <div 
+            className="w-full max-w-5xl flex flex-wrap items-center justify-between gap-3 text-white z-10 bg-slate-900/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold truncate max-w-sm sm:max-w-md">
+              <ZoomIn className="w-4 h-4 text-indigo-400 shrink-0" />
+              <span className="truncate">{lightboxImage.alt || (isVi ? 'Hình ảnh bài viết' : 'Article Image')}</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.25))}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all cursor-pointer"
+                title={isVi ? 'Thu nhỏ' : 'Zoom Out'}
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+
+              <span className="text-xs font-mono font-bold px-2 text-slate-300 min-w-[50px] text-center">
+                {Math.round(zoomLevel * 100)}%
+              </span>
+
+              <button
+                onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.25))}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all cursor-pointer"
+                title={isVi ? 'Phóng to' : 'Zoom In'}
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setZoomLevel(1)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all cursor-pointer text-xs font-bold px-3 hidden sm:inline"
+              >
+                Reset
+              </button>
+
+              <button
+                onClick={() => setLightboxImage(null)}
+                className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all cursor-pointer ml-1 sm:ml-2 flex items-center gap-1 text-xs font-bold"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">{isVi ? 'Đóng' : 'Close'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Lightbox Image Stage */}
+          <div 
+            className="flex-1 w-full max-w-5xl flex items-center justify-center overflow-auto py-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
+              style={{ transform: `scale(${zoomLevel})` }}
+              className="max-w-full max-h-[78vh] object-contain rounded-xl shadow-2xl transition-transform duration-200 ease-out cursor-zoom-in"
+            />
+          </div>
+
+          {/* Footer Instruction */}
+          <div className="text-slate-400 text-xs text-center z-10 pb-1">
+            {isVi ? 'Nhấp ngoài hoặc bấm nút Đóng để thoát xem ảnh' : 'Click outside or press Close to exit'}
           </div>
         </div>
       )}

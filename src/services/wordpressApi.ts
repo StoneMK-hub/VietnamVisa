@@ -101,16 +101,52 @@ function decodeHtmlEntities(str: string): string {
 
 const DIRECT_WP_BASE = 'https://blog.vietnamevisaservice.com';
 
+// Client-side Memory Cache
+let memoryBlogPosts: BlogPost[] | null = null;
+let memoryFaqPosts: WpFaqItem[] | null = null;
+let memoryRequirementPosts: BlogPost[] | null = null;
+const memorySlugPostsMap = new Map<string, BlogPost>();
+
 /**
- * Fetch Blog Posts from backend API or direct WordPress REST API (static host fallback)
+ * Fetch Blog Posts from backend API or direct WordPress REST API with client caching
  */
 export async function fetchUrgentBlogPosts(): Promise<BlogPost[]> {
-  // 1. Try backend API proxy first
+  if (memoryBlogPosts && memoryBlogPosts.length > 0) {
+    fetchUrgentBlogPostsNetwork().then(posts => {
+      if (posts && posts.length > 0) memoryBlogPosts = posts;
+    }).catch(() => {});
+    return memoryBlogPosts;
+  }
+
+  try {
+    const sessionStr = sessionStorage.getItem('wp_urgent_blog_posts_cache');
+    if (sessionStr) {
+      const parsed = JSON.parse(sessionStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        memoryBlogPosts = parsed;
+        fetchUrgentBlogPostsNetwork().then(posts => {
+          if (posts && posts.length > 0) {
+            memoryBlogPosts = posts;
+            sessionStorage.setItem('wp_urgent_blog_posts_cache', JSON.stringify(posts));
+          }
+        }).catch(() => {});
+        return memoryBlogPosts;
+      }
+    }
+  } catch (e) {}
+
+  const posts = await fetchUrgentBlogPostsNetwork();
+  memoryBlogPosts = posts;
+  try {
+    sessionStorage.setItem('wp_urgent_blog_posts_cache', JSON.stringify(posts));
+  } catch (e) {}
+  return posts;
+}
+
+async function fetchUrgentBlogPostsNetwork(): Promise<BlogPost[]> {
   try {
     const res = await fetch('/api/wordpress/posts', {
-      headers: {
-        'Accept': 'application/json'
-      }
+      headers: { 'Accept': 'application/json' }
     });
 
     if (res.ok) {
@@ -123,7 +159,6 @@ export async function fetchUrgentBlogPosts(): Promise<BlogPost[]> {
     console.warn('Backend WordPress API fetch failed, trying direct REST API:', err);
   }
 
-  // 2. Direct fetch from WordPress REST API (for static hosting environments without Node server)
   try {
     const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=100&_embed=true`);
     if (directRes.ok) {
@@ -143,7 +178,7 @@ export async function fetchUrgentBlogPosts(): Promise<BlogPost[]> {
             author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
             featuredImage,
             category: 'Urgent Vietnam Visa Blog New',
-            readTime: '4 min read',
+            readTime: '3 min read',
             link: p.link || `${DIRECT_WP_BASE}/${p.slug}/`,
             slug: p.slug || ''
           };
@@ -220,6 +255,39 @@ export const FALLBACK_FAQS: WpFaqItem[] = [
  * Fetch FAQ Category Posts from WordPress API
  */
 export async function fetchWpFaqPosts(): Promise<WpFaqItem[]> {
+  if (memoryFaqPosts && memoryFaqPosts.length > 0) {
+    fetchWpFaqPostsNetwork().then(faqs => {
+      if (faqs && faqs.length > 0) memoryFaqPosts = faqs;
+    }).catch(() => {});
+    return memoryFaqPosts;
+  }
+
+  try {
+    const sessionStr = sessionStorage.getItem('wp_faq_posts_cache');
+    if (sessionStr) {
+      const parsed = JSON.parse(sessionStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        memoryFaqPosts = parsed;
+        fetchWpFaqPostsNetwork().then(faqs => {
+          if (faqs && faqs.length > 0) {
+            memoryFaqPosts = faqs;
+            sessionStorage.setItem('wp_faq_posts_cache', JSON.stringify(faqs));
+          }
+        }).catch(() => {});
+        return memoryFaqPosts;
+      }
+    }
+  } catch (e) {}
+
+  const faqs = await fetchWpFaqPostsNetwork();
+  memoryFaqPosts = faqs;
+  try {
+    sessionStorage.setItem('wp_faq_posts_cache', JSON.stringify(faqs));
+  } catch (e) {}
+  return faqs;
+}
+
+async function fetchWpFaqPostsNetwork(): Promise<WpFaqItem[]> {
   try {
     const res = await fetch('/api/wordpress/faqs', {
       headers: {
@@ -317,6 +385,39 @@ export const FALLBACK_REQUIREMENT_POSTS: BlogPost[] = [
  * Fetch Requirement Posts from WordPress REST API (Category "Visa Requirements")
  */
 export async function fetchWpRequirementPosts(): Promise<BlogPost[]> {
+  if (memoryRequirementPosts && memoryRequirementPosts.length > 0) {
+    fetchWpRequirementPostsNetwork().then(posts => {
+      if (posts && posts.length > 0) memoryRequirementPosts = posts;
+    }).catch(() => {});
+    return memoryRequirementPosts;
+  }
+
+  try {
+    const sessionStr = sessionStorage.getItem('wp_requirement_posts_cache');
+    if (sessionStr) {
+      const parsed = JSON.parse(sessionStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        memoryRequirementPosts = parsed;
+        fetchWpRequirementPostsNetwork().then(posts => {
+          if (posts && posts.length > 0) {
+            memoryRequirementPosts = posts;
+            sessionStorage.setItem('wp_requirement_posts_cache', JSON.stringify(posts));
+          }
+        }).catch(() => {});
+        return memoryRequirementPosts;
+      }
+    }
+  } catch (e) {}
+
+  const posts = await fetchWpRequirementPostsNetwork();
+  memoryRequirementPosts = posts;
+  try {
+    sessionStorage.setItem('wp_requirement_posts_cache', JSON.stringify(posts));
+  } catch (e) {}
+  return posts;
+}
+
+async function fetchWpRequirementPostsNetwork(): Promise<BlogPost[]> {
   try {
     const res = await fetch('/api/wordpress/requirements', {
       headers: {

@@ -536,12 +536,12 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             {paginatedPosts.map((post) => (
               <article
                 key={post.id}
-                className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-indigo-300 transition-all duration-200 flex flex-col overflow-hidden group"
+                className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-indigo-300 transition-all duration-200 flex flex-col overflow-hidden group"
               >
                 {/* Image Banner */}
                 <div 
                   onClick={() => handleOpenPost(post)}
-                  className="relative h-32 sm:h-44 md:h-48 overflow-hidden bg-slate-100 shrink-0 cursor-pointer"
+                  className="relative h-36 sm:h-44 md:h-48 overflow-hidden bg-slate-100 shrink-0 cursor-pointer"
                 >
                   <img
                     src={post.featuredImage}
@@ -551,11 +551,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-80" />
                   
-                  {/* Category & Read Time */}
-                  <span className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 bg-red-600 text-white text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2.5 py-0.5 rounded-md uppercase tracking-wider shadow-sm truncate max-w-[110px] sm:max-w-none">
-                    {post.category || 'Blog'}
-                  </span>
-
+                  {/* Read Time badge */}
                   <span className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 bg-slate-900/80 text-slate-200 text-[9px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 rounded-md backdrop-blur-xs flex items-center gap-1">
                     <Clock className="w-3 h-3 text-amber-400" />
                     {post.readTime}

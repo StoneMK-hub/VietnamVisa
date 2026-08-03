@@ -33,7 +33,6 @@ div[dangerouslySetInnerHTML] div.wp-block-image {
 .prose img,
 .wp-content img,
 .blog-content img,
-article img,
 div[dangerouslySetInnerHTML] img {
   width: 100% !important;
   max-width: 100% !important;

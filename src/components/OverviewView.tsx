@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Language } from '../types';
 import { TabType } from '../routes';
+import { getOverviewTranslation } from '../data/contentTranslations';
 
 interface OverviewViewProps {
   currentLang: Language;
@@ -27,6 +28,7 @@ interface OverviewViewProps {
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({ currentLang, onNavigate }) => {
+  const tr = getOverviewTranslation(currentLang);
   const isVi = currentLang === 'vi';
   const [activePortTab, setActivePortTab] = useState<'airports' | 'land' | 'sea'>('airports');
   const [portSearch, setPortSearch] = useState('');
@@ -134,15 +136,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ currentLang, onNavig
       <header className="space-y-4 text-center border-b border-slate-200 pb-8">
         <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-bold px-4 py-1.5 rounded-full shadow-2xs">
           <Sparkles className="w-4 h-4 text-indigo-600" />
-          <span>{isVi ? 'Tổng Quan E-Visa Việt Nam 2026' : 'Vietnam eVisa Overview 2026'}</span>
+          <span>{tr.badge}</span>
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-          {isVi ? 'Thị Thực Điện Tử (E-Visa) Việt Nam Là Gì?' : 'What Is a Vietnam eVisa?'}
+          {tr.title}
         </h1>
         <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium">
-          {isVi
-            ? 'Hướng dẫn toàn diện về quy định cấp eVisa Việt Nam, các loại thời hạn, bảng phí dịch vụ và danh sách 83 cửa khẩu nhập cảnh mới nhất.'
-            : 'Comprehensive guide to Vietnam electronic visa regulations, duration options, fee breakdowns, and the expanded list of 83 entry checkpoints.'}
+          {tr.subtitle}
         </p>
       </header>
 
@@ -151,15 +151,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ currentLang, onNavig
         <div className="flex items-center gap-3 text-indigo-700">
           <FileText className="w-7 h-7 shrink-0" />
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            {isVi ? 'Khái Niệm Về E-Visa Việt Nam' : 'What Is a Vietnam eVisa?'}
+            {tr.sec1Title}
           </h2>
         </div>
         <div className="space-y-3.5 text-base sm:text-lg text-slate-700 leading-relaxed font-normal">
-          <p>
-            The Vietnam eVisa is an electronic visa issued by Vietnam's Immigration Department and delivered to your email as a PDF. Unlike older visa types, there is no sticker in your passport. Immigration officers scan the QR code on your printed (or phone-displayed) eVisa, match it against your passport, and stamp you through.
-          </p>
+          <p>{tr.sec1Body1}</p>
           <p className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 sm:p-5 text-slate-800 text-base sm:text-lg">
-            Since <strong>Resolution 127/NQ-CP</strong> took effect on 15 August 2023, the eVisa has been available to citizens of every country and territory worldwide, a significant expansion from the earlier list of 80 eligible nationalities. Vietnam extended the policy again on 2 December 2025 with <strong>Resolution 389/NQ-CP</strong>, expanding the number of accepted entry points from 42 to 83. This includes land borders and seaports, not just airports.
+            {tr.sec1Body2}
           </p>
         </div>
       </section>
@@ -169,16 +167,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ currentLang, onNavig
         <div className="flex items-center gap-3 text-indigo-700">
           <Globe className="w-7 h-7 shrink-0" />
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            {isVi ? 'Ai Cần Xin E-Visa Việt Nam?' : 'Who Needs a Vietnam eVisa?'}
+            {tr.sec2Title}
           </h2>
         </div>
         <div className="space-y-3.5 text-base sm:text-lg text-slate-700 leading-relaxed">
-          <p>
-            If your nationality is on Vietnam's visa-exemption list (citizens of 12 European countries, the UK, France, Germany, Japan, South Korea, ASEAN nations, and a handful of others), you can enter visa-free for a limited period of 14 to 90 days depending on agreement. For everyone else, including US, Canadian, Australian, Indian, Chinese, Mexican, and most South American and African passport holders, the eVisa is required.
-          </p>
-          <p>
-            Even visa-exempt travelers sometimes choose to get an eVisa: it covers stays longer than the visa-free window (45 days isn't always enough for a full Southeast Asia trip), and a multiple-entry eVisa gives you flexibility to leave and return without re-entry concerns.
-          </p>
+          <p>{tr.sec2Body1}</p>
+          <p>{tr.sec2Body2}</p>
         </div>
 
         <div className="pt-2">

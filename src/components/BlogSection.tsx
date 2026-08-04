@@ -8,13 +8,10 @@ import {
   Sparkles, 
   X, 
   RefreshCw,
-  ExternalLink,
-  ShieldAlert,
   Search,
   ArrowLeft,
   ChevronRight,
   ChevronLeft,
-  Filter,
   FileText,
   ZoomIn,
   ZoomOut,
@@ -24,6 +21,8 @@ import { Language } from '../types';
 import { BlogPost, fetchUrgentBlogPosts, fetchWpPostBySlug } from '../services/wordpressApi';
 import { CustomSEOData } from './SEOMetadata';
 import { getBlogSlugFromPath } from '../routes';
+import { tMulti } from '../data/translations';
+import { getLocalizedBlogPost } from '../data/blogTranslations';
 
 interface BlogSectionProps {
   currentLang: Language;
@@ -38,7 +37,6 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
   onSEOChange,
   isHome = false 
 }) => {
-  const isVi = currentLang === 'vi';
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -119,135 +117,169 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
         description: post.excerpt,
         canonicalUrl: `${window.location.origin}/blog/${postSlug}`,
         ogImage: post.featuredImage,
-        ogType: 'article',
-        articleAuthor: post.author || 'Immigration Advisory Team'
+        jsonLd: {
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: post.title,
+          image: [post.featuredImage],
+          datePublished: post.date,
+          author: {
+            '@type': 'Person',
+            name: post.author || 'Vietnam Visa Advisory Team'
+          }
+        }
       });
     }
   };
 
   const handleCloseArticle = () => {
     setSelectedPost(null);
-    if (isHome) {
-      window.history.pushState({}, '', '/');
+    if (window.location.pathname.startsWith('/blog/')) {
+      window.history.pushState({}, '', '/blog');
       window.dispatchEvent(new Event('popstate'));
-    } else {
-      if (window.location.pathname.startsWith('/blog/')) {
-        window.history.pushState({}, '', '/blog');
-        window.dispatchEvent(new Event('popstate'));
-      }
     }
     if (onSEOChange) {
       onSEOChange(null);
     }
   };
 
-  const handleOpenFullBlogPage = (post: BlogPost) => {
-    const postSlug = post.slug || String(post.id);
-    window.history.pushState({}, '', `/blog/${postSlug}`);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+  // Check URL pathname on mount or popstate to render specific blog article if present
   useEffect(() => {
-    const checkUrlRoute = async () => {
+    const syncPostFromPath = async () => {
       const pathname = window.location.pathname;
-      const slugFromPath = getBlogSlugFromPath(pathname);
-
-      if (slugFromPath) {
-        const matched = posts.find(p => p.slug === slugFromPath || String(p.id) === slugFromPath);
-        if (matched) {
-          handleOpenPost(matched, false);
-          return;
+      const slug = getBlogSlugFromPath(pathname);
+      if (slug) {
+        const found = posts.find(p => p.slug === slug || String(p.id) === slug);
+        if (found) {
+          handleOpenPost(found, false);
+        } else {
+          setLoading(true);
+          const fetchedPost = await fetchWpPostBySlug(slug);
+          setLoading(false);
+          if (fetchedPost) {
+            handleOpenPost(fetchedPost, false);
+          }
         }
-
-        const livePost = await fetchWpPostBySlug(slugFromPath);
-        if (livePost) {
-          handleOpenPost(livePost, false);
-        }
-      } else if (pathname === '/' && selectedPost && isHome) {
+      } else if (!pathname.startsWith('/blog/')) {
         setSelectedPost(null);
-        if (onSEOChange) onSEOChange(null);
-      } else if (pathname === '/blog' && selectedPost && !isHome) {
-        setSelectedPost(null);
-        if (onSEOChange) onSEOChange(null);
       }
     };
 
-    checkUrlRoute();
-    window.addEventListener('popstate', checkUrlRoute);
-    return () => window.removeEventListener('popstate', checkUrlRoute);
-  }, [posts, isHome, selectedPost]);
+    syncPostFromPath();
 
-  // Categories list
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    posts.forEach(p => {
-      if (p.category) cats.add(p.category);
-    });
-    return Array.from(cats);
+    const handlePopState = () => {
+      syncPostFromPath();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [posts]);
 
-  // Filtered posts based on search and category
+  // Localize all posts based on current language
+  const localizedPosts = useMemo(() => {
+    return posts.map(p => getLocalizedBlogPost(p, currentLang));
+  }, [posts, currentLang]);
+
+  const activeArticle = useMemo(() => {
+    return selectedPost ? getLocalizedBlogPost(selectedPost, currentLang) : null;
+  }, [selectedPost, currentLang]);
+
+  // Extract unique categories for filter
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    localizedPosts.forEach(p => {
+      if (p.category) set.add(p.category);
+    });
+    return Array.from(set);
+  }, [localizedPosts]);
+
+  // Filter posts by search query & category
   const filteredPosts = useMemo(() => {
-    return posts.filter(post => {
-      const matchesSearch = !searchQuery || 
+    return localizedPosts.filter(post => {
+      const matchesSearch = 
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
       
-      const matchesCat = selectedCategory === 'all' || post.category === selectedCategory;
+      const matchesCategory = 
+        selectedCategory === 'all' || post.category === selectedCategory;
 
-      return matchesSearch && matchesCat;
+      return matchesSearch && matchesCategory;
     });
-  }, [posts, searchQuery, selectedCategory]);
+  }, [localizedPosts, searchQuery, selectedCategory]);
 
-  // Total Pages calculation
-  const totalPages = useMemo(() => {
-    if (isHome) return 1;
-    return Math.max(1, Math.ceil(filteredPosts.length / pageSize));
-  }, [isHome, filteredPosts.length, pageSize]);
-
-  // Paginated articles for rendering
+  // Calculate pagination slice
+  const totalPages = Math.ceil(filteredPosts.length / pageSize);
   const paginatedPosts = useMemo(() => {
     if (isHome) {
-      return posts.slice(0, 4);
+      return filteredPosts.slice(0, 4); // Display max 4 cards on home preview
     }
     const startIndex = (currentPage - 1) * pageSize;
     return filteredPosts.slice(startIndex, startIndex + pageSize);
-  }, [isHome, posts, filteredPosts, currentPage, pageSize]);
+  }, [filteredPosts, currentPage, pageSize, isHome]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
-      const topElement = document.getElementById('blog-grid-top');
-      if (topElement) {
-        topElement.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      const topElem = document.getElementById('blog-grid-top');
+      if (topElem) {
+        topElem.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
 
-  // -------------------------------------------------------------
-  // DEDICATED FULL ARTICLE PAGE VIEW (When in /blog route and article is selected)
-  // -------------------------------------------------------------
-  if (!isHome && selectedPost) {
-    const relatedPosts = posts.filter(p => p.id !== selectedPost.id).slice(0, 3);
+  // Get related posts for single post reader view
+  const relatedPosts = useMemo(() => {
+    if (!activeArticle) return [];
+    return localizedPosts
+      .filter(p => p.id !== activeArticle.id)
+      .slice(0, 3);
+  }, [localizedPosts, activeArticle]);
 
+  // -------------------------------------------------------------
+  // SINGLE BLOG POST FULL READER VIEW
+  // -------------------------------------------------------------
+  if (activeArticle) {
     return (
-      <div className="space-y-6 sm:space-y-8 animate-fade-in pb-12">
-        {/* Top Navigation Bar (Static Flow) */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
-            <button
-              onClick={handleCloseArticle}
-              className="inline-flex items-center gap-1.5 font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{isVi ? 'Tất Cả Bài Viết Blog' : 'All Blog Posts'}</span>
-            </button>
-            <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
-            <span className="font-semibold text-slate-800 truncate max-w-[180px] sm:max-w-md">
-              {selectedPost.title}
+      <div className="max-w-4xl mx-auto py-4 sm:py-8 space-y-6 sm:space-y-8 animate-fadeIn font-sans">
+        {/* Navigation Breadcrumb Bar */}
+        <div className="flex items-center justify-between gap-4 bg-slate-50 border border-slate-200 p-3 sm:p-4 rounded-2xl">
+          <button
+            onClick={handleCloseArticle}
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold text-indigo-700 hover:text-indigo-900 bg-white border border-indigo-200 hover:bg-indigo-50 px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>
+              {tMulti(currentLang, {
+                en: 'Back to Blog List',
+                vi: 'Quay lại danh sách bài viết',
+                fr: 'Retour à la liste des blogs',
+                de: 'Zurück zur Blogübersicht',
+                ja: 'ブログ一覧に戻る',
+                zh: '返回博客列表',
+                he: 'חזרה לרשימת הבלוג',
+                ko: '블로그 목록으로 돌아가기',
+                es: 'Volver a la lista del blog'
+              })}
+            </span>
+          </button>
+
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium truncate max-w-xs md:max-w-md">
+            <span>
+              {tMulti(currentLang, {
+                en: 'Blog',
+                vi: 'Blog',
+                fr: 'Blog',
+                de: 'Blog',
+                ja: 'ブログ',
+                zh: '博客',
+                he: 'בלוג',
+                ko: '블로그',
+                es: 'Blog'
+              })}
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="truncate text-slate-900 font-bold">
+              {activeArticle.title}
             </span>
           </div>
 
@@ -256,9 +288,21 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
               href="https://vietnamvisa.govt.vn/apply-online"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition-all cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition-all cursor-pointer shadow-2xs"
             >
-              <span>{isVi ? 'Xin Visa Khẩn' : 'Apply Visa'}</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: 'Apply Visa',
+                  vi: 'Xin Visa Khẩn',
+                  fr: 'Postuler Visa',
+                  de: 'Visum Beantragen',
+                  ja: 'ビザ申請',
+                  zh: '立即申请签证',
+                  he: 'הגש בקשת ויזה',
+                  ko: '비자 신청',
+                  es: 'Solicitar Visa'
+                })}
+              </span>
             </a>
 
             <button
@@ -266,7 +310,19 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
             >
               <X className="w-4 h-4" />
-              <span>{isVi ? 'Đóng' : 'Close'}</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: 'Close',
+                  vi: 'Đóng',
+                  fr: 'Fermer',
+                  de: 'Schließen',
+                  ja: '閉じる',
+                  zh: '关闭',
+                  he: 'סגור',
+                  ko: '닫기',
+                  es: 'Cerrar'
+                })}
+              </span>
             </button>
           </div>
         </div>
@@ -276,8 +332,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
           {/* Header Banner Image */}
           <div className="relative h-64 sm:h-80 md:h-[420px] bg-slate-950 overflow-hidden">
             <img
-              src={selectedPost.featuredImage}
-              alt={selectedPost.title}
+              src={activeArticle.featuredImage}
+              alt={activeArticle.title}
               className="w-full h-full object-cover opacity-85 scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
@@ -285,30 +341,40 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             <div className="absolute bottom-6 left-6 right-6 space-y-3 text-white max-w-4xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="bg-red-600 text-white text-[11px] font-black px-3 py-1 rounded-lg uppercase tracking-wider shadow-md">
-                  {selectedPost.category || 'Visa News'}
+                  {activeArticle.category || 'Visa News'}
                 </span>
                 <span className="bg-indigo-500/90 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg flex items-center gap-1 backdrop-blur-md">
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  {isVi ? 'Tin Cập Nhật 2026' : 'Latest 2026 News'}
+                  {tMulti(currentLang, {
+                    en: 'Latest 2026 News',
+                    vi: 'Tin Cập Nhật 2026',
+                    fr: 'Dernières Nouvelles 2026',
+                    de: 'Neueste Nachrichten 2026',
+                    ja: '2026年最新ニュース',
+                    zh: '2026 最新动态',
+                    he: 'חדשות 2026 העדכניות',
+                    ko: '2026 최신 소식',
+                    es: 'Últimas noticias 2026'
+                  })}
                 </span>
               </div>
 
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight tracking-tight">
-                {selectedPost.title}
+                {activeArticle.title}
               </h1>
 
               <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
                 <span className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
                   <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                  {selectedPost.date}
+                  {activeArticle.date}
                 </span>
                 <span className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
                   <User className="w-3.5 h-3.5 text-emerald-400" />
-                  {selectedPost.author}
+                  {activeArticle.author}
                 </span>
                 <span className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
                   <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  {selectedPost.readTime || '4 min read'}
+                  {activeArticle.readTime || '4 min read'}
                 </span>
               </div>
             </div>
@@ -319,19 +385,37 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             <div 
               onClick={handleContentClick}
               className="prose prose-slate lg:prose-lg max-w-none text-slate-800 leading-relaxed space-y-5 break-words cursor-pointer title-hover [&_img]:w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:max-h-none [&_img]:object-contain [&_img]:rounded-2xl [&_img]:mx-auto [&_img]:my-6 [&_figure]:w-full [&_figure]:max-w-full [&_figure]:mx-auto [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
-              dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
+              dangerouslySetInnerHTML={{ __html: activeArticle.content || activeArticle.excerpt }}
             />
 
             {/* Application Callout Banner */}
             <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="space-y-1 text-center sm:text-left">
                 <h3 className="text-lg sm:text-xl font-black text-white">
-                  {isVi ? 'Cần Xử Lý E-Visa Việt Nam Khẩn?' : 'Need Urgent Vietnam E-Visa Approval?'}
+                  {tMulti(currentLang, {
+                    en: 'Need Urgent Vietnam E-Visa Approval?',
+                    vi: 'Cần Xử Lý E-Visa Việt Nam Khẩn?',
+                    fr: 'Besoin d\'un e-Visa d\'urgence pour le Vietnam ?',
+                    de: 'Benötigen Sie ein Eilvisum für Vietnam?',
+                    ja: 'ベトナムe-Visaの緊急発給が必要ですか？',
+                    zh: '需要紧急加急办理越南电子签证吗？',
+                    he: 'צריך אישור ויזה דחוף לווייטנאם?',
+                    ko: '베트남 긴급 비자 발급이 필요하신가요?',
+                    es: '¿Necesita aprobación urgente de e-Visa para Vietnam?'
+                  })}
                 </h3>
                 <p className="text-xs sm:text-sm text-indigo-200">
-                  {isVi 
-                    ? 'Nhận kết quả công văn nhập cảnh chỉ từ 1 giờ - 24 giờ làm việc. Cam kết 100% đúng hạn.' 
-                    : 'Get official Vietnam visa approval in 1 to 24 hours. Guaranteed fast & secure service.'}
+                  {tMulti(currentLang, {
+                    en: 'Get official Vietnam visa approval in 1 to 24 hours. Guaranteed fast & secure service.',
+                    vi: 'Nhận kết quả công văn nhập cảnh chỉ từ 1 giờ - 24 giờ làm việc. Cam kết 100% đúng hạn.',
+                    fr: 'Obtenez votre e-visa officiel en 1 à 24 heures. Service rapide et sécurisé.',
+                    de: 'Erhalten Sie Ihr Visum innerhalb von 1 bis 24 Stunden. Schnell und sicher.',
+                    ja: '1〜24時間以内に公式ビザ承認を取得。迅速で安全な保証付きサービス。',
+                    zh: '1 至 24 小时内获得官方核准文件。保质保时，安全快捷。',
+                    he: 'קבל אישור ויזה רשמי תוך 1 עד 24 שעות. שירות מהיר ומאובטח בהתחייבות.',
+                    ko: '1시간~24시간 이내 공식 비자 승인. 신속하고 안전한 발급 보장.',
+                    es: 'Obtenga la aprobación oficial de visa en 1 a 24 horas. Servicio rápido y seguro.'
+                  })}
                 </p>
               </div>
 
@@ -341,7 +425,19 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer shrink-0 shadow-lg flex items-center justify-center gap-2 border border-orange-400/30"
               >
-                <span>{isVi ? 'Nộp Hồ Sơ Khẩn Ngay' : 'Apply Urgent Visa Now'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'Apply Urgent Visa Now',
+                    vi: 'Nộp Hồ Sơ Khẩn Ngay',
+                    fr: 'Demander un visa d\'urgence',
+                    de: 'Jetzt Eilvisum beantragen',
+                    ja: '今すぐ緊急ビザを申請',
+                    zh: '立即申请加急签证',
+                    he: 'הגש ויזה דחופה עכשיו',
+                    ko: '지금 긴급 비자 신청하기',
+                    es: 'Solicitar visa urgente ahora'
+                  })}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </a>
             </div>
@@ -354,13 +450,37 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-indigo-600" />
-                <span>{isVi ? 'Các Bài Viết Blog Khác' : 'Other Blog Articles'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'Other Blog Articles',
+                    vi: 'Các Bài Viết Blog Khác',
+                    fr: 'Autres articles du blog',
+                    de: 'Weitere Blogartikel',
+                    ja: 'その他のブログ記事',
+                    zh: '其他相关文章',
+                    he: 'מאמרים נוספים בבלוג',
+                    ko: '기타 블로그 글',
+                    es: 'Otros artículos del blog'
+                  })}
+                </span>
               </h3>
               <button
                 onClick={handleCloseArticle}
                 className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
               >
-                <span>{isVi ? 'Xem tất cả' : 'View all'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'View all',
+                    vi: 'Xem tất cả',
+                    fr: 'Voir tout',
+                    de: 'Alle ansehen',
+                    ja: 'すべて見る',
+                    zh: '查看全部',
+                    he: 'הצג הכל',
+                    ko: '전체 보기',
+                    es: 'Ver todo'
+                  })}
+                </span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -388,7 +508,19 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                     </h4>
                   </div>
                   <div className="pt-2.5 border-t border-slate-100 mt-2.5 flex items-center justify-between text-xs font-bold text-indigo-600">
-                    <span>{isVi ? 'Đọc bài viết' : 'Read Article'}</span>
+                    <span>
+                      {tMulti(currentLang, {
+                        en: 'Read Article',
+                        vi: 'Đọc bài viết',
+                        fr: 'Lire l\'article',
+                        de: 'Artikel lesen',
+                        ja: '記事を読む',
+                        zh: '阅读全文',
+                        he: 'קרא את המאמר',
+                        ko: '기사 읽기',
+                        es: 'Leer artículo'
+                      })}
+                    </span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </article>
@@ -412,20 +544,36 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div className="space-y-2 max-w-2xl">
           {/* Category Badge */}
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-extrabold tracking-wide shadow-xs">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-extrabold tracking-wide shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
             <span>Vietnam Visa Blog 2026</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
-            {isVi 
-              ? 'Tin Tức & Kinh Nghiệm Visa Việt Nam' 
-              : 'Vietnam Visa Blog & Travel Updates'}
+            {tMulti(currentLang, {
+              en: 'Vietnam Visa Blog & Travel Updates',
+              vi: 'Tin Tức & Kinh Nghiệm Visa Việt Nam',
+              fr: 'Blog Visa Vietnam & Actualités Voyage',
+              de: 'Vietnam Visum Blog & Reiseaktualisierungen',
+              ja: 'ベトナムビザブログ＆渡航最新情報',
+              zh: '越南签证资讯与入境指南博客',
+              he: 'בלוג ויזה לווייטנאם ועדכוני טיולים',
+              ko: '베트남 비자 블로그 및 여행 소식',
+              es: 'Blog de Visa de Vietnam y Novedades de Viaje'
+            })}
           </h1>
           <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed">
-            {isVi 
-              ? 'Tổng hợp bài viết hướng dẫn e-Visa, tin tức xuất nhập cảnh và kinh nghiệm xử lý visa khẩn cấp mới nhất.' 
-              : 'Daily updated guides on Vietnam e-Visa policies, emergency processing tips, and official travel advisories.'}
+            {tMulti(currentLang, {
+              en: 'Daily updated guides on Vietnam e-Visa policies, emergency processing tips, and official travel advisories.',
+              vi: 'Tổng hợp bài viết hướng dẫn e-Visa, tin tức xuất nhập cảnh và kinh nghiệm xử lý visa khẩn cấp mới nhất.',
+              fr: 'Mises à jour quotidiennes sur les politiques e-Visa, conseils pour les urgences et avis officiels.',
+              de: 'Täglich aktualisierte Leitfäden zu e-Visum Bestimmungen, Notfalltipps und Reisehinweisen.',
+              ja: 'ベトナムe-Visaポリシー、特急発給のコツ、公式渡航情報を毎日更新中。',
+              zh: '每日更新越南电子签证最新政策、紧急出签技巧与官方入境警示。',
+              he: 'מדריכים מעודכנים על מדיניות הויזה, טיפים להנפקה דחופה ואזהרות מסע רשמיות.',
+              ko: '베트남 전자비자 정책, 긴급 비자 발급 팁 및 공식 여행 안내를 매일 업데이트합니다.',
+              es: 'Guías actualizadas sobre e-Visa de Vietnam, consejos para trámites urgentes y avisos oficiales.'
+            })}
           </p>
         </div>
 
@@ -440,7 +588,19 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
               }}
               className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
             >
-              <span>{isVi ? 'Xem Tất Cả Bài Viết Blog' : 'View All Blog Articles'}</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: 'View All Blog Articles',
+                  vi: 'Xem Tất Cả Bài Viết Blog',
+                  fr: 'Voir tous les articles',
+                  de: 'Alle Blogartikel ansehen',
+                  ja: 'すべてのブログ記事を見る',
+                  zh: '查看所有博客文章',
+                  he: 'צפה בכל מאמרי הבלוג',
+                  ko: '모든 블로그 글 보기',
+                  es: 'Ver todos los artículos del blog'
+                })}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}
@@ -449,24 +609,60 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             onClick={loadPosts}
             disabled={loading}
             className="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-200 transition-colors cursor-pointer disabled:opacity-50"
-            title={isVi ? 'Tải lại bài viết' : 'Reload articles'}
+            title={
+              tMulti(currentLang, {
+                en: 'Reload articles',
+                vi: 'Tải lại bài viết',
+                fr: 'Recharger les articles',
+                de: 'Artikel neu laden',
+                ja: '記事を再読み込み',
+                zh: '重新加载文章',
+                he: 'טען מאמרים מחדש',
+                ko: '기사 새로고침',
+                es: 'Recargar artículos'
+              })
+            }
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>{isVi ? 'Làm mới' : 'Reload'}</span>
+            <span>
+              {tMulti(currentLang, {
+                en: 'Reload',
+                vi: 'Làm mới',
+                fr: 'Recharger',
+                de: 'Neu laden',
+                ja: '更新',
+                zh: '刷新',
+                he: 'רענן',
+                ko: '새로고침',
+                es: 'Recargar'
+              })}
+            </span>
           </button>
         </div>
       </div>
 
       {/* Filter & Search Bar (Only shown on dedicated /blog page) */}
       {!isHome && (
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             {/* Search Input */}
             <div className="relative w-full sm:w-80">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
               <input
                 type="text"
-                placeholder={isVi ? 'Tìm kiếm bài viết blog...' : 'Search blog articles...'}
+                placeholder={
+                  tMulti(currentLang, {
+                    en: 'Search blog articles...',
+                    vi: 'Tìm kiếm bài viết blog...',
+                    fr: 'Rechercher des articles...',
+                    de: 'Blogartikel suchen...',
+                    ja: 'ブログ記事を検索...',
+                    zh: '搜索博客文章...',
+                    he: 'חפש מאמרים בבלוג...',
+                    ko: '블로그 기사 검색...',
+                    es: 'Buscar artículos del blog...'
+                  })
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm focus:outline-none transition-all"
@@ -487,11 +683,21 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                 onClick={() => setSelectedCategory('all')}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedCategory === 'all'
-                    ? 'bg-slate-900 text-white shadow-sm'
+                    ? 'bg-slate-900 text-white shadow-2xs'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                 }`}
               >
-                {isVi ? 'Tất cả bài viết' : 'All Articles'}
+                {tMulti(currentLang, {
+                  en: 'All Articles',
+                  vi: 'Tất cả bài viết',
+                  fr: 'Tous les articles',
+                  de: 'Alle Artikel',
+                  ja: 'すべての記事',
+                  zh: '所有文章',
+                  he: 'כל המאמרים',
+                  ko: '전체 글',
+                  es: 'Todos los artículos'
+                })}
               </button>
 
               {categories.map((cat) => (
@@ -500,7 +706,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     selectedCategory === cat
-                      ? 'bg-slate-900 text-white shadow-sm'
+                      ? 'bg-slate-900 text-white shadow-2xs'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                   }`}
                 >
@@ -523,17 +729,37 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
         <div className="bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-10 text-center space-y-3">
           <FileText className="w-10 h-10 text-slate-400 mx-auto" />
           <p className="text-sm font-semibold text-slate-600">
-            {isVi ? 'Không tìm thấy bài viết nào phù hợp với từ khóa.' : 'No blog posts matched your search filters.'}
+            {tMulti(currentLang, {
+              en: 'No blog posts matched your search filters.',
+              vi: 'Không tìm thấy bài viết nào phù hợp với từ khóa.',
+              fr: 'Aucun article ne correspond à vos filtres de recherche.',
+              de: 'Keine Blogartikel entsprechen Ihren Suchfiltern.',
+              ja: '検索条件に一致するブログ記事が見つかりませんでした。',
+              zh: '没有找到匹配搜索条件的文章。',
+              he: 'לא נמצאו מאמרים התואמים את המסננים שלך.',
+              ko: '검색 조건과 일치하는 글이 없습니다.',
+              es: 'No se encontraron artículos que coincidan con los filtros.'
+            })}
           </p>
           <button
             onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
             className="text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
           >
-            {isVi ? 'Xóa bộ lọc' : 'Clear search filters'}
+            {tMulti(currentLang, {
+              en: 'Clear search filters',
+              vi: 'Xóa bộ lọc',
+              fr: 'Effacer les filtres',
+              de: 'Filter zurücksetzen',
+              ja: 'フィルターをクリア',
+              zh: '清除搜索条件',
+              he: 'נקה מסננים',
+              ko: '필터 초기화',
+              es: 'Limpiar filtros de búsqueda'
+            })}
           </button>
         </div>
       ) : (
-        /* Blog Cards Grid: 2 columns on Mobile, 3 columns on Desktop (or 4 on Home preview) */
+        /* Blog Cards Grid */
         <div className="space-y-8">
           <div className={isHome ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" : "grid grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6"}>
             {paginatedPosts.map((post) => {
@@ -611,7 +837,19 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                         }}
                         className="w-full text-xs sm:text-sm font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center justify-between cursor-pointer"
                       >
-                        <span>{isVi ? 'Xem chi tiết' : 'Read Article'}</span>
+                        <span>
+                          {tMulti(currentLang, {
+                            en: 'Read Article',
+                            vi: 'Xem chi tiết',
+                            fr: 'Lire l\'article',
+                            de: 'Artikel lesen',
+                            ja: '詳細を見る',
+                            zh: '阅读全文',
+                            he: 'קרא מאמר',
+                            ko: '자세히 보기',
+                            es: 'Leer artículo'
+                          })}
+                        </span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </a>
                     </div>
@@ -621,19 +859,23 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
             })}
           </div>
 
-          {/* Pagination Controls Bar (Only on dedicated /blog page with multiple pages) */}
+          {/* Pagination Controls Bar */}
           {!isHome && totalPages > 1 && (
             <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200">
               <div className="text-xs sm:text-sm text-slate-600 font-medium text-center sm:text-left">
-                {isVi ? (
-                  <span>
-                    Hiển thị <b>{Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)}</b> - <b>{Math.min(currentPage * pageSize, filteredPosts.length)}</b> trong <b>{filteredPosts.length}</b> bài viết (Trang {currentPage}/{totalPages})
-                  </span>
-                ) : (
-                  <span>
-                    Showing <b>{Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)}</b> - <b>{Math.min(currentPage * pageSize, filteredPosts.length)}</b> of <b>{filteredPosts.length}</b> articles (Page {currentPage} of {totalPages})
-                  </span>
-                )}
+                <span>
+                  {tMulti(currentLang, {
+                    en: `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} of ${filteredPosts.length} articles (Page ${currentPage} of ${totalPages})`,
+                    vi: `Hiển thị ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} trong ${filteredPosts.length} bài viết (Trang ${currentPage}/${totalPages})`,
+                    fr: `Affichage de ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} à ${Math.min(currentPage * pageSize, filteredPosts.length)} sur ${filteredPosts.length} articles (Page ${currentPage} sur ${totalPages})`,
+                    de: `Anzeige von ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} von ${filteredPosts.length} Artikeln (Seite ${currentPage} von ${totalPages})`,
+                    ja: `${filteredPosts.length}件中 ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)}〜${Math.min(currentPage * pageSize, filteredPosts.length)}件を表示 (${totalPages}ページ中${currentPage}ページ目)`,
+                    zh: `显示第 ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} 条，共 ${filteredPosts.length} 条文章 (第 ${currentPage} / ${totalPages} 页)`,
+                    he: `מציג ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} מתוך ${filteredPosts.length} מאמרים (עמוד ${currentPage} מתוך ${totalPages})`,
+                    ko: `총 ${filteredPosts.length}개 기사 중 ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} 표시 (페이지 ${currentPage} / ${totalPages})`,
+                    es: `Mostrando ${Math.min((currentPage - 1) * pageSize + 1, filteredPosts.length)} - ${Math.min(currentPage * pageSize, filteredPosts.length)} de ${filteredPosts.length} artículos (Página ${currentPage} de ${totalPages})`
+                  })}
+                </span>
               </div>
 
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -641,51 +883,58 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer shadow-2xs disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">{isVi ? 'Trang trước' : 'Previous'}</span>
+                  <span className="hidden sm:inline">
+                    {tMulti(currentLang, {
+                      en: 'Previous',
+                      vi: 'Trang trước',
+                      fr: 'Précédent',
+                      de: 'Zurück',
+                      ja: '前へ',
+                      zh: '上一页',
+                      he: 'הקודם',
+                      ko: '이전',
+                      es: 'Anterior'
+                    })}
+                  </span>
                 </button>
 
                 {/* Page Number Buttons */}
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
-                    // Show numbers: page 1, current page +- 1, totalPages
-                    if (
-                      pageNum === 1 ||
-                      pageNum === totalPages ||
-                      Math.abs(pageNum - currentPage) <= 1
-                    ) {
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => handlePageChange(pageNum)}
-                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
-                            currentPage === pageNum
-                              ? 'bg-indigo-600 text-white shadow-md scale-105'
-                              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    } else if (
-                      (pageNum === 2 && currentPage > 3) ||
-                      (pageNum === totalPages - 1 && currentPage < totalPages - 2)
-                    ) {
-                      return <span key={pageNum} className="px-1 text-slate-400 text-xs">...</span>;
-                    }
-                    return null;
-                  })}
-                </div>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
+                      currentPage === pageNum
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 {/* Next Page Button */}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage >= totalPages}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed"
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer shadow-2xs disabled:cursor-not-allowed"
                 >
-                  <span className="hidden sm:inline">{isVi ? 'Trang sau' : 'Next'}</span>
+                  <span className="hidden sm:inline">
+                    {tMulti(currentLang, {
+                      en: 'Next',
+                      vi: 'Trang sau',
+                      fr: 'Suivant',
+                      de: 'Weiter',
+                      ja: '次へ',
+                      zh: '下一页',
+                      he: 'הבא',
+                      ko: '다음',
+                      es: 'Siguiente'
+                    })}
+                  </span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -694,183 +943,63 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
         </div>
       )}
 
-      {/* -------------------------------------------------------------
-          QUICK VIEW OVERLAY MODAL WITH STICKY FLOATING CLOSE BUTTON
-          (Used on Home or quick preview mode)
-         ------------------------------------------------------------- */}
-      {selectedPost && isHome && (
-        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 relative space-y-6 scrollbar-thin">
-            
-            {/* Modal Header Image with Top-Right Close Button */}
-            <div className="relative h-52 sm:h-64 bg-slate-900 overflow-hidden rounded-t-3xl">
-              {/* Close Button */}
-              <div className="absolute top-3 right-3 z-30 flex justify-end">
-                <button
-                  onClick={handleCloseArticle}
-                  className="bg-slate-900/80 hover:bg-red-600 text-white p-2 sm:p-2.5 rounded-full shadow-lg border border-white/30 backdrop-blur-md transition-all hover:scale-105 cursor-pointer flex items-center gap-1.5"
-                  title={isVi ? 'Đóng cửa sổ xem nhanh' : 'Close quick view'}
-                >
-                  <X className="w-5 h-5" />
-                  <span className="text-xs font-bold pr-1 hidden sm:inline">{isVi ? 'Đóng' : 'Close'}</span>
-                </button>
-              </div>
-
-              <img
-                src={selectedPost.featuredImage}
-                alt={selectedPost.title}
-                className="w-full h-full object-cover opacity-80"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
-
-              <div className="absolute bottom-4 left-4 right-4 space-y-1.5 text-white">
-                <span className="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
-                  {selectedPost.category}
-                </span>
-                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight">
-                  {selectedPost.title}
-                </h2>
-                <div className="flex items-center gap-4 text-xs text-slate-300 pt-1">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                    {selectedPost.date}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-emerald-400" />
-                    {selectedPost.author}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Content Body */}
-            <div className="p-6 sm:p-8 space-y-6">
-              <div 
-                onClick={handleContentClick}
-                className="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700 space-y-4 break-words cursor-pointer [&_img]:w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:max-h-none [&_img]:object-contain [&_img]:rounded-xl [&_img]:mx-auto [&_img]:my-4 [&_figure]:w-full [&_figure]:max-w-full [&_figure]:mx-auto [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_iframe]:max-w-full"
-                dangerouslySetInnerHTML={{ __html: selectedPost.content || selectedPost.excerpt }}
-              />
-
-              {/* Urgent Callout Box inside Modal */}
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2.5 rounded-xl bg-amber-500 text-white shrink-0 mt-0.5">
-                    <ShieldAlert className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 text-xs sm:text-sm">
-                      {isVi ? 'Bạn Cần Dịch Vụ Visa Khẩn 1H - 24H?' : 'Need Emergency 1-Hour Vietnam E-Visa?'}
-                    </h4>
-                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">
-                      {isVi 
-                        ? 'Đội ngũ chuyên gia sẵn sàng nộp hồ sơ trực tiếp với Cục XNC 24/7 kể cả cuối tuần.' 
-                        : 'Our 24/7 team directly files with Vietnam Immigration for instant approval letters.'}
-                    </p>
-                  </div>
-                </div>
-
-                <a
-                  href="https://vietnamvisa.govt.vn/apply-online"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all cursor-pointer shrink-0 shadow-md border border-orange-500 text-center"
-                >
-                  {isVi ? 'Xin Visa Khẩn Ngay' : 'Apply Urgent Visa'}
-                </a>
-              </div>
-
-              {/* Modal Footer Controls */}
-              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-                <button
-                  onClick={() => handleOpenFullBlogPage(selectedPost)}
-                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer"
-                >
-                  <span>{isVi ? 'Xem Trang Chi Tiết Blog Full' : 'Open Full Article Page'}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </button>
-
-                <button
-                  onClick={handleCloseArticle}
-                  className="text-xs font-bold text-slate-700 hover:text-slate-900 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
-                >
-                  {isVi ? 'Đóng bài viết' : 'Close Article'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Interactive Image Lightbox Modal */}
+      {/* Lightbox Modal for Article Images */}
       {lightboxImage && (
         <div 
-          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-between p-3 sm:p-6 animate-fade-in select-none"
+          className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setLightboxImage(null)}
         >
-          {/* Lightbox Header Bar */}
           <div 
-            className="w-full max-w-5xl flex flex-wrap items-center justify-between gap-3 text-white z-10 bg-slate-900/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10 shadow-2xl"
+            className="relative max-w-5xl max-h-[90vh] bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold truncate max-w-sm sm:max-w-md">
-              <ZoomIn className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span className="truncate">{lightboxImage.alt || (isVi ? 'Hình ảnh bài viết' : 'Article Image')}</span>
-            </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <button
-                onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.25))}
-                className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all cursor-pointer"
-                title={isVi ? 'Thu nhỏ' : 'Zoom Out'}
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-
-              <span className="text-xs font-mono font-bold px-2 text-slate-300 min-w-[50px] text-center">
-                {Math.round(zoomLevel * 100)}%
+            {/* Lightbox Controls Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60 text-white">
+              <span className="text-xs font-semibold text-slate-300 truncate max-w-md">
+                {lightboxImage.alt}
               </span>
-
-              <button
-                onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.25))}
-                className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all cursor-pointer"
-                title={isVi ? 'Phóng to' : 'Zoom In'}
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => setZoomLevel(1)}
-                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all cursor-pointer text-xs font-bold px-3 hidden sm:inline"
-              >
-                Reset
-              </button>
-
-              <button
-                onClick={() => setLightboxImage(null)}
-                className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all cursor-pointer ml-1 sm:ml-2 flex items-center gap-1 text-xs font-bold"
-              >
-                <X className="w-4 h-4" />
-                <span className="hidden sm:inline">{isVi ? 'Đóng' : 'Close'}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.25))}
+                  className="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <span className="text-xs font-mono px-1">{Math.round(zoomLevel * 100)}%</span>
+                <button
+                  onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.25))}
+                  className="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setZoomLevel(1)}
+                  className="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors ml-1"
+                  title="Reset Zoom"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setLightboxImage(null)}
+                  className="p-2 text-slate-300 hover:text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors ml-3"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Lightbox Image Stage */}
-          <div 
-            className="flex-1 w-full max-w-5xl flex items-center justify-center overflow-auto py-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={lightboxImage.src}
-              alt={lightboxImage.alt}
-              style={{ transform: `scale(${zoomLevel})` }}
-              className="max-w-full max-h-[78vh] object-contain rounded-xl shadow-2xl transition-transform duration-200 ease-out cursor-zoom-in"
-            />
-          </div>
-
-          {/* Footer Instruction */}
-          <div className="text-slate-400 text-xs text-center z-10 pb-1">
-            {isVi ? 'Nhấp ngoài hoặc bấm nút Đóng để thoát xem ảnh' : 'Click outside or press Close to exit'}
+            {/* Lightbox Image Container */}
+            <div className="p-4 overflow-auto flex items-center justify-center max-h-[calc(90vh-60px)]">
+              <img
+                src={lightboxImage.src}
+                alt={lightboxImage.alt}
+                style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center center' }}
+                className="max-w-full max-h-full object-contain transition-transform duration-200 rounded-lg"
+              />
+            </div>
           </div>
         </div>
       )}

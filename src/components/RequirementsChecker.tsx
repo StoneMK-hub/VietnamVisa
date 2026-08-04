@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { Language } from '../types';
 import { COUNTRIES_DATA } from '../data/countries';
-import { TRANSLATIONS } from '../data/translations';
+import { TRANSLATIONS, tMulti } from '../data/translations';
 import { 
   BlogPost, 
   fetchWpRequirementPosts, 
@@ -31,6 +31,77 @@ import { getExactCountryRequirementUrl } from '../data/countryUrls';
 
 import { CustomSEOData } from './SEOMetadata';
 import { getRequirementSlugFromPath } from '../routes';
+
+// Localized Country Name Helper
+export function getLocalizedCountryName(c: { countryName: string; countryNameVi: string; code?: string }, lang: Language): string {
+  if (lang === 'vi') return c.countryNameVi || c.countryName;
+  if (lang === 'en') return c.countryName;
+  
+  const countryNameMap: Record<string, Record<Language, string>> = {
+    'US': { en: 'United States', vi: 'Mỹ (Hoa Kỳ)', fr: 'États-Unis', de: 'Vereinigte Staaten', ja: 'アメリカ合衆国', zh: '美国', he: 'ארצות הברית', ko: '미국', es: 'Estados Unidos' },
+    'GB': { en: 'United Kingdom', vi: 'Vương quốc Anh', fr: 'Royaume-Uni', de: 'Vereinigtes Königreich', ja: 'イギリス', zh: '英国', he: 'הממלכה המאוחדת', ko: '영국', es: 'Reino Unido' },
+    'DE': { en: 'Germany', vi: 'Đức', fr: 'Allemagne', de: 'Deutschland', ja: 'ドイツ', zh: '德国', he: 'גרמניה', ko: '독일', es: 'Alemania' },
+    'FR': { en: 'France', vi: 'Pháp', fr: 'France', de: 'Frankreich', ja: 'フランス', zh: '法国', he: 'צרפת', ko: 'פנים', es: 'Francia' },
+    'IT': { en: 'Italy', vi: 'Ý (Italia)', fr: 'Italie', de: 'Italien', ja: 'イタリア', zh: '意大利', he: 'איטליה', ko: '이탈리아', es: 'Italia' },
+    'ES': { en: 'Spain', vi: 'Tây Ban Nha', fr: 'Espagne', de: 'Spanien', ja: 'スペイン', zh: '西班牙', he: 'ספרד', ko: '스페인', es: 'España' },
+    'RU': { en: 'Russia', vi: 'Nga', fr: 'Russie', de: 'Russland', ja: 'ロシア', zh: '俄罗斯', he: 'רוסיה', ko: '러시아', es: 'Rusia' },
+    'JP': { en: 'Japan', vi: 'Nhật Bản', fr: 'Japon', de: 'Japan', ja: '日本', zh: '日本', he: 'יפן', ko: '일본', es: 'Japón' },
+    'KR': { en: 'South Korea', vi: 'Hàn Quốc', fr: 'Corée du Sud', de: 'Südkorea', ja: '韓国', zh: '韩国', he: 'קוריאה הדרומית', ko: '대한민국', es: 'Corea del Sur' },
+    'CN': { en: 'China', vi: 'Trung Quốc', fr: 'Chine', de: 'China', ja: '中国', zh: '中国', he: 'סין', ko: '중국', es: 'China' },
+    'TW': { en: 'Taiwan', vi: 'Đài Loan', fr: 'Taïwan', de: 'Taiwan', ja: '台湾', zh: '台湾', he: 'טייוואן', ko: '대만', es: 'Taiwán' },
+    'IN': { en: 'India', vi: 'Ấn Độ', fr: 'Inde', de: 'Indien', ja: 'インド', zh: '印度', he: 'הודו', ko: '인도', es: 'India' },
+    'AU': { en: 'Australia', vi: 'Úc (Australia)', fr: 'Australie', de: 'Australien', ja: 'オーストラリア', zh: '澳大利亚', he: 'אוסטרליה', ko: '호주', es: 'Australia' },
+    'CA': { en: 'Canada', vi: 'Canada', fr: 'Canada', de: 'Kanada', ja: 'カナダ', zh: '加拿大', he: 'קנדה', ko: '캐나다', es: 'Canadá' },
+    'BE': { en: 'Belgium', vi: 'Bỉ', fr: 'Belgique', de: 'Belgien', ja: 'ベルギー', zh: '比利时', he: 'בלגיה', ko: '벨기에', es: 'Bélgica' },
+    'NL': { en: 'Netherlands', vi: 'Hà Lan', fr: 'Pays-Bas', de: 'Niederlande', ja: 'オランダ', zh: '荷兰', he: 'הולנד', ko: '네덜란드', es: 'Países Bajos' },
+    'CH': { en: 'Switzerland', vi: 'Thụy Sĩ', fr: 'Suisse', de: 'Schweiz', ja: 'スイス', zh: '瑞士', he: 'שווייץ', ko: '스위스', es: 'Suiza' },
+    'SE': { en: 'Sweden', vi: 'Thụy Điển', fr: 'Suède', de: 'Schweden', ja: 'スウェーデン', zh: '瑞典', he: 'שוודיה', ko: '스웨덴', es: 'Suecia' },
+    'NO': { en: 'Norway', vi: 'Na Uy', fr: 'Norvège', de: 'Norwegen', ja: 'ノルウェー', zh: '挪威', he: 'נורווגיה', ko: '노르웨이', es: 'Noruega' },
+    'DK': { en: 'Denmark', vi: 'Đan Mạch', fr: 'Danemark', de: 'Dänemark', ja: 'デンマーク', zh: '丹麦', he: 'דנמרק', ko: '덴마크', es: 'Dinamarca' },
+    'FI': { en: 'Finland', vi: 'Phần Lan', fr: 'Finlande', de: 'Finnland', ja: 'フィンランド', zh: '芬兰', he: 'פינלנד', ko: '핀란드', es: 'Finlandia' },
+    'SG': { en: 'Singapore', vi: 'Singapore', fr: 'Singapour', de: 'Singapur', ja: 'シンガポール', zh: '新加坡', he: 'סינגפור', ko: '싱가포르', es: 'Singapur' },
+    'TH': { en: 'Thailand', vi: 'Thái Lan', fr: 'Thaïlande', de: 'Thailand', ja: 'タイ', zh: '泰国', he: 'תאילנד', ko: '태국', es: 'Tailandia' },
+    'MY': { en: 'Malaysia', vi: 'Malaysia', fr: 'Malaisie', de: 'Malaysia', ja: 'マレーシア', zh: '马来西亚', he: 'מלזיה', ko: '말레이시아', es: 'Malasia' },
+    'ID': { en: 'Indonesia', vi: 'Indonesia', fr: 'Indonésie', de: 'Indonesien', ja: 'インドネシア', zh: '印度尼西亚', he: 'אינדונזיה', ko: '인โด네시아', es: 'Indonesia' },
+    'PH': { en: 'Philippines', vi: 'Philippines', fr: 'Philippines', de: 'Philippinen', ja: 'フィリピン', zh: '菲律宾', he: 'פיליפינים', ko: '필리핀', es: 'Filipinas' }
+  };
+
+  const code = c.code?.toUpperCase();
+  if (code && countryNameMap[code] && countryNameMap[code][lang]) {
+    return countryNameMap[code][lang];
+  }
+
+  return c.countryName;
+}
+
+// Localized Country Note Helper
+export function getLocalizedCountryNotes(c: { exemptionDays: number; notes: string; notesVi: string }, lang: Language): string {
+  if (c.exemptionDays > 0) {
+    return tMulti(lang, {
+      en: `Visa exemption up to ${c.exemptionDays} days. 90-day e-Visa available.`,
+      vi: `Miễn visa ${c.exemptionDays} ngày. Đủ điều kiện e-Visa 90 ngày.`,
+      fr: `Exemption de visa jusqu'à ${c.exemptionDays} jours. e-Visa 90 jours disponible.`,
+      de: `Visumbefreiung bis zu ${c.exemptionDays} Tage. 90-Tage-e-Visum verfügbar.`,
+      ja: `最大${c.exemptionDays}日間のビザ免除。90日間e-Visa申請可能。`,
+      zh: `免签停留长达 ${c.exemptionDays} 天。可申请 90 天电子签证。`,
+      he: `פטור וויזה עד ${c.exemptionDays} ימים. ויזה אלקטרונית ל-90 יום זמינה.`,
+      ko: `최대 ${c.exemptionDays}일 비자 면제. 90일 전자비자 신청 가능.`,
+      es: `Exención de visado hasta ${c.exemptionDays} días. e-Visa de 90 días disponible.`
+    });
+  }
+
+  return tMulti(lang, {
+    en: 'Eligible for 30-day and 90-day Single/Multiple Entry e-Visa.',
+    vi: 'Được cấp e-Visa 30 ngày hoặc 90 ngày (1 hoặc nhiều lần).',
+    fr: 'Éligible à l\'e-Visa 30 et 90 jours (entrée simple/multiple).',
+    de: 'Berechtigt für 30- und 90-Tage e-Visum (ein- oder mehrmalige Einreise).',
+    ja: '30日および90日間の一次/数次e-Visaの対象。',
+    zh: '符合 30 天和 90 天单次/多次入境电子签证条件。',
+    he: 'זכאי לוויזה אלקטרונית ל-30 ו-90 יום (כניסה חד/רב פעמית).',
+    ko: '30일 및 90일 단수/복수 전자비자 신청 가능.',
+    es: 'Elegible para e-Visa de 30 y 90 días (entrada única/múltiple).'
+  });
+}
 
 interface RequirementsCheckerProps {
   currentLang: Language;
@@ -525,14 +596,14 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                         loading="lazy"
                       />
                       <span className="font-bold text-slate-900 text-xs sm:text-sm leading-tight line-clamp-2 sm:line-clamp-1 sm:truncate group-hover:text-indigo-600 transition-colors">
-                        {isVi ? c.countryNameVi : c.countryName}
+                        {getLocalizedCountryName(c, currentLang)}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between sm:justify-end gap-1.5 shrink-0 pt-0.5 sm:pt-0">
                       {c.exemptionDays > 0 ? (
                         <span className="bg-emerald-100 text-emerald-800 text-[9px] sm:text-xs font-black px-1.5 sm:px-2 py-0.5 rounded border border-emerald-300/80 shrink-0">
-                          {c.exemptionDays}D EXEMPT
+                          {c.exemptionDays}{tMulti(currentLang, { en: 'D EXEMPT', vi: ' NGÀY MIỄN', fr: 'J EXEMPT', de: 'T BEFREIT', ja: '日免除', zh: '天免签', he: ' ימים פטור', ko: '일 면제', es: 'D EXENTO' })}
                         </span>
                       ) : (
                         <span className="bg-blue-100 text-blue-800 text-[9px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded border border-blue-200 shrink-0">
@@ -542,7 +613,17 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
                       <span
                         className="p-0.5 sm:p-1 rounded-md text-indigo-600 group-hover:bg-indigo-50 group-hover:translate-x-0.5 transition-all flex items-center justify-center shrink-0"
-                        title={isVi ? `Xem chi tiết quy định visa ${c.countryNameVi}` : `View visa guide for ${c.countryName}`}
+                        title={tMulti(currentLang, {
+                          en: `View visa guide for ${c.countryName}`,
+                          vi: `Xem chi tiết quy định visa ${c.countryNameVi}`,
+                          fr: `Voir le guide des visas pour ${c.countryName}`,
+                          de: `Visabestimmungen für ${c.countryName} anzeigen`,
+                          ja: `${c.countryName}のビザ要件ガイドを見る`,
+                          zh: `查看 ${c.countryName} 签证指南`,
+                          he: `צפה במדריך ויזה עבור ${c.countryName}`,
+                          ko: `${c.countryName} 비자 규정 보기`,
+                          es: `Ver guía de visados para ${c.countryName}`
+                        })}
                       >
                         <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </span>
@@ -550,7 +631,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-600 mt-2 sm:mt-2.5 leading-relaxed line-clamp-2">
-                    {isVi ? c.notesVi : c.notes}
+                    {getLocalizedCountryNotes(c, currentLang)}
                   </p>
                 </div>
               </a>
@@ -563,14 +644,30 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-between bg-gradient-to-r from-indigo-50 via-slate-50 to-blue-50 p-4 sm:p-5 rounded-2xl border border-indigo-100 gap-4">
             <div className="space-y-1 text-center sm:text-left">
               <p className="font-bold text-slate-900 text-sm">
-                {currentLang === 'vi'
-                  ? 'Bạn muốn kiểm tra quốc gia khác trên thế giới?'
-                  : 'Looking for requirements of other countries?'}
+                {tMulti(currentLang, {
+                  en: 'Looking for requirements of other countries?',
+                  vi: 'Bạn muốn kiểm tra quốc gia khác trên thế giới?',
+                  fr: 'Vous cherchez les exigences d\'autres pays ?',
+                  de: 'Suchen Sie nach Bestimmungen anderer Länder?',
+                  ja: '他の国のビザ要件をお探しですか？',
+                  zh: '寻找其他国家的签证要求？',
+                  he: 'מחפש דרישות עבור מדינות אחרות?',
+                  ko: '다른 국가의 비자 요건을 찾고 계신가요?',
+                  es: '¿Busca requisitos de otros países?'
+                })}
               </p>
               <p className="text-xs text-slate-500">
-                {currentLang === 'vi'
-                  ? `Tra cứu danh sách đầy đủ ${COUNTRIES_DATA.length}+ quốc gia & lịch miễn thị thực mới nhất 2026.`
-                  : `Search full directory of ${COUNTRIES_DATA.length}+ countries and 2026 exemption guidelines.`}
+                {tMulti(currentLang, {
+                  en: `Search full directory of ${COUNTRIES_DATA.length}+ countries and 2026 exemption guidelines.`,
+                  vi: `Tra cứu danh sách đầy đủ ${COUNTRIES_DATA.length}+ quốc gia & lịch miễn thị thực mới nhất 2026.`,
+                  fr: `Recherchez le répertoire complet de plus de ${COUNTRIES_DATA.length} pays et les directives d'exemption 2026.`,
+                  de: `Durchsuchen Sie das vollständige Verzeichnis von ${COUNTRIES_DATA.length}+ Ländern und die Richtlinien für 2026.`,
+                  ja: `${COUNTRIES_DATA.length}か国以上の完全なディレクトリと2026年のビザ免除ガイドラインを検索。`,
+                  zh: `查询 ${COUNTRIES_DATA.length}+ 个国家和地区的完整免签与电子签政策。`,
+                  he: `חפש במדריך המלא של ${COUNTRIES_DATA.length}+ מדינות והנחיות פטור 2026.`,
+                  ko: `${COUNTRIES_DATA.length}개국 이상의 전체 국가 목록 및 2026년 비자 면제 가이드라인 검색.`,
+                  es: `Busque en el directorio completo de más de ${COUNTRIES_DATA.length} países y directrices de exención 2026.`
+                })}
               </p>
             </div>
 
@@ -578,7 +675,19 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
               onClick={onViewAll}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-md hover:shadow-indigo-200 hover:scale-[1.02] shrink-0 cursor-pointer"
             >
-              <span>{currentLang === 'vi' ? 'Xem Tất Cả 100+ Quốc Gia' : 'View All 100+ Countries'}</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: 'View All 100+ Countries',
+                  vi: 'Xem Tất Cả 100+ Quốc Gia',
+                  fr: 'Voir tous les 100+ pays',
+                  de: 'Alle 100+ Länder anzeigen',
+                  ja: '100か国以上をすべて見る',
+                  zh: '查看全部 100+ 国家',
+                  he: 'צפה בכל 100+ המדינות',
+                  ko: '전 세계 100개국+ 전체 보기',
+                  es: 'Ver todos los 100+ países'
+                })}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -593,20 +702,44 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
             <div className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
               <span>
-                {currentLang === 'vi'
-                  ? 'QUY ĐỊNH MIỄN THỊ THỰC VIỆT NAM 2026'
-                  : 'VIETNAM VISA-FREE EXEMPTION SCHEDULE 2026'}
+                {tMulti(currentLang, {
+                  en: 'VIETNAM VISA-FREE EXEMPTION SCHEDULE 2026',
+                  vi: 'QUY ĐỊNH MIỄN THỊ THỰC VIỆT NAM 2026',
+                  fr: 'CALENDRIER D\'EXEMPTION DE VISA POUR LE VIETNAM 2026',
+                  de: 'VIETNAM VISUMBEFREIUNGSREGELUNG 2026',
+                  ja: 'ベトナム ビザ免除規定 2026',
+                  zh: '2026 年越南最新免签政策一览表',
+                  he: 'לוח פטור מויזה לווייטנאם 2026',
+                  ko: '2026년 베트남 비자 면제 규정 안내',
+                  es: 'CALENDARIO DE EXENCIÓN DE VISADO PARA VIETNAM 2026'
+                })}
               </span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              {currentLang === 'vi'
-                ? 'Danh Sách Các Quốc Gia Được Miễn Visa Vào Việt Nam'
-                : 'Vietnam Visa-Free Exemption Categories & Eligible Countries'}
+              {tMulti(currentLang, {
+                en: 'Vietnam Visa-Free Exemption Categories & Eligible Countries',
+                vi: 'Danh Sách Các Quốc Gia Được Miễn Visa Vào Việt Nam',
+                fr: 'Catégories d\'exemption de visa pour le Vietnam et pays éligibles',
+                de: 'Kategorien der Visumbefreiung für Vietnam & berechtigte Länder',
+                ja: 'ベトナムビザ免除対象国および期間別一覧',
+                zh: '免签入境越南的国家与停留天数分类表',
+                he: 'קטגוריות פטור מויזה לווייטנאם ומדינות זכאיות',
+                ko: '베트남 무비자 입국 가능 국가 및 유형별 목록',
+                es: 'Categorías de exención de visado para Vietnam y países elegibles'
+              })}
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-3xl">
-              {currentLang === 'vi'
-                ? 'Công dân thuộc các quốc gia dưới đây được miễn thị thực nhập cảnh Việt Nam theo Nghị định 44/NQ-CP, 229/NQ-CP và các Hiệp định song phương/ASEAN. Du khách lưu trú vượt quá thời gian miễn phí cần xin E-Visa trực tuyến.'
-                : 'Citizens holding ordinary passports from the following countries are exempt from Vietnam visa requirements under Resolutions 44/NQ-CP, 229/NQ-CP, and ASEAN/bilateral agreements. Travelers staying longer than the visa-free period must apply for an E-Visa.'}
+              {tMulti(currentLang, {
+                en: 'Citizens holding ordinary passports from the following countries are exempt from Vietnam visa requirements under Resolutions 44/NQ-CP, 229/NQ-CP, and ASEAN/bilateral agreements. Travelers staying longer than the visa-free period must apply for an E-Visa.',
+                vi: 'Công dân thuộc các quốc gia dưới đây được miễn thị thực nhập cảnh Việt Nam theo Nghị định 44/NQ-CP, 229/NQ-CP và các Hiệp định song phương/ASEAN. Du khách lưu trú vượt quá thời gian miễn phí cần xin E-Visa trực tuyến.',
+                fr: 'Les citoyens titulaires d\'un passeport ordinaire des pays suivants sont exemptés de visa pour le Vietnam en vertu des résolutions officielles et accords de l\'ASEAN.',
+                de: 'Inhaber gewöhnlicher Reisepässe aus den folgenden Ländern sind gemäß den Regierungsbeschlüssen von der Visumpflicht für Vietnam befreit.',
+                ja: '以下の国のパスポート所持者は、政府決議およびASEAN/二国間協定に基づきベトナムへの無査政入国が認められています。',
+                zh: '持有以下国家普通护照的公民，根据越南政府决议及双边/东盟协议可享受免签入境待遇。超过免签停留期限者需申请电子签证。',
+                he: 'אזרחים בעלי דרכון רגיל מהמדינות הבאות פטורים מדרישות ויזה לווייטנאם על פי החלטות הממשלה והסכמי ASEAN.',
+                ko: '다음 국가의 일반 여권 소지자는 베트남 정부 결의안 및 ASEAN/양자 협정에 따라 비자 없이 입국할 수 있습니다.',
+                es: 'Los ciudadanos con pasaporte ordinario de los siguientes países están exentos de visado para Vietnam según las resoluciones oficiales y acuerdos de la ASEAN.'
+              })}
             </p>
           </div>
 
@@ -620,11 +753,31 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                     45 DAYS
                   </span>
                   <h4 className="text-sm font-extrabold text-slate-900">
-                    {currentLang === 'vi' ? 'Miễn Visa 45 Ngày' : '45 Days Visa-Free'}
+                    {tMulti(currentLang, {
+                      en: '45 Days Visa-Free',
+                      vi: 'Miễn Visa 45 Ngày',
+                      fr: 'Exemption 45 jours',
+                      de: '45 Tage Visumfrei',
+                      ja: '45日間 ビザ免除',
+                      zh: '45 天免签',
+                      he: '45 ימים פטור מויזה',
+                      ko: '45일 무비자 입국',
+                      es: '45 días sin visado'
+                    })}
                   </h4>
                 </div>
                 <span className="text-xs font-medium text-slate-500">
-                  24 {currentLang === 'vi' ? 'quốc gia theo NQ 44/NQ-CP & 229/NQ-CP' : 'countries under Resolutions 44/NQ-CP & 229/NQ-CP'}
+                  24 {tMulti(currentLang, {
+                    en: 'countries under Resolutions 44/NQ-CP & 229/NQ-CP',
+                    vi: 'quốc gia theo NQ 44/NQ-CP & 229/NQ-CP',
+                    fr: 'pays sous les résolutions 44/NQ-CP et 229/NQ-CP',
+                    de: 'Länder gemäß Beschluss 44/NQ-CP & 229/NQ-CP',
+                    ja: '政府決議44/NQ-CPおよび229/NQ-CP対象24か国',
+                    zh: '个国家（依据 44/NQ-CP 和 229/NQ-CP 决议）',
+                    he: 'מדינות על פי החלטות 44/NQ-CP ו-229/NQ-CP',
+                    ko: '결의안 44/NQ-CP & 229/NQ-CP에 따른 24개국',
+                    es: 'países según Resoluciones 44/NQ-CP y 229/NQ-CP'
+                  })}
                 </span>
               </div>
 
@@ -681,7 +834,17 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                       30 DAYS
                     </span>
                     <h4 className="text-sm font-extrabold text-slate-900">
-                      {currentLang === 'vi' ? 'Miễn Visa 30 Ngày' : '30 Days Visa-Free'}
+                      {tMulti(currentLang, {
+                        en: '30 Days Visa-Free',
+                        vi: 'Miễn Visa 30 Ngày',
+                        fr: 'Exemption 30 jours',
+                        de: '30 Tage Visumfrei',
+                        ja: '30日間 ビザ免除',
+                        zh: '30 天免签',
+                        he: '30 ימים פטור מויזה',
+                        ko: '30일 무비자 입국',
+                        es: '30 días sin visado'
+                      })}
                     </h4>
                   </div>
                   <span className="text-xs font-medium text-slate-500">ASEAN & Bilateral</span>
@@ -725,7 +888,17 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                       90 DAYS
                     </span>
                     <h4 className="text-sm font-extrabold text-slate-900">
-                      {currentLang === 'vi' ? 'Miễn Visa 90 Ngày' : '90 Days Visa-Free'}
+                      {tMulti(currentLang, {
+                        en: '90 Days Visa-Free',
+                        vi: 'Miễn Visa 90 Ngày',
+                        fr: 'Exemption 90 jours',
+                        de: '90 Tage Visumfrei',
+                        ja: '90日間 ビザ免除',
+                        zh: '90 天免签',
+                        he: '90 ימים פטור מויזה',
+                        ko: '90일 무비자 입국',
+                        es: '90 días sin visado'
+                      })}
                     </h4>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -758,7 +931,17 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                         21 DAYS
                       </span>
                       <h4 className="text-xs font-bold text-slate-900">
-                        21 Days
+                        {tMulti(currentLang, {
+                          en: '21 Days',
+                          vi: '21 Ngày',
+                          fr: '21 jours',
+                          de: '21 Tage',
+                          ja: '21日間',
+                          zh: '21 天',
+                          he: '21 ימים',
+                          ko: '21일',
+                          es: '21 días'
+                        })}
                       </h4>
                     </div>
                     <div className="flex flex-wrap gap-1">
@@ -786,7 +969,17 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                         14 DAYS
                       </span>
                       <h4 className="text-xs font-bold text-slate-900">
-                        14 Days
+                        {tMulti(currentLang, {
+                          en: '14 Days',
+                          vi: '14 Ngày',
+                          fr: '14 jours',
+                          de: '14 Tage',
+                          ja: '14日間',
+                          zh: '14 天',
+                          he: '14 ימים',
+                          ko: '14일',
+                          es: '14 días'
+                        })}
                       </h4>
                     </div>
                     <div className="flex flex-wrap gap-1">
@@ -820,10 +1013,30 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-slate-900 text-xs">
-                  {currentLang === 'vi' ? 'Thời Hạn Hộ Chiếu' : 'Passport Validity'}
+                  {tMulti(currentLang, {
+                    en: 'Passport Validity',
+                    vi: 'Thời Hạn Hộ Chiếu',
+                    fr: 'Validité du passeport',
+                    de: 'Gültigkeit des Reisepasses',
+                    ja: 'パスポート有効期限',
+                    zh: '护照有效期要求',
+                    he: 'תוקף דרכון',
+                    ko: '여권 유효 기간',
+                    es: 'Validez del pasaporte'
+                  })}
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  {currentLang === 'vi' ? 'Hộ chiếu phải còn hạn ít nhất 6 tháng và có 2 trang trống.' : 'Must be valid for at least 6 months past entry date with 2 blank pages.'}
+                  {tMulti(currentLang, {
+                    en: 'Must be valid for at least 6 months past entry date with 2 blank pages.',
+                    vi: 'Hộ chiếu phải còn hạn ít nhất 6 tháng và có 2 trang trống.',
+                    fr: 'Doit être valide au moins 6 mois après la date d\'entrée avec 2 pages vierges.',
+                    de: 'Muss noch mindestens 6 Monate ab Einreisedatum gültig sein und 2 freie Seiten haben.',
+                    ja: '入国日から6か月以上の有効期限と2ページの blank ページが必要です。',
+                    zh: '护照自入境之日起须有至少 6 个月有效期，并留有 2 页空白页。',
+                    he: 'חייב להיות בתוקף לפחות 6 חודשים מיום הכניסה עם 2 דפים ריקים.',
+                    ko: '입국일 기준 최소 6개월 이상 유효하고 빈 페이지 2장이 있어야 합니다.',
+                    es: 'Debe ser válido al menos 6 meses después de la fecha de entrada con 2 páginas en blanco.'
+                  })}
                 </p>
               </div>
             </div>
@@ -832,10 +1045,30 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-slate-900 text-xs">
-                  {currentLang === 'vi' ? 'Lưu Ý Miễn Visa' : 'Overstay Caution'}
+                  {tMulti(currentLang, {
+                    en: 'Overstay Caution',
+                    vi: 'Lưu Ý Miễn Visa',
+                    fr: 'Attention au dépassement',
+                    de: 'Hinweis zu Überziehung',
+                    ja: '滞在期限の注意事項',
+                    zh: '免签停留注意',
+                    he: 'אזהרת שהיית יתר',
+                    ko: '무비자 체류 주의사항',
+                    es: 'Precaución de estancia'
+                  })}
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  {currentLang === 'vi' ? 'Áp dụng cho chuyến lưu trú liên tục. Muốn ở lâu hơn cần xin E-Visa.' : 'Exemption applies to continuous stay; apply E-Visa for longer stays.'}
+                  {tMulti(currentLang, {
+                    en: 'Exemption applies to continuous stay; apply E-Visa for longer stays.',
+                    vi: 'Áp dụng cho chuyến lưu trú liên tục. Muốn ở lâu hơn cần xin E-Visa.',
+                    fr: 'L\'exemption s\'applique au séjour continu; demandez un e-Visa pour des séjours plus longs.',
+                    de: 'Befreiung gilt für durchgehenden Aufenthalt; beantragen Sie ein e-Visum für längere Aufenthalte.',
+                    ja: '連続滞在に適用されます。長期滞在の場合はe-Visaを申請してください。',
+                    zh: '免签适用于连续停留。如需延长停留，请提前在线申请电子签证。',
+                    he: 'הפטור חל על שהייה רצופה; הגישו בקשה לוויזה אלקטרונית לשהייה ארוכה יותר.',
+                    ko: '무비자는 연속 체류에 적용됩니다. 더 길게 체류하려면 전자비자를 신청하세요.',
+                    es: 'La exención se aplica a la estancia continua; solicite e-Visa para estancias más largas.'
+                  })}
                 </p>
               </div>
             </div>
@@ -844,10 +1077,30 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-slate-900 text-xs">
-                  {currentLang === 'vi' ? 'E-Visa Mọi Quốc Tịch' : 'E-Visa for All Nationalities'}
+                  {tMulti(currentLang, {
+                    en: 'E-Visa for All Nationalities',
+                    vi: 'E-Visa Mọi Quốc Tịch',
+                    fr: 'e-Visa pour toutes nationalités',
+                    de: 'e-Visum für alle Nationalitäten',
+                    ja: '全国籍対象 e-Visa',
+                    zh: '全球所有国籍电子签',
+                    he: 'ויזה אלקטרונית לכל הלאומים',
+                    ko: '전 세계 모든 국적 전자비자',
+                    es: 'e-Visa para todas las nacionalidades'
+                  })}
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  {currentLang === 'vi' ? 'Công dân 190+ nước đều được cấp E-Visa 30/90 ngày 1 lần hoặc nhiều lần.' : 'Citizens of 190+ countries can apply for 30/90 days single/multiple E-Visa.'}
+                  {tMulti(currentLang, {
+                    en: 'Citizens of 190+ countries can apply for 30/90 days single/multiple E-Visa.',
+                    vi: 'Công dân 190+ nước đều được cấp E-Visa 30/90 ngày 1 lần hoặc nhiều lần.',
+                    fr: 'Les citoyens de plus de 190 pays peuvent demander un e-Visa de 30/90 jours à entrée simple/multiple.',
+                    de: 'Bürger aus 190+ Ländern können ein e-Visum für 30/90 Tage (ein-/mehrmalig) beantragen.',
+                    ja: '190か国以上の市民が30/90日間の一次/数次e-Visaを申請できます。',
+                    zh: '全球 190+ 国家公民均可在线申请 30/90 天单次/多次入境电子签证。',
+                    he: 'אזרחי 190+ מדינות יכולים להגיש בקשה לוויזה אלקטרונית ל-30/90 יום.',
+                    ko: '190개국 이상의 공민이 30/90일 단수/복수 전자비자를 신청할 수 있습니다.',
+                    es: 'Ciudadanos de más de 190 países pueden solicitar e-Visa de 30/90 días entrada única/múltiple.'
+                  })}
                 </p>
               </div>
             </div>

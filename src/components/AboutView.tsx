@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Language } from '../types';
 import { TabType } from '../routes';
+import { tMulti } from '../data/translations';
 
 interface AboutViewProps {
   currentLang: Language;
@@ -23,38 +24,92 @@ export const AboutView: React.FC<AboutViewProps> = ({ currentLang, onNavigate })
 
   const comparisonItems = [
     {
-      labelEn: 'Government stamp fee',
-      labelVi: 'Lệ phí tem Nhà nước',
+      label: tMulti(currentLang, {
+        en: 'Government stamp fee',
+        vi: 'Lệ phí tem Nhà nước',
+        fr: 'Frais de timbre gouvernemental',
+        de: 'Staatliche Stempelgebühr',
+        ja: '政府スタンプ料',
+        zh: '政府印花费',
+        he: 'אגרת בולים ממשלתית',
+        ko: '정부 인지대',
+        es: 'Tasas de visado oficial'
+      }),
       self: 'Included',
       bda: 'Included',
     },
     {
-      labelEn: 'Application review before filing',
-      labelVi: 'Rà soát lỗi hồ sơ trước khi nộp',
+      label: tMulti(currentLang, {
+        en: 'Application review before filing',
+        vi: 'Rà soát lỗi hồ sơ trước khi nộp',
+        fr: 'Vérification du dossier avant soumission',
+        de: 'Prüfung der Unterlagen vor Einreichung',
+        ja: '申請提出前の書類審査',
+        zh: '提交前材料审核',
+        he: 'בדיקת בקשה לפני הגשה',
+        ko: '제출 전 서류 검토',
+        es: 'Revisión de solicitud antes de presentar'
+      }),
       self: false,
       bda: true,
     },
     {
-      labelEn: 'Error correction guidance',
-      labelVi: 'Hướng dẫn sửa lỗi ảnh & thông tin',
+      label: tMulti(currentLang, {
+        en: 'Error correction guidance',
+        vi: 'Hướng dẫn sửa lỗi ảnh & thông tin',
+        fr: 'Assistance à la correction des erreurs',
+        de: 'Anleitung zur Fehlerkorrektur',
+        ja: 'エラー修正ガイダンス',
+        zh: '错误纠正指导',
+        he: 'הנחיות לתיקון שגיאות',
+        ko: '오류 수정 안내',
+        es: 'Guía de corrección de errores'
+      }),
       self: false,
       bda: true,
     },
     {
-      labelEn: '1-day Super Urgent express option',
-      labelVi: 'Dịch vụ làm khẩn Super Urgent 1 ngày',
+      label: tMulti(currentLang, {
+        en: '1-day Super Urgent express option',
+        vi: 'Dịch vụ làm khẩn Super Urgent 1 ngày',
+        fr: 'Option Super Urgente 1 jour',
+        de: '1-Tag Super-Eilservice Option',
+        ja: '1日特急発行オプション',
+        zh: '1天超加急特急办理',
+        he: 'אפשרות סופר דחופה ליום אחד',
+        ko: '1일 당일 슈퍼 긴급 발급',
+        es: 'Opción súper urgente en 1 día'
+      }),
       self: false,
       bda: true,
     },
     {
-      labelEn: '24/7 Multilingual support team',
-      labelVi: 'Đội ngũ hỗ trợ đa ngôn ngữ 24/7',
+      label: tMulti(currentLang, {
+        en: '24/7 Multilingual support team',
+        vi: 'Đội ngũ hỗ trợ đa ngôn ngữ 24/7',
+        fr: 'Équipe d\'assistance multilingue 24/7',
+        de: '24/7 Mehrsprachiges Support-Team',
+        ja: '24/7 多言語サポートチーム',
+        zh: '24/7 多语言支持团队',
+        he: 'צוות תמיכה רב-לשוני 24/7',
+        ko: '24시간 다국어 지원 팀',
+        es: 'Equipo de soporte multilingüe 24/7'
+      }),
       self: false,
       bda: true,
     },
     {
-      labelEn: 'Human follow-up & tracking on delays',
-      labelVi: 'Theo dõi sát sao & xử lý hồ sơ chậm',
+      label: tMulti(currentLang, {
+        en: 'Human follow-up & tracking on delays',
+        vi: 'Theo dõi sát sao & xử lý hồ sơ chậm',
+        fr: 'Suivi humain et gestion des retards',
+        de: 'Persönliche Nachverfolgung bei Verzögerungen',
+        ja: '遅延時の個別進捗追跡サポート',
+        zh: '人工跟进与延迟处理',
+        he: 'מעקב אנושי וטיפול בעיכובים',
+        ko: '지연 발생 시 상담원 직접 추적',
+        es: 'Seguimiento humano y gestión de retrasos'
+      }),
       self: false,
       bda: true,
     },
@@ -278,7 +333,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ currentLang, onNavigate })
                 {comparisonItems.map((item, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
                     <td className="py-3 px-4 font-medium text-slate-800">
-                      {isVi ? item.labelVi : item.labelEn}
+                      {item.label}
                     </td>
                     <td className="py-3 px-4 text-center text-slate-500 font-medium">
                       {typeof item.self === 'string' ? (

@@ -32,17 +32,40 @@ import {
   VisaApplication
 } from './types';
 
+import { parseLocaleAndPath, getLocalePath, autoDetectLocale, getLocaleByCode } from './data/locales';
+
 export default function App() {
-  const [currentLang, setCurrentLang] = useState<Language>('en');
+  // Locale and Language State initialized from URL prefix or auto-detection
+  const [currentLocaleCode, setCurrentLocaleCode] = useState<string>(() => {
+    const { locale, hasLocalePrefix } = parseLocaleAndPath(window.location.pathname);
+    return hasLocalePrefix ? locale.code : autoDetectLocale().code;
+  });
+
+  const [currentLang, setCurrentLang] = useState<Language>(() => {
+    const loc = getLocaleByCode(currentLocaleCode);
+    return loc.lang;
+  });
+
   const [activeTab, setActiveTab] = useState<TabType>(() => getTabFromPath(window.location.pathname));
   const [customSEO, setCustomSEO] = useState<CustomSEOData | null>(null);
 
-  // Handle URL changes & Browser Back/Forward buttons (SEO Routing)
+  // Sync state with URL location
   useEffect(() => {
+    const { locale, hasLocalePrefix } = parseLocaleAndPath(window.location.pathname);
+    if (hasLocalePrefix && locale.code !== currentLocaleCode) {
+      setCurrentLocaleCode(locale.code);
+      setCurrentLang(locale.lang);
+    }
+
     const initialTab = getTabFromPath(window.location.pathname);
     setActiveTab(initialTab);
 
     const handlePopState = () => {
+      const { locale: popLocale, hasLocalePrefix: popHasPrefix } = parseLocaleAndPath(window.location.pathname);
+      if (popHasPrefix) {
+        setCurrentLocaleCode(popLocale.code);
+        setCurrentLang(popLocale.lang);
+      }
       const tabFromUrl = getTabFromPath(window.location.pathname);
       setActiveTab(tabFromUrl);
       setViewingCertificate(false);
@@ -53,6 +76,19 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const handleLanguageChange = (newLang: Language, newLocaleCode?: string) => {
+    const targetCode = newLocaleCode || (newLang === 'vi' ? 'vi-vn' : 'en-us');
+    setCurrentLocaleCode(targetCode);
+    setCurrentLang(newLang);
+
+    // Update URL sub-path to reflect the selected country locale
+    const route = getRouteFromTab(activeTab);
+    const newPath = getLocalePath(route.path, targetCode);
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({}, '', newPath);
+    }
+  };
+
   const handleNavigate = (tab: TabType | 'faq') => {
     const targetTab: TabType = tab === 'faq' ? 'faqs' : (tab as TabType);
     setActiveTab(targetTab);
@@ -60,8 +96,9 @@ export default function App() {
     setCustomSEO(null);
 
     const route = getRouteFromTab(targetTab);
-    if (window.location.pathname !== route.path) {
-      window.history.pushState({}, '', route.path);
+    const localizedPath = getLocalePath(route.path, currentLocaleCode);
+    if (window.location.pathname !== localizedPath) {
+      window.history.pushState({}, '', localizedPath);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -111,12 +148,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-800 antialiased selection:bg-indigo-600 selection:text-white">
       {/* SEO Head Metadata & OpenGraph/JSON-LD Dynamic Tags */}
-      <SEOMetadata activeTab={activeTab} currentLang={currentLang} customSEO={customSEO} />
+      <SEOMetadata activeTab={activeTab} currentLang={currentLang} currentLocaleCode={currentLocaleCode} customSEO={customSEO} />
 
       {/* Top Navigation */}
       <Header
         currentLang={currentLang}
-        onLanguageChange={setCurrentLang}
+        currentLocaleCode={currentLocaleCode}
+        onLanguageChange={handleLanguageChange}
         activeTab={activeTab === 'faqs' ? 'faq' : activeTab}
         onNavigate={handleNavigate}
       />

@@ -1,4 +1,5 @@
 import { Language } from './types';
+import { parseLocaleAndPath, getLocalePath } from './data/locales';
 
 export type TabType = 
   | 'home' 
@@ -202,7 +203,8 @@ export const ROUTES: Record<TabType, RouteConfig> = {
 
 /** Get TabType from URL pathname */
 export function getTabFromPath(pathname: string): TabType {
-  const normalized = pathname.toLowerCase().replace(/\/$/, '');
+  const { cleanPath } = parseLocaleAndPath(pathname);
+  const normalized = cleanPath.toLowerCase().replace(/\/$/, '');
   if (!normalized || normalized === '' || normalized === '/home') return 'home';
 
   for (const config of Object.values(ROUTES)) {
@@ -234,7 +236,8 @@ export function getTabFromPath(pathname: string): TabType {
 
 /** Extract requirement post slug from pathname if present */
 export function getRequirementSlugFromPath(pathname: string): string | null {
-  const normalized = pathname.toLowerCase().replace(/\/$/, '');
+  const { cleanPath } = parseLocaleAndPath(pathname);
+  const normalized = cleanPath.toLowerCase().replace(/\/$/, '');
   if (!normalized) return null;
 
   if (normalized.startsWith('/vietnam-visa-requirements/')) {
@@ -252,7 +255,8 @@ export function getRequirementSlugFromPath(pathname: string): string | null {
 
 /** Extract blog post slug from pathname if present */
 export function getBlogSlugFromPath(pathname: string): string | null {
-  const normalized = pathname.toLowerCase().replace(/\/$/, '');
+  const { cleanPath } = parseLocaleAndPath(pathname);
+  const normalized = cleanPath.toLowerCase().replace(/\/$/, '');
   if (!normalized) return null;
 
   if (normalized.startsWith('/blog/')) {
@@ -266,6 +270,12 @@ export function getBlogSlugFromPath(pathname: string): string | null {
 }
 
 /** Get RouteConfig from TabType */
-export function getRouteFromTab(tab: TabType): RouteConfig {
-  return ROUTES[tab] || ROUTES.home;
+export function getRouteFromTab(tab: TabType, localeCode?: string): RouteConfig {
+  const baseRoute = ROUTES[tab] || ROUTES.home;
+  if (!localeCode) return baseRoute;
+  
+  return {
+    ...baseRoute,
+    path: getLocalePath(baseRoute.path, localeCode)
+  };
 }

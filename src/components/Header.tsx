@@ -18,10 +18,12 @@ import {
 import { Language } from '../types';
 import { TRANSLATIONS } from '../data/translations';
 import { Logo } from './Logo';
+import { COUNTRY_LOCALES, getLocaleByCode, getLocalePath } from '../data/locales';
 
 interface HeaderProps {
   currentLang: Language;
-  onLanguageChange: (lang: Language) => void;
+  currentLocaleCode?: string;
+  onLanguageChange: (lang: Language, localeCode?: string) => void;
   activeTab: string;
   onNavigate: (tab: any) => void;
   onOpenQuickTrack?: () => void;
@@ -29,11 +31,13 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   currentLang,
+  currentLocaleCode,
   onLanguageChange,
   activeTab,
   onNavigate,
   onOpenQuickTrack
 }) => {
+  const currentLocale = getLocaleByCode(currentLocaleCode || currentLang);
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -73,38 +77,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   const isVi = currentLang === 'vi';
 
-  const languages: { code: Language; name: string; flag: string }[] = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
-    { code: 'zh', name: '中文', flag: '🇨🇳' }
-  ];
-
-  // Hidden mobile menu items (only shown when user clicks Menu button)
-  const hiddenMenuItems: {
-    id: 'requirements' | 'faq' | 'contact';
-    label: string;
-    icon: React.ReactNode;
-  }[] = [
-    {
-      id: 'requirements',
-      label: t.navRequirements,
-      icon: <Globe2 className="w-4 h-4 text-indigo-600" />
-    },
-    {
-      id: 'faq',
-      label: t.navFaq,
-      icon: <HelpCircle className="w-4 h-4 text-amber-600" />
-    },
-    {
-      id: 'contact',
-      label: t.navContact || (isVi ? 'Liên Hệ' : 'Contact Us'),
-      icon: <PhoneCall className="w-4 h-4 text-emerald-600" />
-    }
-  ];
-
   const handleNav = (id: 'home' | 'apply' | 'calculator' | 'requirements' | 'track' | 'faq' | 'overview' | 'contact') => {
     onNavigate(id);
     setMobileMenuOpen(false);
@@ -124,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Desktop Navigation Links (Visible on lg+ screens) */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
           <a
-            href="/overview"
+            href={getLocalePath('/overview', currentLocale.code)}
             onClick={(e) => {
               e.preventDefault();
               handleNav('overview');
@@ -139,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
           
           <a
-            href="/how-to-apply"
+            href={getLocalePath('/how-to-apply', currentLocale.code)}
             onClick={(e) => {
               e.preventDefault();
               handleNav('apply');
@@ -154,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           <a
-            href="/visa-fee"
+            href={getLocalePath('/visa-fee', currentLocale.code)}
             onClick={(e) => {
               e.preventDefault();
               handleNav('calculator');
@@ -169,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           <a
-            href="/visa-requirements"
+            href={getLocalePath('/visa-requirements', currentLocale.code)}
             onClick={(e) => {
               e.preventDefault();
               handleNav('requirements');
@@ -184,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           <a
-            href="/blog"
+            href={getLocalePath('/blog', currentLocale.code)}
             onClick={(e) => {
               e.preventDefault();
               handleNav('blog' as any);
@@ -199,7 +171,7 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           <a
-            href="/faqs"
+            href={getLocalePath('/faqs', currentLocale.code)}
             onClick={(e) => {
               e.preventDefault();
               handleNav('faq');
@@ -211,21 +183,6 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t.navFaq}
-          </a>
-
-          <a
-            href="/contact-us"
-            onClick={(e) => {
-              e.preventDefault();
-              handleNav('contact');
-            }}
-            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
-              activeTab === 'contact'
-                ? 'bg-indigo-50 text-indigo-700 font-bold'
-                : 'hover:bg-slate-100 text-slate-600'
-            }`}
-          >
-            {t.navContact || 'Contact'}
           </a>
         </nav>
 
@@ -242,39 +199,47 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Language Selector Dropdown (Hidden on mobile < lg) */}
-          <div className="relative hidden lg:block">
+          {/* Country / Language Selector Dropdown (Desktop & Mobile) */}
+          <div className="relative">
             <button
               onClick={() => {
                 setLangMenuOpen(!langMenuOpen);
-                setMobileMenuOpen(false);
+                if (!langMenuOpen) setMobileMenuOpen(false);
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors whitespace-nowrap cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors whitespace-nowrap cursor-pointer shadow-2xs"
             >
-              <Globe className="w-3.5 h-3.5 text-slate-500" />
-              <span>{languages.find(l => l.code === currentLang)?.flag}</span>
-              <span className="uppercase text-xs font-bold">{currentLang}</span>
+              <Globe className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="text-base leading-none">{currentLocale.flag}</span>
+              <span className="uppercase text-xs font-bold tracking-wider">{currentLocale.code}</span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {langMenuOpen && (
-              <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in slide-in-from-top-2">
-                {languages.map((lang) => (
+              <div className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 max-h-80 overflow-y-auto">
+                <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                  Select Country / Region
+                </div>
+                {COUNTRY_LOCALES.map((loc) => (
                   <button
-                    key={lang.code}
+                    key={loc.code}
                     onClick={() => {
-                      onLanguageChange(lang.code);
+                      onLanguageChange(loc.lang, loc.code);
                       setLangMenuOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm font-medium flex items-center justify-between hover:bg-indigo-50 transition-colors ${
-                      currentLang === lang.code ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-700'
+                    className={`w-full text-left px-3.5 py-2 text-xs font-medium flex items-center justify-between hover:bg-indigo-50 transition-colors ${
+                      currentLocale.code === loc.code ? 'text-indigo-700 font-bold bg-indigo-50/70' : 'text-slate-700'
                     }`}
                   >
-                    <span className="flex items-center gap-2">
-                      <span>{lang.flag}</span>
-                      <span>{lang.name}</span>
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-base">{loc.flag}</span>
+                      <div className="flex flex-col">
+                        <span className="font-semibold leading-tight">{loc.name}</span>
+                        <span className="text-[10px] text-slate-400">{loc.englishName}</span>
+                      </div>
                     </span>
-                    {currentLang === lang.code && <CheckCircle className="w-4 h-4 text-indigo-600" />}
+                    <span className="uppercase text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                      /{loc.code}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -292,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span>{isVi ? 'Nộp E-Visa' : 'Apply Online'}</span>
           </a>
 
-          {/* Mobile Menu Toggle Button (Replaces Apply Online & Language on mobile top right) */}
+          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`lg:hidden px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
@@ -351,38 +316,32 @@ export const Header: React.FC<HeaderProps> = ({
                 {
                   id: 'overview',
                   label: isVi ? 'Tổng Quan' : 'Overview',
-                  href: '/overview',
+                  href: getLocalePath('/overview', currentLocale.code),
                   icon: <LayoutDashboard className="w-4 h-4 text-indigo-600" />
                 },
                 {
                   id: 'apply',
                   label: t.navApply || (isVi ? 'Xin Visa' : 'How to Apply'),
-                  href: '/how-to-apply',
+                  href: getLocalePath('/how-to-apply', currentLocale.code),
                   icon: <FileText className="w-4 h-4 text-blue-600" />
                 },
                 {
                   id: 'calculator',
                   label: t.navCalculator || (isVi ? 'Bảng Phí' : 'Visa Fees'),
-                  href: '/visa-fee',
+                  href: getLocalePath('/visa-fee', currentLocale.code),
                   icon: <Calculator className="w-4 h-4 text-emerald-600" />
                 },
                 {
                   id: 'requirements',
                   label: t.navRequirements || (isVi ? 'Điều Kiện Visa' : 'Requirements'),
-                  href: '/visa-requirements',
+                  href: getLocalePath('/visa-requirements', currentLocale.code),
                   icon: <Globe2 className="w-4 h-4 text-purple-600" />
                 },
                 {
                   id: 'faq',
                   label: t.navFaq || (isVi ? 'Hỏi Đáp FAQs' : 'FAQs'),
-                  href: '/faqs',
+                  href: getLocalePath('/faqs', currentLocale.code),
                   icon: <HelpCircle className="w-4 h-4 text-amber-600" />
-                },
-                {
-                  id: 'contact',
-                  label: t.navContact || (isVi ? 'Liên Hệ' : 'Contact Us'),
-                  href: '/contact-us',
-                  icon: <PhoneCall className="w-4 h-4 text-teal-600" />
                 }
               ].map((item) => {
                 const isActive = activeTab === item.id || (item.id === 'faq' && activeTab === 'faqs');

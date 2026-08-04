@@ -1,4 +1,4 @@
-export type Language = 'en' | 'vi' | 'fr' | 'de' | 'ja' | 'zh';
+export type Language = 'en' | 'vi' | 'fr' | 'de' | 'ja' | 'zh' | 'he' | 'ko' | 'es';
 
 export type VisaType = 
   | 'tourist_30_single'

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Language } from '../types';
 import { TabType, getRouteFromTab } from '../routes';
+import { COUNTRY_LOCALES, getLocaleByCode, getLocalePath } from '../data/locales';
 
 export interface CustomSEOData {
   title?: string;
@@ -15,17 +16,20 @@ export interface CustomSEOData {
 interface SEOMetadataProps {
   activeTab: TabType;
   currentLang: Language;
+  currentLocaleCode?: string;
   customSEO?: CustomSEOData | null;
 }
 
-export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang, customSEO }) => {
+export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang, currentLocaleCode, customSEO }) => {
+  const currentLocale = getLocaleByCode(currentLocaleCode || currentLang);
   const route = getRouteFromTab(activeTab);
   const isVi = currentLang === 'vi';
 
+  const localizedPath = getLocalePath(route.path, currentLocale.code);
   const defaultTitle = isVi ? route.titleVi : route.titleEn;
   const defaultDescription = isVi ? route.descVi : route.descEn;
   const defaultKeywords = isVi ? route.keywordsVi : route.keywordsEn;
-  const defaultCanonicalUrl = `${window.location.origin}${route.path}`;
+  const defaultCanonicalUrl = `${window.location.origin}${localizedPath}`;
 
   const title = customSEO?.title || defaultTitle;
   const description = customSEO?.description || defaultDescription;
@@ -35,6 +39,10 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
   const ogType = customSEO?.ogType || 'website';
 
   useEffect(() => {
+    // 0. Update HTML Tag attributes for language & RTL direction
+    document.documentElement.lang = currentLocale.hreflang;
+    document.documentElement.dir = currentLocale.isRtl ? 'rtl' : 'ltr';
+
     // 1. Dynamic Document Title
     document.title = title;
 
@@ -70,6 +78,26 @@ export const SEOMetadata: React.FC<SEOMetadataProps> = ({ activeTab, currentLang
       document.head.appendChild(linkCanonical);
     }
     linkCanonical.setAttribute('href', canonicalUrl);
+
+    // 5. Inject Hreflang Tags for Multi-country / Local SEO indexing
+    // Remove old hreflangs
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(el => el.remove());
+
+    // x-default hreflang
+    const defaultLink = document.createElement('link');
+    defaultLink.setAttribute('rel', 'alternate');
+    defaultLink.setAttribute('hreflang', 'x-default');
+    defaultLink.setAttribute('href', `${window.location.origin}${getLocalePath(route.path, 'en-us')}`);
+    document.head.appendChild(defaultLink);
+
+    // Hreflang for each locale
+    COUNTRY_LOCALES.forEach(loc => {
+      const link = document.createElement('link');
+      link.setAttribute('rel', 'alternate');
+      link.setAttribute('hreflang', loc.hreflang.toLowerCase());
+      link.setAttribute('href', `${window.location.origin}${getLocalePath(route.path, loc.code)}`);
+      document.head.appendChild(link);
+    });
 
     // 5. Schema.org JSON-LD Structured Data Injection for Search Engine Rich Snippets
     let jsonLdScript = document.getElementById('seo-json-ld') as HTMLScriptElement | null;

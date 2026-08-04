@@ -287,50 +287,59 @@ const getWpCredentials = () => {
 async function fetchAndCachePosts(): Promise<any[]> {
   try {
     const { wpBaseUrl, authHeader } = getWpCredentials();
-    const postsUrl = `${wpBaseUrl}/wp-json/wp/v2/posts?categories=16&per_page=100&_embed=true`;
-    const postsRes = await fetch(postsUrl, {
+    let postsUrl = `${wpBaseUrl}/wp-json/wp/v2/posts?categories=16&per_page=100&_embed=true`;
+    let postsRes = await fetch(postsUrl, {
       headers: { 'Authorization': authHeader, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
       signal: AbortSignal.timeout(8000)
     });
 
-    if (postsRes.ok) {
-      const wpPosts = await postsRes.json();
-      if (Array.isArray(wpPosts) && wpPosts.length > 0) {
-        const formatted = wpPosts.map((p: any) => {
-          let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
-          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
-            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
-          }
-          const rawTitle = p.title?.rendered || 'Urgent Vietnam Visa Update';
-          const cleanTitle = decodeWpHtml(rawTitle);
-          const rawExcerpt = p.excerpt?.rendered || p.content?.rendered || '';
-          const cleanExcerpt = decodeWpHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim()).substring(0, 165) + '...';
-
-          const postObj = {
-            id: p.id,
-            title: cleanTitle,
-            excerpt: cleanExcerpt,
-            content: p.content?.rendered || '',
-            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
-            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
-            featuredImage,
-            category: 'Urgent Vietnam Visa Blog New',
-            readTime: '3 min read',
-            link: p.link || 'https://blog.vietnamevisaservice.com',
-            slug: p.slug || `post-${p.id}`
-          };
-
-          if (p.slug) {
-            slugPostsCacheMap.set(p.slug.toLowerCase(), { data: postObj, timestamp: Date.now() });
-          }
-
-          return postObj;
-        });
-
-        postsCacheStore = { data: formatted, timestamp: Date.now() };
-        console.log(`[WordPress Cache] Refreshed ${formatted.length} blog posts successfully.`);
-        return formatted;
+    let wpPosts = postsRes.ok ? await postsRes.json() : [];
+    if (!Array.isArray(wpPosts) || wpPosts.length === 0) {
+      postsUrl = `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=100&_embed=true`;
+      postsRes = await fetch(postsUrl, {
+        headers: { 'Authorization': authHeader, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+        signal: AbortSignal.timeout(8000)
+      });
+      if (postsRes.ok) {
+        wpPosts = await postsRes.json();
       }
+    }
+
+    if (Array.isArray(wpPosts) && wpPosts.length > 0) {
+      const formatted = wpPosts.map((p: any) => {
+        let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+        if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+          featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+        }
+        const rawTitle = p.title?.rendered || 'Urgent Vietnam Visa Update';
+        const cleanTitle = decodeWpHtml(rawTitle);
+        const rawExcerpt = p.excerpt?.rendered || p.content?.rendered || '';
+        const cleanExcerpt = decodeWpHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim()).substring(0, 165) + '...';
+
+        const postObj = {
+          id: p.id,
+          title: cleanTitle,
+          excerpt: cleanExcerpt,
+          content: p.content?.rendered || '',
+          date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+          featuredImage,
+          category: 'Urgent Vietnam Visa Blog New',
+          readTime: '3 min read',
+          link: p.link || 'https://blog.vietnamevisaservice.com',
+          slug: p.slug || `post-${p.id}`
+        };
+
+        if (p.slug) {
+          slugPostsCacheMap.set(p.slug.toLowerCase(), { data: postObj, timestamp: Date.now() });
+        }
+
+        return postObj;
+      });
+
+      postsCacheStore = { data: formatted, timestamp: Date.now() };
+      console.log(`[WordPress Cache] Refreshed ${formatted.length} blog posts successfully.`);
+      return formatted;
     }
   } catch (err) {
     console.warn('[WordPress Cache] Warning fetching blog posts:', err);

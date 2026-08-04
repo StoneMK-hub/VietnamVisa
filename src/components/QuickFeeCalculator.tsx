@@ -15,7 +15,7 @@ import {
 import { VisaType, ProcessingTime, ExtraService, Language } from '../types';
 import { COUNTRIES_DATA } from '../data/countries';
 import { VISA_TYPE_PRICING, PROCESSING_SPEED_PRICING, EXTRA_SERVICES_PRICING, calculateVisaFees } from '../data/pricing';
-import { TRANSLATIONS } from '../data/translations';
+import { TRANSLATIONS, tMulti } from '../data/translations';
 
 interface QuickFeeCalculatorProps {
   currentLang: Language;
@@ -64,20 +64,46 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         <div className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold px-3.5 py-1 rounded-full shadow-2xs">
           <Calculator className="w-3.5 h-3.5 text-indigo-600" />
           <span>
-            {isVi ? 'BẢNG GIÁ NIÊM YẾT E-VISA VIỆT NAM 2026' : 'TRANSPARENT VIETNAM E-VISA FEE SCHEDULE 2026'}
+            {tMulti(currentLang, {
+              en: 'TRANSPARENT VIETNAM E-VISA FEE SCHEDULE 2026',
+              vi: 'BẢNG GIÁ NIÊM YẾT E-VISA VIỆT NAM 2026',
+              fr: 'GRILLE TARIFAIRE DE L\'E-VISA POUR LE VIETNAM 2026',
+              de: 'TRANSPARENTE VIETNAM E-VISUM GEBÜHRENORDNUNG 2026',
+              ja: '2026年 ベトナム e-Visa 公開料金表',
+              zh: '2026 年越南电子签证透明收费标准',
+              he: 'לוח אגרות ויזה אלקטרונית לווייטנאם 2026',
+              ko: '2026년 베트남 전자비자 수수료 안내',
+              es: 'TABLA DE TARIFAS DE E-VISA PARA VIETNAM 2026'
+            })}
           </span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-          {isVi
-            ? 'Công Cụ Tính Phí & Bảng Lệ Phí E-Visa Việt Nam Trọn Gói'
-            : 'Vietnam E-Visa Fee Calculator & Pricing Schedule'}
+          {tMulti(currentLang, {
+            en: 'Vietnam E-Visa Fee Calculator & Pricing Schedule',
+            vi: 'Công Cụ Tính Phí & Bảng Lệ Phí E-Visa Việt Nam Trọn Gói',
+            fr: 'Calculateur de frais d\'e-Visa pour le Vietnam et grille tarifaire',
+            de: 'Vietnam E-Visum Gebührenrechner & Preisübersicht',
+            ja: 'ベトナム e-Visa 料金計算ツール・定額費用一覧',
+            zh: '越南电子签证费用在线计算器与全包价格表',
+            he: 'מחשבון אגרות ויזה אלקטרונית לווייטנאם ולוח מחירים',
+            ko: '베트남 전자비자 수수료 계산기 및 정찰제 안내',
+            es: 'Calculadora de tarifas de e-Visa para Vietnam y tabla de precios'
+          })}
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed text-center bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 sm:p-4 shadow-2xs">
-          {isVi
-            ? 'Tra cứu và tính toán chính xác tổng chi phí cấp Thị thực điện tử (E-Visa) Việt Nam. Bảng giá minh bạch đã bao gồm phí đóng dấu Chính phủ và phí dịch vụ thẩm định hồ sơ.'
-            : 'Calculate the total cost for your Vietnam Electronic Visa (E-Visa). Our transparent breakdown includes government stamping fees and application processing with zero hidden charges.'}
+          {tMulti(currentLang, {
+            en: 'Calculate the total cost for your Vietnam Electronic Visa (E-Visa). Our transparent breakdown includes government stamping fees and application processing with zero hidden charges.',
+            vi: 'Tra cứu và tính toán chính xác tổng chi phí cấp Thị thực điện tử (E-Visa) Việt Nam. Bảng giá minh bạch đã bao gồm phí đóng dấu Chính phủ và phí dịch vụ thẩm định hồ sơ.',
+            fr: 'Calculez le coût total de votre e-Visa pour le Vietnam. Notre ventilation transparente comprend les frais de gouvernement et le traitement du dossier sans frais cachés.',
+            de: 'Berechnen Sie die Gesamtkosten für Ihr Vietnam E-Visum. Unsere transparente Aufschlüsselung enthält Regierungsgebühren und Bearbeitung ohne versteckte Kosten.',
+            ja: 'ベトナム電子ビザ (E-Visa) の総費用を正確に試算できます。政府手数料および審査サポート費を含む明朗会計です。',
+            zh: '准确计算您的越南电子签证 (E-Visa) 总费用。透明计费，已包含越南政府规费及审核服务费，无隐藏附加费。',
+            he: 'חשב את העלות הכוללת עבור הויזה האלקטרונית לווייטנאם. הפירוט השקוף שלנו כולל אגרות ממשלתיות וטיפול בבקשה.',
+            ko: '베트남 전자비자(E-Visa) 총 발급 비용을 정확하게 계산하세요. 정부 수수료 및 서류 검토 수수료가 포함되어 있습니다.',
+            es: 'Calcule el costo total de su e-Visa para Vietnam. Desglose transparente que incluye las tasas gubernamentales sin cargos ocultos.'
+          })}
         </p>
       </article>
 
@@ -87,10 +113,32 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           <div>
             <div className="flex items-center gap-1.5 text-indigo-700 font-bold text-xs uppercase tracking-wider mb-0.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-              <span>{isVi ? 'Tính Phí Nhanh Trực Tuyến' : 'Live Fee Estimator'}</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: 'Live Fee Estimator',
+                  vi: 'Tính Phí Nhanh Trực Tuyến',
+                  fr: 'Estimateur de frais en direct',
+                  de: 'Live-Gebührenrechner',
+                  ja: 'リアルタイム費用見積もり',
+                  zh: '在线费用估算器',
+                  he: 'אומדן אגרות בזמן אמת',
+                  ko: '실시간 수수료 계산기',
+                  es: 'Estimador de tarifas en vivo'
+                })}
+              </span>
             </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-              {isVi ? 'Chọn Thông Tin Chuyến Đi Của Bạn' : 'Select Visa Options'}
+              {tMulti(currentLang, {
+                en: 'Select Visa Options',
+                vi: 'Chọn Thông Tin Chuyến Đi Của Bạn',
+                fr: 'Sélectionnez les options de visa',
+                de: 'Visum-Optionen auswählen',
+                ja: '旅行条件の選択',
+                zh: '选择您的行程与签证选项',
+                he: 'בחר אפשרויות ויזה',
+                ko: '비자 옵션 선택',
+                es: 'Seleccione las opciones de visado'
+              })}
             </h2>
           </div>
         </div>
@@ -102,7 +150,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             <div className="space-y-1">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
                 <Users className="w-3.5 h-3.5 text-indigo-600" />
-                <span>{isVi ? 'Số lượng khách' : 'Applicants Count'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'Applicants Count',
+                    vi: 'Số lượng khách',
+                    fr: 'Nombre de demandeurs',
+                    de: 'Anzahl der Antragsteller',
+                    ja: '申請人数',
+                    zh: '申请人数',
+                    he: 'מספר מבקשים',
+                    ko: '신청 인원 수',
+                    es: 'Número de solicitantes'
+                  })}
+                </span>
               </label>
               <div className="relative">
                 <select
@@ -112,7 +172,9 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                     <option key={num} value={num}>
-                      {num} {num === 1 ? 'Applicant' : 'Applicants'}
+                      {num} {num === 1 
+                        ? tMulti(currentLang, { en: 'Applicant', vi: 'Khách', fr: 'Demandeur', de: 'Antragsteller', ja: '名', zh: '位', he: 'מבקש', ko: '명', es: 'Solicitante' })
+                        : tMulti(currentLang, { en: 'Applicants', vi: 'Khách', fr: 'Demandeurs', de: 'Antragsteller', ja: '名', zh: '位', he: 'מבקשים', ko: '명', es: 'Solicitantes' })}
                     </option>
                   ))}
                 </select>
@@ -124,7 +186,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             <div className="space-y-1">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
                 <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                <span>{isVi ? 'Loại thị thực (Visa Type & Duration)' : 'Visa Type & Duration'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'Visa Type & Duration',
+                    vi: 'Loại thị thực (Visa Type & Duration)',
+                    fr: 'Type et durée du visa',
+                    de: 'Visumtyp & Dauer',
+                    ja: 'ビザの種類・滞在期間',
+                    zh: '签证类型与有效期限',
+                    he: 'סוג ויזה ומשך שהייה',
+                    ko: '비자 유형 및 체류 기간',
+                    es: 'Tipo de visado y duración'
+                  })}
+                </span>
               </label>
               <div className="relative">
                 <select
@@ -147,7 +221,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             <div className="space-y-1">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-indigo-600" />
-                <span>{isVi ? 'Tốc độ xử lý (Processing Speed)' : 'Processing Speed Tier'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'Processing Speed Tier',
+                    vi: 'Tốc độ xử lý (Processing Speed)',
+                    fr: 'Niveau de vitesse de traitement',
+                    de: 'Bearbeitungsgeschwindigkeit',
+                    ja: '発券処理スピード',
+                    zh: '加急办理速度',
+                    he: 'מהירות טיפול',
+                    ko: '발급 처리 속도',
+                    es: 'Nivel de velocidad de procesamiento'
+                  })}
+                </span>
               </label>
               <div className="relative">
                 <select
@@ -166,7 +252,17 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             {/* Compact Add-ons Selection */}
             <div className="space-y-2 pt-2 border-t border-slate-100">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                {isVi ? 'Dịch Vụ Bổ Sung Sân Bay (Tùy Chọn)' : 'Optional Airport Add-Ons'}
+                {tMulti(currentLang, {
+                  en: 'Optional Airport Add-Ons',
+                  vi: 'Dịch Vụ Bổ Sung Sân Bay (Tùy Chọn)',
+                  fr: 'Services optionnels à l\'aéroport',
+                  de: 'Optionale Flughafen-Zusatzleistungen',
+                  ja: '空港オプショナルサービス',
+                  zh: '机场可选增值服务',
+                  he: 'שירותי שדה תעופה אופציונליים',
+                  ko: '공항 부가 서비스 (선택)',
+                  es: 'Servicios opcionales de aeropuerto'
+                })}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
                 {(['travel_insurance', 'fast_track', 'car_pickup'] as ExtraService[]).map((srvKey, idx) => {
@@ -191,7 +287,9 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                         className="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="truncate font-semibold text-[11px] sm:text-xs text-slate-900">{srv.labelEn}</div>
+                        <div className="truncate font-semibold text-[11px] sm:text-xs text-slate-900">
+                          {currentLang === 'vi' ? srv.labelVi : srv.labelEn}
+                        </div>
                         <div className="text-[10px] sm:text-[11px] text-emerald-700 font-extrabold leading-none mt-0.5">+${srv.feePerApplicantUsd}/pax</div>
                       </div>
                     </label>
@@ -206,7 +304,17 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                 <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-                  {isVi ? 'Bảng Chi Tiết Giá' : 'Fee Breakdown'}
+                  {tMulti(currentLang, {
+                    en: 'Fee Breakdown',
+                    vi: 'Bảng Chi Tiết Giá',
+                    fr: 'Détail des frais',
+                    de: 'Gebührenaufschlüsselung',
+                    ja: '費用の内訳',
+                    zh: '费用细目清单',
+                    he: 'פירוט אגרות',
+                    ko: '수수료 내역',
+                    es: 'Desglose de tarifas'
+                  })}
                 </span>
                 <span className="text-xs text-slate-500 font-semibold">{applicantCount} Pax</span>
               </div>
@@ -214,28 +322,74 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
               <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600">
-                    {isVi ? 'Phí Visa Cơ Bản' : 'Base Visa Fee'} (${pricing.govFeePerPerson + pricing.serviceFeePerPerson} x {applicantCount}):
+                    {tMulti(currentLang, {
+                      en: 'Base Visa Fee',
+                      vi: 'Phí Visa Cơ Bản',
+                      fr: 'Frais de visa de base',
+                      de: 'Basis-Visumgebühr',
+                      ja: '基本ビザ費用',
+                      zh: '基础签证费',
+                      he: 'אגרת ויזה בסיסית',
+                      ko: '기본 비자 수수료',
+                      es: 'Tarifa base de visado'
+                    })} (${pricing.govFeePerPerson + pricing.serviceFeePerPerson} x {applicantCount}):
                   </span>
                   <span className="font-bold text-slate-900">${(pricing.govFeePerPerson + pricing.serviceFeePerPerson) * applicantCount} USD</span>
                 </div>
 
                 {pricing.speedFeeTotal > 0 && (
                   <div className="flex items-center justify-between text-indigo-800">
-                    <span>{isVi ? 'Phụ Phí Xử Lý Khẩn' : 'Speed Surcharge'}:</span>
+                    <span>
+                      {tMulti(currentLang, {
+                        en: 'Speed Surcharge',
+                        vi: 'Phụ Phí Xử Lý Khẩn',
+                        fr: 'Supplément urgence',
+                        de: 'Eilzuschlag',
+                        ja: '特急加算費用',
+                        zh: '加急办理附加费',
+                        he: 'תוספת מהירות',
+                        ko: '급행 발급 수수료',
+                        es: 'Recargo por velocidad'
+                      })}:
+                    </span>
                     <span className="font-extrabold">+${pricing.speedFeeTotal} USD</span>
                   </div>
                 )}
 
                 {pricing.extraServicesTotal > 0 && (
                   <div className="flex items-center justify-between text-emerald-800">
-                    <span>{isVi ? 'Dịch Vụ Bổ Sung' : 'Selected Add-Ons'}:</span>
+                    <span>
+                      {tMulti(currentLang, {
+                        en: 'Selected Add-Ons',
+                        vi: 'Dịch Vụ Bổ Sung',
+                        fr: 'Options sélectionnées',
+                        de: 'Gewählte Zusatzleistungen',
+                        ja: '選択中のオプション',
+                        zh: '已选增值服务',
+                        he: 'תוספות שנבחרו',
+                        ko: '선택된 추가 서비스',
+                        es: 'Servicios opcionales seleccionados'
+                      })}:
+                    </span>
                     <span className="font-extrabold">+${pricing.extraServicesTotal} USD</span>
                   </div>
                 )}
 
                 {pricing.groupDiscount > 0 && (
                   <div className="flex items-center justify-between text-emerald-700 font-semibold">
-                    <span>{isVi ? 'Giảm Giá Nhóm' : 'Group Discount'}:</span>
+                    <span>
+                      {tMulti(currentLang, {
+                        en: 'Group Discount',
+                        vi: 'Giảm Giá Nhóm',
+                        fr: 'Remise de groupe',
+                        de: 'Gruppenrabatt',
+                        ja: '団体割引',
+                        zh: '多人拼团优惠',
+                        he: 'הנחת קבוצה',
+                        ko: '단체 할인',
+                        es: 'Descuento de grupo'
+                      })}:
+                    </span>
                     <span>-${pricing.groupDiscount} USD</span>
                   </div>
                 )}
@@ -243,7 +397,17 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
 
               <div className="pt-3 border-t border-slate-200 space-y-0.5">
                 <div className="text-[11px] text-slate-500 uppercase tracking-wider font-bold">
-                  {isVi ? 'TỔNG CỘNG TRỌN GÓI' : 'GRAND TOTAL'}
+                  {tMulti(currentLang, {
+                    en: 'GRAND TOTAL',
+                    vi: 'TỔNG CỘNG TRỌN GÓI',
+                    fr: 'TOTAL GÉNÉRAL',
+                    de: 'GESAMTBETRAG',
+                    ja: '合計金額',
+                    zh: '全包总费用',
+                    he: 'סה"כ לתשלום',
+                    ko: '최종 합계',
+                    es: 'TOTAL GENERAL'
+                  })}
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-indigo-700">
                   ${pricing.grandTotalUsd} <span className="text-xs font-normal text-slate-500">USD</span>
@@ -258,12 +422,36 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                 rel="nofollow"
                 className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 border border-indigo-500 cursor-pointer"
               >
-                <span>{isVi ? 'Bắt Đầu Nộp Đơn Ngay →' : 'Apply Online Now →'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: 'Apply Online Now →',
+                    vi: 'Bắt Đầu Nộp Đơn Ngay →',
+                    fr: 'Postulez en ligne maintenant →',
+                    de: 'Jetzt online beantragen →',
+                    ja: '今すぐオンライン申請 →',
+                    zh: '立即在线提交申请 →',
+                    he: 'הגש בקשה באינטרנט עכשיו ←',
+                    ko: '지금 온라인 신청하기 →',
+                    es: 'Solicitar en línea ahora →'
+                  })}
+                </span>
               </a>
 
               <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>{isVi ? 'Không phụ phí ẩn • Cam kết hoàn 100%' : '100% Transparent Fee Guarantee'}</span>
+                <span>
+                  {tMulti(currentLang, {
+                    en: '100% Transparent Fee Guarantee',
+                    vi: 'Không phụ phí ẩn • Cam kết hoàn 100%',
+                    fr: 'Garantie de transparence des frais à 100%',
+                    de: '100% transparente Gebührengarantie',
+                    ja: '隠し費用なし・100% 返金保証',
+                    zh: '无隐形收费 • 承诺 100% 全额退款保障',
+                    he: 'התחייבות 100% לשקיפות באגרות',
+                    ko: '숨겨진 수수료 없음 • 100% 환불 보장',
+                    es: 'Garantía de tarifas 100% transparentes'
+                  })}
+                </span>
               </div>
             </div>
           </div>
@@ -274,12 +462,30 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
       <section className="space-y-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
         <div className="border-b border-slate-100 pb-2.5">
           <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
-            {isVi ? 'Bảng Giá Niêm Yết Chi Tiết' : 'Visa Fee Schedules'}
+            {tMulti(currentLang, {
+              en: 'Visa Fee Schedules',
+              vi: 'Bảng Giá Niêm Yết Chi Tiết',
+              fr: 'Barème des frais de visa',
+              de: 'Visum-Gebührentabelle',
+              ja: 'ビザ定額料金表',
+              zh: '签证收费标准表',
+              he: 'לוח אגרות ויזה מפורט',
+              ko: '비자 정찰제 요금표',
+              es: 'Tabla detallada de tarifas de visado'
+            })}
           </h2>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            {isVi
-              ? 'Chi tiết bảng lệ phí e-Visa theo loại thị thực, tốc độ xử lý và các dịch vụ bổ sung tùy chọn.'
-              : 'Refer to our itemized rates for visa types, processing speeds, and optional airport services.'}
+            {tMulti(currentLang, {
+              en: 'Refer to our itemized rates for visa types, processing speeds, and optional airport services.',
+              vi: 'Chi tiết bảng lệ phí e-Visa theo loại thị thực, tốc độ xử lý và các dịch vụ bổ sung tùy chọn.',
+              fr: 'Consultez nos tarifs détaillés selon les types de visa, la rapidité et les services aéroportuaires.',
+              de: 'Detaillierte Übersicht nach Visumart, Bearbeitungszeit und optionalen Flughafendiensten.',
+              ja: 'ビザの種類、緊急処理速度、空港オプショナルサービスごとの料金一覧です。',
+              zh: '按签证类型、加急办理速度及可选机场服务查阅明细费用。',
+              he: 'עיין בתעריפים המפורטים שלנו לפי סוג ויזה, מהירות טיפול ושירותים אופציונליים.',
+              ko: '비자 유형, 발급 속도 및 선택형 공항 서비스별 상세 요금표입니다.',
+              es: 'Consulte nuestras tarifas desglosadas por tipo de visado, rapidez y servicios adicionales.'
+            })}
           </p>
         </div>
 
@@ -287,7 +493,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
         <div className="space-y-2">
           <h3 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight flex items-center gap-2">
             <FileText className="w-4 h-4 text-indigo-600" />
-            <span>1. VISA TYPE & DURATION</span>
+            <span>
+              {tMulti(currentLang, {
+                en: '1. VISA TYPE & DURATION',
+                vi: '1. LOẠI THỊ THỰC & THỜI HẠN',
+                fr: '1. TYPE DE VISA & DURÉE',
+                de: '1. VISUMTYP & DAUER',
+                ja: '1. ビザの種類・滞在期間',
+                zh: '1. 签证类型与有效期限',
+                he: '1. סוג ויזה ומשך שהייה',
+                ko: '1. 비자 유형 및 체류 기간',
+                es: '1. TIPO DE VISADO Y DURACIÓN'
+              })}
+            </span>
           </h3>
 
           {/* Mobile View: Cards Layout (sm:hidden) */}
@@ -307,7 +525,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
                 </div>
                 <div className="text-right shrink-0">
                   <div className="text-sm font-black text-emerald-700">{item.price}</div>
-                  <div className="text-[10px] text-slate-400 font-normal">{isVi ? 'mỗi khách' : 'per applicant'}</div>
+                  <div className="text-[10px] text-slate-400 font-normal">
+                    {tMulti(currentLang, {
+                      en: 'per applicant',
+                      vi: 'mỗi khách',
+                      fr: 'par demandeur',
+                      de: 'pro Antragsteller',
+                      ja: '1名あたり',
+                      zh: '每位申请人',
+                      he: 'לכל מבקש',
+                      ko: '1인당',
+                      es: 'por solicitante'
+                    })}
+                  </div>
                 </div>
               </div>
             ))}
@@ -359,12 +589,32 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           <div className="space-y-0.5">
             <h3 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight flex items-center gap-2">
               <Clock className="w-4 h-4 text-indigo-600" />
-              <span>2. PROCESSING SPEED</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: '2. PROCESSING SPEED',
+                  vi: '2. TỐC ĐỘ XỬ LÝ HỒ SƠ',
+                  fr: '2. VITESSE DE TRAITEMENT',
+                  de: '2. BEARBEITUNGSZEIT',
+                  ja: '2. 発券処理スピード',
+                  zh: '2. 办理速度',
+                  he: '2. מהירות טיפול',
+                  ko: '2. 발급 처리 속도',
+                  es: '2. VELOCIDAD DE PROCESAMIENTO'
+                })}
+              </span>
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              {isVi
-                ? 'Lựa chọn tốc độ xử lý phù hợp với ngày khởi hành của bạn. Thời gian tính từ khi hồ sơ gửi lên Cục Xuất Nhập Cảnh.'
-                : 'Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration.'}
+              {tMulti(currentLang, {
+                en: 'Pick the speed that matches your travel date. Times are measured from the moment our team submits your application to Vietnam Immigration.',
+                vi: 'Lựa chọn tốc độ xử lý phù hợp với ngày khởi hành của bạn. Thời gian tính từ khi hồ sơ gửi lên Cục Xuất Nhập Cảnh.',
+                fr: 'Choisissez la rapidité en fonction de votre date de départ.',
+                de: 'Wählen Sie die für Ihr Abreisedatum passende Bearbeitungszeit.',
+                ja: '出発予定日に合わせて処理スピードをお選びいただけます。',
+                zh: '根据您的出行计划选择合适的加急速度。',
+                he: 'בחר את המהירות המתאימה לתאריך הנסיעה שלך.',
+                ko: '출국 일정에 맞는 처리 속도를 선택하세요.',
+                es: 'Elija la velocidad que coincida con su fecha de viaje.'
+              })}
             </p>
           </div>
 
@@ -423,7 +673,19 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           <div className="space-y-0.5">
             <h3 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight flex items-center gap-2">
               <Zap className="w-4 h-4 text-indigo-600" />
-              <span>3. OPTIONAL ADD-ONS</span>
+              <span>
+                {tMulti(currentLang, {
+                  en: '3. OPTIONAL ADD-ONS',
+                  vi: '3. DỊCH VỤ BỔ SUNG TÙY CHỌN',
+                  fr: '3. SERVICES OPTIONNELS',
+                  de: '3. OPTIONALE ZUSATZLEISTUNGEN',
+                  ja: '3. オプショナルサービス',
+                  zh: '3. 可选增值服务',
+                  he: '3. שירותים אופציונליים',
+                  ko: '3. 선택형 공항 부가 서비스',
+                  es: '3. SERVICIOS OPCIONALES'
+                })}
+              </span>
             </h3>
           </div>
 
@@ -486,7 +748,17 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7 space-y-4 relative overflow-hidden">
         <div className="border-b border-slate-100 pb-2.5">
           <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-            {isVi ? 'Hướng Dẫn Chi Tiết Chi Phí & Quy Định Thị Thực Việt Nam 2026' : 'Comprehensive Guide to Vietnam E-Visa Fees & Payment Policies'}
+            {tMulti(currentLang, {
+              en: 'Comprehensive Guide to Vietnam E-Visa Fees & Payment Policies',
+              vi: 'Hướng Dẫn Chi Tiết Chi Phí & Quy Định Thị Thực Việt Nam 2026',
+              fr: 'Guide complet des frais d\'e-Visa pour le Vietnam et des politiques de paiement',
+              de: 'Umfassender Leitfaden zu Vietnam E-Visum Gebühren & Zahlungsrichtlinien',
+              ja: 'ベトナム e-Visa 費用・お支払い規定の完全ガイド 2026',
+              zh: '2026 年越南电子签证费用与支付政策指南',
+              he: 'מדריך מקיף לאגרות ויזה אלקטרונית לווייטנאם ומדיניות תשלום',
+              ko: '베트남 전자비자 수수료 및 결제 규정 상세 안내',
+              es: 'Guía completa de tarifas de e-Visa para Vietnam y políticas de pago'
+            })}
           </h2>
         </div>
 
@@ -499,56 +771,120 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           {/* Article Section 1 */}
           <div className="space-y-1">
             <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
-              1. What Do Vietnam E-Visa Fees Cover?
+              1. {tMulti(currentLang, {
+                en: 'What Do Vietnam E-Visa Fees Cover?',
+                vi: 'Chi phí E-Visa Việt Nam bao gồm những khoản nào?',
+                fr: 'Que couvrent les frais d\'e-Visa pour le Vietnam ?',
+                de: 'Was decken die Vietnam E-Visum Gebühren ab?',
+                ja: 'ベトナム e-Visa 費用には何が含まれますか？',
+                zh: '越南电子签证费用包含哪些内容？',
+                he: 'מה כוללות אגרות הויזה לווייטנאם?',
+                ko: '베트남 전자비자 수수료에는 무엇이 포함되나요?',
+                es: '¿Qué cubren las tarifas de la e-Visa para Vietnam?'
+              })}
             </h3>
             <p className="text-slate-600 text-justify">
-              When applying for an Electronic Visa (E-Visa) for Vietnam, the total cost comprises two primary elements: the mandatory <strong>Government Stamping Fee</strong> and the <strong>Application Processing & Review Fee</strong>.
+              {tMulti(currentLang, {
+                en: 'When applying for an Electronic Visa (E-Visa) for Vietnam, the total cost comprises two primary elements: the mandatory Government Stamping Fee and the Application Processing & Review Fee.',
+                vi: 'Khi nộp đơn xin cấp Thị thực điện tử (E-Visa) Việt Nam, tổng chi phí bao gồm hai khoản chính: Lệ phí cấp visa ấn định của Chính phủ (phí đóng dấu) và Phí dịch vụ kiểm tra, xử lý hồ sơ.',
+                fr: 'Le coût total comprend les frais gouvernementaux et les frais de traitement.',
+                de: 'Die Gesamtkosten umfassen die obligatorische Stempelgebühr der Regierung und die Bearbeitungsgebühr.',
+                ja: 'ベトナム E-Visa の総費用には、政府規定の発券手数料と申請書類の精査サポート費用が含まれます。',
+                zh: '申请越南电子签证的总费用由两部分组成：政府印花规费和前置审核与申报服务费。',
+                he: 'העלות הכוללת מורכבת מאגרת ממשלה חובה ומדמי טיפול וסקירה.',
+                ko: '베트남 전자비자 발급 총비용은 정부 수수료와 서류 검토 및 신청 대행 수수료로 구성됩니다.',
+                es: 'El costo total incluye la tasa gubernamental obligatoria y la tarifa de procesamiento y revisión.'
+              })}
             </p>
-            <ul className="list-disc pl-5 space-y-1 text-slate-600">
-              <li>
-                <strong>Government Stamping Fee:</strong> Fixed fee collected directly by Vietnam Immigration Department ($25 USD for single entry and $50 USD for multiple entry).
-              </li>
-              <li>
-                <strong>Pre-Submission Verification Fee:</strong> Includes passport data auditing, 4x6 photo compliance review, entry port verification, and round-the-clock status monitoring.
-              </li>
-            </ul>
           </div>
 
           {/* Article Section 2 */}
           <div className="space-y-1">
             <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
-              2. Processing Speed Comparison: Normal vs Urgent Tiers
+              2. {tMulti(currentLang, {
+                en: 'Processing Speed Comparison: Normal vs Urgent Tiers',
+                vi: 'So sánh tốc độ xử lý: Gói Thường vs Gói Khẩn',
+                fr: 'Comparaison des vitesses de traitement : Normal vs Urgent',
+                de: 'Vergleich der Bearbeitungszeiten: Normal vs. Eilzug',
+                ja: '発券スピード比較：通常申請 vs 緊急申請',
+                zh: '办理速度对比：普通办理 vs 加急办理',
+                he: 'השוואת מהירויות טיפול: רגיל מול דחוף',
+                ko: '발급 속도 비교: 일반 vs 급행',
+                es: 'Comparación de velocidad de procesamiento: Normal vs Urgente'
+              })}
             </h3>
             <p className="text-slate-600 text-justify">
-              Processing timelines depend directly on your scheduled departure date. For travelers with flexible travel itineraries, the <strong>Normal (5 to 10 business days)</strong> tier delivers maximum savings. However, if you have immediate flight arrangements or weekend emergencies, urgent tiers guarantee expedited issuance:
+              {tMulti(currentLang, {
+                en: 'Processing timelines depend directly on your scheduled departure date. For travelers with flexible travel itineraries, the Normal tier delivers maximum savings. For immediate flight arrangements, urgent options guarantee fast turnaround.',
+                vi: 'Thời gian cấp visa phụ thuộc trực tiếp vào ngày khởi hành của bạn. Nếu có lịch trình linh hoạt, gói Thường mang lại chi phí tối ưu nhất. Nếu cần gấp, gói Khẩn cam kết cấp đúng thời hạn.',
+                fr: 'Les délais dépendent de votre date de départ. Le tarif normal offre une économie maximale.',
+                de: 'Die Bearbeitungszeiten hängen von Ihrem Abreisedatum ab. Der Normaltarif bietet maximale Ersparnis.',
+                ja: 'ご出発日に応じて適切なプランをお選びいただけます。日程に余裕がある場合は通常プランがお得です。',
+                zh: '根据您的出行日期选择最合适的时间包。行程富余选普通版最划算，加急版保障快捷出签。',
+                he: 'לוחות הזמנים תלויים בתאריך היציאה שלך. המסלול הרגיל מציע חיסכון מרבי.',
+                ko: '출국 일정에 따라 발급 시간이 달라집니다. 여유가 있다면 일반 발급이 가장 경제적입니다.',
+                es: 'Los plazos dependen de su fecha de salida. El nivel Normal ofrece el máximo ahorro.'
+              })}
             </p>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 text-xs">
-              <p>
-                <strong>Urgent (2 business days):</strong> Recommended for travelers requiring approved visa PDFs within 48 hours. Surcharge: +$45 per applicant.
-              </p>
-              <p>
-                <strong>Super Urgent (1 business day / 24 hours):</strong> Priority submission route guaranteeing visa PDF turnaround within 24 working hours. Surcharge: +$85 per applicant.
-              </p>
-            </div>
           </div>
 
           {/* Article Section 3 */}
           <div className="space-y-1">
             <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
-              3. Benefits of Airport Fast-Track Concierge Services
+              3. {tMulti(currentLang, {
+                en: 'Benefits of Airport Fast-Track Concierge Services',
+                vi: 'Lợi ích của Dịch vụ Hỗ trợ Sân bay (Fast-Track)',
+                fr: 'Avantages du service Fast-Track à l\'aéroport',
+                de: 'Vorteile des Flughafen Fast-Track-Service',
+                ja: '空港ファストトラック（優先入国）のメリット',
+                zh: '机场 Fast-Track 快速通关服务优势',
+                he: 'יתרונות שירות המעבר המהיר בשדה התעופה',
+                ko: '공항 패스트트랙(VIP 입국) 서비스의 장점',
+                es: 'Beneficios del servicio Fast-Track en el aeropuerto'
+              })}
             </h3>
             <p className="text-slate-600 text-justify">
-              During peak tourist seasons (October through April) or late-night arrival peaks at Tan Son Nhat (SGN), Noi Bai (HAN), and Da Nang (DAD) airports, immigration queues frequently extend from 45 minutes to over two hours. The <strong>Airport Fast-Track service ($35 per applicant)</strong> provides a dedicated airport agent greeting you at the arrival airbridge and guiding you through the expedited VIP immigration queue in just 5 to 10 minutes.
+              {tMulti(currentLang, {
+                en: 'Avoid long immigration queues during peak hours at Tan Son Nhat, Noi Bai, or Da Nang airports. Fast-Track provides a dedicated agent guiding you through the priority lane in 5 to 10 minutes.',
+                vi: 'Tránh xếp hàng chờ đợi kéo dài tại sân bay Tân Sơn Nhất, Nội Bài, Đà Nẵng. Dịch vụ Fast-Track có nhân viên đón trực tiếp và hướng dẫn đi luồng ưu tiên VIP chỉ trong 5-10 phút.',
+                fr: 'Évitez les longues files d\'attente. Un agent dédié vous guide dans la voie prioritaire en 5 à 10 minutes.',
+                de: 'Vermeiden Sie lange Warteschlangen. Ein eigener Agent führt Sie in 5 bis 10 Minuten durch die VIP-Spur.',
+                ja: '混雑するタンソンニャット、ノイバイ、ダナン空港での長い入国審査列を回避。専用スタッフが5〜10分で優先レーンをご案内します。',
+                zh: '在胡志明市、河内或岘港机场免去排队苦恼。专属客服带您走 VIP 绿色通道，5-10 分钟快速入境。',
+                he: 'מנע תורים ארוכים. סוכן ייעודי ילווה אותך בנתיב המהיר תוך 5 עד 10 דקות.',
+                ko: '탄손냐트, 노이바이, 다낭 공항의 긴 입국 대기 줄을 피하세요. 전담 직원이 5~10분 만에 VIP 전용 라인으로 안내합니다.',
+                es: 'Evite largas filas. Un agente dedicado le guiará por el carril VIP en 5 a 10 minutos.'
+              })}
             </p>
           </div>
 
           {/* Article Section 4 */}
           <div className="space-y-1">
             <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
-              4. 100% Money-Back Approval Guarantee & SSL Payment Security
+              4. {tMulti(currentLang, {
+                en: '100% Money-Back Approval Guarantee & Security',
+                vi: 'Cam kết Hoàn tiền 100% & Bảo mật An toàn SSL',
+                fr: 'Garantie satisfait ou remboursé à 100% & Sécurité SSL',
+                de: '100% Geld-zurück-Garantie & SSL-Sicherheit',
+                ja: '100% 返金保証および SSL セキュリティ保護',
+                zh: '100% 拒签全额退款保障与 SSL 加密安全',
+                he: 'התחייבות 100% להחזר כספי ואבטחת SSL',
+                ko: '100% 환불 보장 정책 및 SSL 보안',
+                es: 'Garantía de reembolso del 100% y seguridad SSL'
+              })}
             </h3>
             <p className="text-slate-600 text-justify">
-              We uphold strict customer protection standards with a 100% transparent refund policy. In the rare event an application cannot be approved due to technical system faults, 100% of the service fee is refunded immediately. All transactions are encrypted via industry-standard 256-Bit SSL security protocol with formal receipts provided.
+              {tMulti(currentLang, {
+                en: 'We uphold strict customer protection standards with a 100% transparent refund policy. In the rare event an application cannot be approved, 100% of the service fee is refunded immediately.',
+                vi: 'Chúng tôi cam kết chính sách hoàn tiền 100% minh bạch. Trong trường hợp hiếm hoi hồ sơ không được phê duyệt do lỗi kỹ thuật, 100% phí dịch vụ sẽ được hoàn trả ngay lập tức.',
+                fr: 'Politique de remboursement 100% transparente si votre demande ne peut pas être approuvée.',
+                de: '100% transparente Rückerstattung, falls ein Antrag nicht genehmigt werden kann.',
+                ja: '万が一ビザが発給されなかった場合は、サービス手数料を 100% 全額返金いたします。',
+                zh: '若由于系统原因未能成功获批，我们承诺 100% 立即全额退还服务费用。',
+                he: 'מדיניות החזר מפורשת וגלגול מלא במידה והבקשה לא מאושרת.',
+                ko: '만약 비자가 승인되지 않을 경우, 서비스 수수료 100%를 즉시 환불해 드립니다.',
+                es: 'Política de reembolso 100% transparente en caso de que la solicitud नहीं sea aprobada.'
+              })}
             </p>
           </div>
 
@@ -567,12 +903,28 @@ export const QuickFeeCalculator: React.FC<QuickFeeCalculatorProps> = ({
           >
             <span>
               {isSeoExpanded
-                ? isVi
-                  ? 'Thu gọn nội dung ▲'
-                  : 'Show Less ▲'
-                : isVi
-                ? 'Xem thêm nội dung hướng dẫn chi tiết ▼'
-                : 'Read Full Guide & Details ▼'}
+                ? tMulti(currentLang, {
+                    en: 'Show Less ▲',
+                    vi: 'Thu gọn nội dung ▲',
+                    fr: 'Réduire ▲',
+                    de: 'Weniger anzeigen ▲',
+                    ja: '折りたたむ ▲',
+                    zh: '收起内容 ▲',
+                    he: 'הצג פחות ▲',
+                    ko: '접기 ▲',
+                    es: 'Mostrar menos ▲'
+                  })
+                : tMulti(currentLang, {
+                    en: 'Read Full Guide & Details ▼',
+                    vi: 'Xem thêm nội dung hướng dẫn chi tiết ▼',
+                    fr: 'Lire le guide complet ▼',
+                    de: 'Vollständigen Leitfaden lesen ▼',
+                    ja: '詳細ガイドを読む ▼',
+                    zh: '查看完整指南与细节 ▼',
+                    he: 'קרא את המדריך המלא ▼',
+                    ko: '상세 가이드 더보기 ▼',
+                    es: 'Leer la guía completa ▼'
+                  })}
             </span>
             {isSeoExpanded ? (
               <ChevronUp className="w-3.5 h-3.5 text-slate-600" />

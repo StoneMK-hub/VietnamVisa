@@ -167,6 +167,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
       const targetPath = `/vietnam-visa-requirements/${slug}`;
       if (window.location.pathname !== targetPath) {
         window.history.pushState({}, '', targetPath);
+        window.dispatchEvent(new Event('popstate'));
       }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -234,6 +235,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     setSelectedPost(null);
     setSelectedCountryName('');
     window.history.pushState({}, '', isHome ? '/' : '/vietnam-visa-requirements');
+    window.dispatchEvent(new Event('popstate'));
     if (onSEOChange) {
       onSEOChange(null);
     }
@@ -419,10 +421,13 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
                 {COUNTRIES_DATA.slice(0, 16).map((c) => {
+                  const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
+                  const slug = exactUrl.split('/').filter(Boolean).pop() || '';
+                  const href = `/vietnam-visa-requirements/${slug}`;
                   return (
                     <a
                       key={c.code}
-                      href={`#req-${c.code.toLowerCase()}`}
+                      href={href}
                       onClick={(e) => {
                         e.preventDefault();
                         handleOpenCountryPost(c);
@@ -496,13 +501,19 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 pt-1 sm:pt-2">
           {countriesToDisplay.map((c, index) => {
             const isHiddenOnMobileForHome = isHome && index >= 4;
+            const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
+            const slug = exactUrl.split('/').filter(Boolean).pop() || '';
+            const href = `/vietnam-visa-requirements/${slug}`;
+
             return (
-              <div
+              <a
                 key={c.code}
-                onClick={isHome ? undefined : () => handleOpenCountryPost(c)}
-                className={`${isHiddenOnMobileForHome ? 'hidden sm:flex' : 'flex'} bg-slate-50 ${
-                  isHome ? '' : 'hover:bg-white hover:border-indigo-300 hover:shadow-md cursor-pointer group'
-                } rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200/90 transition-all flex-col justify-between space-y-2.5 relative`}
+                href={href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenCountryPost(c);
+                }}
+                className={`${isHiddenOnMobileForHome ? 'hidden sm:flex' : 'flex'} bg-slate-50 hover:bg-white hover:border-indigo-300 hover:shadow-md cursor-pointer group rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200/90 transition-all flex-col justify-between space-y-2.5 relative`}
               >
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1.5 sm:pb-2 border-b border-slate-200/70 gap-1.5">
@@ -513,7 +524,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                         className="w-4.5 h-3 sm:w-5 sm:h-3.5 object-cover rounded-[2px] border border-slate-200/80 shrink-0 shadow-2xs"
                         loading="lazy"
                       />
-                      <span className={`font-bold text-slate-900 text-xs sm:text-sm leading-tight line-clamp-2 sm:line-clamp-1 sm:truncate ${isHome ? '' : 'group-hover:text-indigo-600'} transition-colors`}>
+                      <span className="font-bold text-slate-900 text-xs sm:text-sm leading-tight line-clamp-2 sm:line-clamp-1 sm:truncate group-hover:text-indigo-600 transition-colors">
                         {isVi ? c.countryNameVi : c.countryName}
                       </span>
                     </div>
@@ -529,20 +540,12 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                         </span>
                       )}
 
-                      {!isHome && (
-                        <a
-                          href={`#req-${c.code.toLowerCase()}`}
-                          className="p-0.5 sm:p-1 rounded-md text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors flex items-center justify-center shrink-0"
-                          title={isVi ? `Xem chi tiết quy định visa ${c.countryNameVi}` : `View visa guide for ${c.countryName}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleOpenCountryPost(c);
-                          }}
-                        >
-                          <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </a>
-                      )}
+                      <span
+                        className="p-0.5 sm:p-1 rounded-md text-indigo-600 group-hover:bg-indigo-50 group-hover:translate-x-0.5 transition-all flex items-center justify-center shrink-0"
+                        title={isVi ? `Xem chi tiết quy định visa ${c.countryNameVi}` : `View visa guide for ${c.countryName}`}
+                      >
+                        <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </span>
                     </div>
                   </div>
 
@@ -550,7 +553,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                     {isVi ? c.notesVi : c.notes}
                   </p>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>

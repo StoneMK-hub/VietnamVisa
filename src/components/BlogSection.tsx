@@ -108,6 +108,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
       const targetPath = `/blog/${postSlug}`;
       if (window.location.pathname !== targetPath) {
         window.history.pushState({}, '', targetPath);
+        window.dispatchEvent(new Event('popstate'));
       }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -128,9 +129,11 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
     setSelectedPost(null);
     if (isHome) {
       window.history.pushState({}, '', '/');
+      window.dispatchEvent(new Event('popstate'));
     } else {
       if (window.location.pathname.startsWith('/blog/')) {
         window.history.pushState({}, '', '/blog');
+        window.dispatchEvent(new Event('popstate'));
       }
     }
     if (onSEOChange) {
@@ -533,73 +536,89 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
         /* Blog Cards Grid: 2 columns on Mobile, 3 columns on Desktop (or 4 on Home preview) */
         <div className="space-y-8">
           <div className={isHome ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" : "grid grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6"}>
-            {paginatedPosts.map((post) => (
-              <article
-                key={post.id}
-                className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-indigo-300 transition-all duration-200 flex flex-col overflow-hidden group"
-              >
-                {/* Image Banner */}
-                <div 
-                  onClick={() => handleOpenPost(post)}
-                  className="relative h-36 sm:h-44 md:h-48 overflow-hidden bg-slate-100 shrink-0 cursor-pointer"
+            {paginatedPosts.map((post) => {
+              const postHref = `/blog/${post.slug || post.id}`;
+              return (
+                <article
+                  key={post.id}
+                  className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-indigo-300 transition-all duration-200 flex flex-col overflow-hidden group"
                 >
-                  <img
-                    src={post.featuredImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-80" />
-                  
-                  {/* Read Time badge */}
-                  <span className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 bg-slate-900/80 text-slate-200 text-[9px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 rounded-md backdrop-blur-xs flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-amber-400" />
-                    {post.readTime}
-                  </span>
-                </div>
+                  {/* Image Banner */}
+                  <a 
+                    href={postHref}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenPost(post);
+                    }}
+                    className="relative h-36 sm:h-44 md:h-48 overflow-hidden bg-slate-100 shrink-0 cursor-pointer block"
+                  >
+                    <img
+                      src={post.featuredImage}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-80" />
+                    
+                    {/* Read Time badge */}
+                    <span className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 bg-slate-900/80 text-slate-200 text-[9px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 rounded-md backdrop-blur-xs flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-amber-400" />
+                      {post.readTime}
+                    </span>
+                  </a>
 
-                {/* Card Body */}
-                <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2.5 sm:space-y-3">
-                  <div className="space-y-1.5 sm:space-y-2">
-                    {/* Meta Date & Author */}
-                    <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-500 font-medium">
-                      <span className="flex items-center gap-1 shrink-0">
-                        <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-500" />
-                        {post.date}
-                      </span>
-                      <span className="hidden sm:flex items-center gap-1 truncate max-w-[130px]">
-                        <User className="w-3.5 h-3.5 text-emerald-500" />
-                        {post.author}
-                      </span>
+                  {/* Card Body */}
+                  <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2.5 sm:space-y-3">
+                    <div className="space-y-1.5 sm:space-y-2">
+                      {/* Meta Date & Author */}
+                      <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-500 font-medium">
+                        <span className="flex items-center gap-1 shrink-0">
+                          <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-500" />
+                          {post.date}
+                        </span>
+                        <span className="hidden sm:flex items-center gap-1 truncate max-w-[130px]">
+                          <User className="w-3.5 h-3.5 text-emerald-500" />
+                          {post.author}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-extrabold text-slate-900 text-xs sm:text-base group-hover:text-indigo-600 transition-colors line-clamp-2 cursor-pointer leading-snug">
+                        <a 
+                          href={postHref}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleOpenPost(post);
+                          }}
+                        >
+                          {post.title}
+                        </a>
+                      </h3>
+
+                      {/* Excerpt */}
+                      <p className="text-[11px] sm:text-sm text-slate-600 line-clamp-2 sm:line-clamp-3 leading-relaxed font-normal">
+                        {post.excerpt}
+                      </p>
                     </div>
 
-                    {/* Title */}
-                    <h3 
-                      onClick={() => handleOpenPost(post)}
-                      className="font-extrabold text-slate-900 text-xs sm:text-base group-hover:text-indigo-600 transition-colors line-clamp-2 cursor-pointer leading-snug"
-                    >
-                      {post.title}
-                    </h3>
-
-                    {/* Excerpt */}
-                    <p className="text-[11px] sm:text-sm text-slate-600 line-clamp-2 sm:line-clamp-3 leading-relaxed font-normal">
-                      {post.excerpt}
-                    </p>
+                    {/* Action Footer */}
+                    <div className="pt-2 sm:pt-3 border-t border-slate-100 flex items-center justify-between">
+                      <a
+                        href={postHref}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleOpenPost(post);
+                        }}
+                        className="w-full text-xs sm:text-sm font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center justify-between cursor-pointer"
+                      >
+                        <span>{isVi ? 'Xem chi tiết' : 'Read Article'}</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    </div>
                   </div>
-
-                  {/* Action Footer */}
-                  <div className="pt-2 sm:pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <button
-                      onClick={() => handleOpenPost(post)}
-                      className="w-full text-xs sm:text-sm font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center justify-between cursor-pointer"
-                    >
-                      <span>{isVi ? 'Xem chi tiết' : 'Read Article'}</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           {/* Pagination Controls Bar (Only on dedicated /blog page with multiple pages) */}

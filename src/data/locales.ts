@@ -175,9 +175,9 @@ export function getLocalePath(cleanPath: string, localeCode: string): string {
   return `/${locale.code}${normalizedPath}`;
 }
 
-/** Auto detect best locale from browser navigator.language or localStorage */
+/** Auto detect best locale from browser navigator.language, timezone or localStorage */
 export function autoDetectLocale(): CountryLocale {
-  // Check localStorage first
+  // 1. Check localStorage first (user explicit preference)
   try {
     const saved = localStorage.getItem('user_locale');
     if (saved) {
@@ -188,7 +188,7 @@ export function autoDetectLocale(): CountryLocale {
     // Ignore storage errors
   }
 
-  // Check browser language
+  // 2. Check browser language
   if (typeof navigator !== 'undefined') {
     const browserLangs = navigator.languages || [navigator.language || ''];
     for (const bLang of browserLangs) {
@@ -205,6 +205,24 @@ export function autoDetectLocale(): CountryLocale {
       if (lower.startsWith('es')) return getLocaleByCode('es-es');
       if (lower.startsWith('en')) return getLocaleByCode('en-us');
     }
+  }
+
+  // 3. Timezone fallback
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) {
+      const lowerTz = tz.toLowerCase();
+      if (lowerTz.includes('ho_chi_minh') || lowerTz.includes('saigon') || lowerTz.includes('hanoi')) return getLocaleByCode('vi-vn');
+      if (lowerTz.includes('jerusalem') || lowerTz.includes('tel_aviv')) return getLocaleByCode('he-il');
+      if (lowerTz.includes('tokyo')) return getLocaleByCode('ja-jp');
+      if (lowerTz.includes('seoul')) return getLocaleByCode('ko-kr');
+      if (lowerTz.includes('paris')) return getLocaleByCode('fr-fr');
+      if (lowerTz.includes('berlin')) return getLocaleByCode('de-de');
+      if (lowerTz.includes('shanghai') || lowerTz.includes('chongqing') || lowerTz.includes('hong_kong')) return getLocaleByCode('zh-cn');
+      if (lowerTz.includes('madrid')) return getLocaleByCode('es-es');
+    }
+  } catch (e) {
+    // Ignore
   }
 
   return DEFAULT_LOCALE;

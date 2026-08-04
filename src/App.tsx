@@ -78,6 +78,11 @@ export default function App() {
 
   const handleLanguageChange = (newLang: Language, newLocaleCode?: string) => {
     const targetCode = newLocaleCode || (newLang === 'vi' ? 'vi-vn' : 'en-us');
+    try {
+      localStorage.setItem('user_locale', targetCode);
+    } catch (e) {
+      // Ignore
+    }
     setCurrentLocaleCode(targetCode);
     setCurrentLang(newLang);
 

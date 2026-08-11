@@ -245,6 +245,205 @@ Your role:
   }
 });
 
+// API 4.5: Article & Content Translation Engine for WordPress Posts/Requirements
+const articleTranslationCache = new Map<string, { title: string; excerpt: string; content: string }>();
+
+// Helper: Translate plain text using Google GTX Free Translation API
+async function translateWithGoogleGTX(text: string, targetLang: string): Promise<string> {
+  if (!text || !text.trim()) return text;
+  
+  const langMap: Record<string, string> = {
+    zh: 'zh-CN',
+    he: 'iw',
+    ja: 'ja',
+    ko: 'ko',
+    vi: 'vi',
+    fr: 'fr',
+    de: 'de',
+    es: 'es'
+  };
+  const tl = langMap[targetLang] || targetLang;
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+    if (!response.ok) return text;
+    const data = await response.json();
+    if (Array.isArray(data) && Array.isArray(data[0])) {
+      return data[0].map((item: any) => (item && item[0]) ? item[0] : '').join('');
+    }
+  } catch (err) {
+    console.warn('GTX translation error:', err);
+  }
+  return text;
+}
+
+// Helper: Translate HTML content node-by-node to preserve all HTML structure & classes
+async function translateHtmlContentGTX(html: string, targetLang: string): Promise<string> {
+  if (!html || !html.trim()) return html;
+
+  // Split HTML into tags and text segments
+  const parts = html.split(/(<[^>]+>)/g);
+
+  const textIndices: number[] = [];
+  const textPromises: Promise<string>[] = [];
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    // Skip HTML tags and empty/whitespace parts
+    if (!part || part.startsWith('<') || !part.trim()) {
+      continue;
+    }
+    // Skip pure numbers or single symbols
+    if (/^[\d\s\p{P}]+$/u.test(part.trim())) {
+      continue;
+    }
+
+    textIndices.push(i);
+    textPromises.push(translateWithGoogleGTX(part, targetLang));
+  }
+
+  if (textPromises.length === 0) return html;
+
+  const translatedTexts = await Promise.all(textPromises);
+
+  for (let k = 0; k < textIndices.length; k++) {
+    const origIdx = textIndices[k];
+    parts[origIdx] = translatedTexts[k];
+  }
+
+  return parts.join('');
+}
+
+app.post('/api/translate-article', async (req, res) => {
+  try {
+    const { title = '', excerpt = '', content = '', targetLang = 'vi', id = '', slug = '', skipContent = false } = req.body;
+    
+    if (targetLang === 'en' || !targetLang) {
+      return res.json({ success: true, title, excerpt, content });
+    }
+
+    const cacheKey = `${id || slug || title.substring(0, 30)}_${targetLang}`;
+    const isFullContentRequested = !skipContent && content && content.trim().length > 30;
+
+    if (articleTranslationCache.has(cacheKey)) {
+      const cached = articleTranslationCache.get(cacheKey)!;
+      const hasCachedContent = cached.content && cached.content.trim().length > 30;
+      
+      if (!isFullContentRequested || hasCachedContent) {
+        return res.json({
+          success: true,
+          title: cached.title,
+          excerpt: cached.excerpt,
+          content: isFullContentRequested ? cached.content : '',
+          source: 'cache'
+        });
+      }
+    }
+
+    // Attempt 1: Gemini AI Translation if API key is configured
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (apiKey) {
+      try {
+        const ai = new GoogleGenAI({ apiKey });
+
+        const langNames: Record<string, string> = {
+          vi: 'Vietnamese',
+          fr: 'French',
+          de: 'German',
+          ja: 'Japanese',
+          zh: 'Chinese (Simplified)',
+          he: 'Hebrew',
+          ko: 'Korean',
+          es: 'Spanish'
+        };
+
+        const targetLangName = langNames[targetLang] || 'Vietnamese';
+
+        const prompt = `You are a professional travel & visa translator. Translate the following article content into ${targetLangName}.
+CRITICAL INSTRUCTIONS:
+1. Keep all HTML tags (<p>, <h3>, <ul>, <li>, <strong>, <b>, <div>, <span>, <a>, etc.) intact without modifying HTML tags or class attributes.
+2. Only translate the human-readable text inside the tags.
+3. Translate clearly and naturally for travel advisory context.
+
+Article Title: ${title}
+Article Excerpt: ${excerpt}
+Article Content HTML:
+${content}
+
+Return ONLY a valid JSON object with keys: "title", "excerpt", "content"`;
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: prompt,
+          config: {
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+          }
+        });
+
+        let resultText = response.text || '';
+        if (resultText) {
+          let cleanText = resultText.trim();
+          if (cleanText.startsWith('```json')) {
+            cleanText = cleanText.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
+          } else if (cleanText.startsWith('```')) {
+            cleanText = cleanText.replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+          }
+
+          let parsed: any = {};
+          try {
+            parsed = JSON.parse(cleanText);
+          } catch (pErr) {
+            const sanitized = cleanText.replace(/[\r\n]+/g, '\\n').replace(/\t/g, '\\t');
+            parsed = JSON.parse(sanitized);
+          }
+
+          if (parsed.title || parsed.content) {
+            const existing = articleTranslationCache.get(cacheKey);
+            const translatedObj = {
+              title: parsed.title || title,
+              excerpt: parsed.excerpt || excerpt,
+              content: parsed.content || existing?.content || ''
+            };
+            articleTranslationCache.set(cacheKey, translatedObj);
+            return res.json({ success: true, ...translatedObj, source: 'gemini' });
+          }
+        }
+      } catch (gErr) {
+        console.warn('Gemini translation failed, switching to Google GTX engine:', gErr);
+      }
+    }
+
+    // Attempt 2: Free GTX Translation Engine (Guaranteed fallback, works without API key)
+    const existing = articleTranslationCache.get(cacheKey);
+    const [translatedTitle, translatedExcerpt, translatedContent] = await Promise.all([
+      translateWithGoogleGTX(title, targetLang),
+      translateWithGoogleGTX(excerpt, targetLang),
+      isFullContentRequested 
+        ? translateHtmlContentGTX(content, targetLang)
+        : Promise.resolve(existing?.content || '')
+    ]);
+
+    const translatedObj = {
+      title: translatedTitle || title,
+      excerpt: translatedExcerpt || excerpt,
+      content: translatedContent || existing?.content || ''
+    };
+
+    articleTranslationCache.set(cacheKey, translatedObj);
+    return res.json({ success: true, ...translatedObj, source: 'gtx' });
+
+  } catch (err: any) {
+    console.error('Translation error:', err);
+    return res.status(500).json({ success: false, error: err.message, title: req.body.title, excerpt: req.body.excerpt, content: req.body.content });
+  }
+});
+
 // High Performance In-Memory Cache Store for WordPress APIs
 interface WpCacheEntry<T> {
   data: T;

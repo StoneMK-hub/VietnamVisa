@@ -23,6 +23,7 @@ import { CustomSEOData } from './SEOMetadata';
 import { getBlogSlugFromPath } from '../routes';
 import { tMulti } from '../data/translations';
 import { getLocalizedBlogPost } from '../data/blogTranslations';
+import { translateBlogPost, translateBlogPosts } from '../services/translationService';
 
 interface BlogSectionProps {
   currentLang: Language;
@@ -175,14 +176,57 @@ export const BlogSection: React.FC<BlogSectionProps> = ({
     return () => window.removeEventListener('popstate', handlePopState);
   }, [posts]);
 
-  // Localize all posts based on current language
-  const localizedPosts = useMemo(() => {
-    return posts.map(p => getLocalizedBlogPost(p, currentLang));
+  // State for active translated article
+  const [activeTranslatedArticle, setActiveTranslatedArticle] = useState<BlogPost | null>(null);
+  const [isTranslating, setIsTranslating] = useState<boolean>(false);
+
+  // State for translated list of blog posts
+  const [translatedPostsList, setTranslatedPostsList] = useState<BlogPost[]>([]);
+
+  // Automatically translate blog post list when posts or language changes
+  useEffect(() => {
+    let isMounted = true;
+    const baseLocalized = posts.map(p => getLocalizedBlogPost(p, currentLang));
+    setTranslatedPostsList(baseLocalized);
+
+    if (currentLang !== 'en' && posts.length > 0) {
+      translateBlogPosts(posts, currentLang, true)
+        .then(translated => {
+          if (isMounted && translated && translated.length > 0) {
+            setTranslatedPostsList(translated);
+          }
+        })
+        .catch(err => console.warn('Blog posts list translation error:', err));
+    }
   }, [posts, currentLang]);
 
-  const activeArticle = useMemo(() => {
-    return selectedPost ? getLocalizedBlogPost(selectedPost, currentLang) : null;
+  const localizedPosts = translatedPostsList.length > 0 ? translatedPostsList : posts.map(p => getLocalizedBlogPost(p, currentLang));
+
+  useEffect(() => {
+    if (!selectedPost) {
+      setActiveTranslatedArticle(null);
+      return;
+    }
+
+    let isMounted = true;
+    const baseLocalized = getLocalizedBlogPost(selectedPost, currentLang);
+    setActiveTranslatedArticle(baseLocalized);
+
+    if (currentLang !== 'en') {
+      setIsTranslating(true);
+      translateBlogPost(selectedPost, currentLang, false)
+        .then(translated => {
+          if (isMounted && translated) {
+            setActiveTranslatedArticle(translated);
+          }
+        })
+        .finally(() => {
+          if (isMounted) setIsTranslating(false);
+        });
+    }
   }, [selectedPost, currentLang]);
+
+  const activeArticle = activeTranslatedArticle;
 
   // Extract unique categories for filter
   const categories = useMemo(() => {

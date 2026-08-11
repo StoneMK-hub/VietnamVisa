@@ -1,5 +1,7 @@
 import { Language } from '../types';
 import { getExactCountryRequirementUrl } from '../data/countryUrls';
+import { tMulti } from '../data/translations';
+import { getLocalizedBlogPost } from '../data/blogTranslations';
 
 export interface BlogPost {
   id: number | string;
@@ -496,55 +498,180 @@ export function getRequirementPostForCountry(
   });
 
   if (matchedPost) {
+    const localized = getLocalizedBlogPost(matchedPost, lang);
     return {
-      ...matchedPost,
+      ...localized,
       link: exactUrl || matchedPost.link
     };
   }
 
   // 2. Generate a structured, detailed country requirement article if WP API has no specific post yet
-  const title = isVi
-    ? `Quy Định & Thủ Tục Xin Visa Việt Nam Cho Công Dân ${countryNameVi} (2026)`
-    : `Vietnam Visa Requirements & Official Entry Guidelines for ${countryName} Citizens (2026)`;
+  const cName = lang === 'vi' ? countryNameVi : countryName;
 
-  const excerpt = isVi
-    ? `Hướng dẫn chi tiết quy định thị thực, thời hạn hộ chiếu và các gói xử lý e-Visa 1h - 24h cho công dân ${countryNameVi}.`
-    : `Complete 2026 immigration breakdown for ${countryName} passport holders. Learn e-Visa validity, exemption rules, required documents, and express processing options.`;
+  const title = tMulti(lang, {
+    en: `Vietnam Visa Requirements & Official Entry Guidelines for ${countryName} Citizens (2026)`,
+    vi: `Quy Định & Thủ Tục Xin Visa Việt Nam Cho Công Dân ${countryNameVi} (2026)`,
+    fr: `Exigences de visa pour le Vietnam pour les citoyens de ${countryName} (2026)`,
+    de: `Vietnam Visabestimmungen für Staatsbürger von ${countryName} (2026)`,
+    ja: `${countryName}市民向けベトナムビザ申請要件と入国ガイド (2026年)`,
+    zh: `${countryName}公民 2026 越南签证申请要求与入境指南`,
+    he: `דרישות ויזה לווייטנאם לאזרחי ${countryName} (2026)`,
+    ko: `${countryName} 시민을 위한 베트남 비자 신청 요건 (2026년)`,
+    es: `Requisitos de visado para Vietnam para ciudadanos de ${countryName} (2026)`
+  });
 
-  const exemptionNoticeHtml = exemptionDays > 0
-    ? `<div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-emerald-900 font-medium mb-4">
-        <strong>${isVi ? `Được Miễn Visa ${exemptionDays} Ngày:` : `Free ${exemptionDays}-Day Visa Exemption:`}</strong>
-        ${isVi 
-          ? `Công dân ${countryNameVi} mang hộ chiếu phổ thông được MIỄN VISA lưu trú tối đa ${exemptionDays} ngày theo quy định hiện hành. Nếu muốn ở lại trên ${exemptionDays} ngày hoặc nhập cảnh nhiều lần, bạn cần xin E-Visa 90 ngày.` 
-          : `Citizens of ${countryName} holding an ordinary passport enjoy a <strong>${exemptionDays}-Day Visa Exemption</strong> upon arrival in Vietnam. For stays longer than ${exemptionDays} days or multiple entries, apply for a 90-day e-Visa online.`}
-       </div>`
-    : `<div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-blue-900 font-medium mb-4">
-        <strong>${isVi ? 'Yêu Cầu Có E-Visa Trước Khi Bay:' : 'E-Visa Required Prior to Departure:'}</strong>
-        ${isVi 
-          ? `Công dân ${countryNameVi} cần có E-Visa Việt Nam hợp lệ (30 ngày hoặc 90 ngày, 1 lần hoặc nhiều lần) trước khi lên máy bay.` 
-          : `Citizens of ${countryName} are required to obtain a valid Vietnam e-Visa (30 or 90 days, single or multiple entry) before boarding their flight.`}
-       </div>`;
+  const excerpt = tMulti(lang, {
+    en: `Complete 2026 immigration breakdown for ${countryName} passport holders. Learn e-Visa validity, exemption rules, required documents, and express processing options.`,
+    vi: `Hướng dẫn chi tiết quy định thị thực, thời hạn hộ chiếu và các gói xử lý e-Visa 1h - 24h cho công dân ${countryNameVi}.`,
+    fr: `Guide officiel 2026 sur les e-visas, exemptions et exigences pour les titulaires de passeport de ${countryName}.`,
+    de: `Vollständiger Leitfaden 2026 zu E-Visum Richtlinien und Notfalloptionen für ${countryName}.`,
+    ja: `e-Visa申請手順、パスポート有効期限、緊急発給オプションに関する${countryName}向けガイド。`,
+    zh: `关于 ${countryName} 公民电子签证申请步骤、护照有效期及紧急加急出签服务的完整说明。`,
+    he: `מדריך רשמי להנפקת ויזה אלקטרונית, תוקף דרכון ואפשרויות הנפקה דחופה לאזרחי ${countryName}.`,
+    ko: `${countryName} 여권 소지자를 위한 베트남 전자비자 발급 절차 및 긴급 패스트트랙 안내.`,
+    es: `Guía oficial 2026 sobre e-visas, exenciones y opciones de trámite urgente para ciudadanos de ${countryName}.`
+  });
+
+  const exemptionTitle = exemptionDays > 0
+    ? tMulti(lang, {
+        en: `Free ${exemptionDays}-Day Visa Exemption:`,
+        vi: `Được Miễn Visa ${exemptionDays} Ngày:`,
+        fr: `Exemption de visa gratuite de ${exemptionDays} jours:`,
+        de: `Kostenlose ${exemptionDays}-Tage Visumbefreiung:`,
+        ja: `${exemptionDays}日間のビザ免除対象:`,
+        zh: `${exemptionDays} 天免签停留:`,
+        he: `פטור מויזה ל-${exemptionDays} ימים:`,
+        ko: `${exemptionDays}일 무비자 면제:`,
+        es: `Exención de visado gratuita de ${exemptionDays} días:`
+      })
+    : tMulti(lang, {
+        en: 'E-Visa Required Prior to Departure:',
+        vi: 'Yêu Cầu Có E-Visa Trước Khi Bay:',
+        fr: 'e-Visa requis avant le départ:',
+        de: 'E-Visum vor dem Abflug erforderlich:',
+        ja: '渡航前にe-Visaの取得が必要です:',
+        zh: '登机前须持有效电子签证:',
+        he: 'נדרשת ויזה אלקטרונית לפני ההמראה:',
+        ko: '출국 전 전자비자 발급 필수:',
+        es: 'Requisito de e-Visa previo a la salida:'
+      });
+
+  const exemptionDetail = exemptionDays > 0
+    ? tMulti(lang, {
+        en: `Citizens of ${countryName} holding an ordinary passport enjoy a <strong>${exemptionDays}-Day Visa Exemption</strong> upon arrival in Vietnam. For stays longer than ${exemptionDays} days or multiple entries, apply for a 90-day e-Visa online.`,
+        vi: `Công dân ${countryNameVi} mang hộ chiếu phổ thông được MIỄN VISA lưu trú tối đa ${exemptionDays} ngày theo quy định hiện hành. Nếu muốn ở lại trên ${exemptionDays} ngày hoặc nhập cảnh nhiều lần, bạn cần xin E-Visa 90 ngày.`,
+        fr: `Les citoyens de ${countryName} bénéficient d'une exemption de visa de ${exemptionDays} jours à l'arrivée. Pour un séjour plus long, demandez un e-Visa de 90 jours.`,
+        de: `Staatsbürger von ${countryName} genießen bei der Ankunft eine ${exemptionDays}-tägige Visumbefreiung. Für längere Aufenthalte beantragen Sie ein 90-Tage-e-Visum.`,
+        ja: `${countryName}パスポート所持者は最長${exemptionDays}日間のビザ免除を受けられます。${exemptionDays}日を超える滞在には90日間のe-Visaを申請してください。`,
+        zh: `${countryName} 普通护照持有人可享有长达 ${exemptionDays} 天的免签待遇。如需停留超过 ${exemptionDays} 天或多次入境，请在线申请 90 天电子签证。`,
+        he: `אזרחי ${countryName} נהנים מפטור מויזה עד ${exemptionDays} ימים. לשהייה ארוכה יותר, יש להגיש בקשה לוויזה ל-90 יום.`,
+        ko: `${countryName} 여권 소지자는 최대 ${exemptionDays}일간 무비자 입국이 가능합니다. ${exemptionDays}일 초과 체류 시 90일 전자비자를 신청하세요.`,
+        es: `Los ciudadanos de ${countryName} disfrutan de exención de visado de hasta ${exemptionDays} días. Para estancias superiores, solicite e-Visa de 90 días.`
+      })
+    : tMulti(lang, {
+        en: `Citizens of ${countryName} are required to obtain a valid Vietnam e-Visa (30 or 90 days, single or multiple entry) before boarding their flight.`,
+        vi: `Công dân ${countryNameVi} cần có E-Visa Việt Nam hợp lệ (30 ngày hoặc 90 ngày, 1 lần hoặc nhiều lần) trước khi lên máy bay.`,
+        fr: `Les citoyens de ${countryName} doivent obtenir un e-Visa valide pour le Vietnam avant d'embarquer.`,
+        de: `Staatsbürger von ${countryName} müssen vor dem Boarding ein gültiges Vietnam E-Visum vorweisen.`,
+        ja: `${countryName}市民は搭乗前に有効なベトナムe-Visa（30日または90日）を取得する必要があります。`,
+        zh: `${countryName} 公民在登机前必须取得有效的越南电子签证（30 天或 90 天，单次或多次）。`,
+        he: `אזרחי ${countryName} חייבים להנפיק ויזה אלקטרונית בתוקף לפני העלייה למטוס.`,
+        ko: `${countryName} 시민은 탑승 전 유효한 베트남 전자비자(30일 또는 90일)를 취득해야 합니다.`,
+        es: `Los ciudadanos de ${countryName} deben obtener una e-Visa válida antes de abordar su vuelo.`
+      });
+
+  const exemptionBoxClass = exemptionDays > 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-blue-50 border-blue-200 text-blue-900';
+
+  const exemptionNoticeHtml = `<div class="${exemptionBoxClass} border p-4 rounded-xl font-medium mb-4">
+    <strong>${exemptionTitle}</strong> ${exemptionDetail}
+  </div>`;
+
+  const h3Checklist = tMulti(lang, {
+    en: 'Passport & Photo Compliance Checklist:',
+    vi: 'Điều Kiện Hộ Chiếu & Hồ Sơ Bắt Buộc:',
+    fr: 'Exigences relatives au passeport et aux photos:',
+    de: 'Pass- und Fotoanforderungen:',
+    ja: 'パスポートおよび証明写真の基準:',
+    zh: '护照与照片符合要求 Checklist:',
+    he: 'דרישות דרכון ותמונה:',
+    ko: '여권 및 사진 규격 체크리스트:',
+    es: 'Lista de verificación de pasaporte y foto:'
+  });
+
+  const liValidity = tMulti(lang, {
+    en: '<strong>Passport Validity:</strong> Must have at least 6 months remaining validity from arrival date with 2 blank pages.',
+    vi: '<strong>Thời hạn hộ chiếu:</strong> Còn hạn ít nhất 6 tháng tính từ ngày nhập cảnh Việt Nam, có ít nhất 2 trang trống.',
+    fr: '<strong>Validité du passeport:</strong> Au moins 6 mois de validité restante à compter de l\'arrivée avec 2 pages vierges.',
+    de: '<strong>Passgültigkeit:</strong> Mindestens 6 Monate Restgültigkeit ab Einreisedatum und 2 freie Seiten.',
+    ja: '<strong>パスポート有効期限:</strong> 入国予定日から6ヶ月以上の残存期間と2ページ以上の未使用ページが必要。',
+    zh: '<strong>护照有效期：</strong> 自入境日起算剩余有效期须在 6 个月以上，且至少有 2 页空白页。',
+    he: '<strong>תוקף דרכון:</strong> תוקף של 6 חודשים לפחות מיום ההגעה עם 2 דפים ריקים.',
+    ko: '<strong>여권 유효기간:</strong> 입국일 기준 최소 6개월 이상 잔여 유효기간 및 2면 이상의 빈 페이지 필요.',
+    es: '<strong>Validez del pasaporte:</strong> Al menos 6 meses de vigencia a la llegada y 2 páginas en blanco.'
+  });
+
+  const liPhoto = tMulti(lang, {
+    en: '<strong>Portrait Photo:</strong> 4x6cm digital photo, white background, no eyeglasses, clear face facing forward.',
+    vi: '<strong>Ảnh chân dung:</strong> Mới chụp trong 6 tháng, phông nền trắng, rõ mặt, không đeo kính râm.',
+    fr: '<strong>Photo de portrait:</strong> Photo numérique fond blanc, visage dégagé, sans lunettes de soleil.',
+    de: '<strong>Passfoto:</strong> Digitales Foto auf weißem Hintergrund, ohne Sonnenbrille, Gesicht gerade.',
+    ja: '<strong>証明写真:</strong> 白背景のデジタル写真、サングラス不可、正面を向いた鮮明な画像。',
+    zh: '<strong>证件照：</strong> 近 6 个月内拍摄的白底数字照片，面部清晰，不得佩戴墨镜。',
+    he: '<strong>תמונת פספורט:</strong> תמונה דיגיטלית על רקע לבן, ללא משקפי שמש, פנים גלויות.',
+    ko: '<strong>증명사진:</strong> 6개월 이내 촬영한 흰색 배경 디지털 사진, 안경 미착용.',
+    es: '<strong>Fotografía de retrato:</strong> Foto digital fondo blanco, rostro despejado, sin gafas de sol.'
+  });
+
+  const h3Options = tMulti(lang, {
+    en: 'E-Visa Categories & Speed Options:',
+    vi: 'Loại E-Visa & Thời Gian Xử Lý:',
+    fr: 'Types d\'e-Visa et options de traitement:',
+    de: 'E-Visum Kategorien und Eiloptionen:',
+    ja: 'e-Visaの種類と処理スピード:',
+    zh: '电子签证种类与加急办理选项:',
+    he: 'סוגי ויזה וזמני עיבוד:',
+    ko: '전자비자 종류 및 긴급 발급 옵션:',
+    es: 'Tipos de e-Visa y opciones de velocidad:'
+  });
+
+  const h3Ports = tMulti(lang, {
+    en: 'Eligible Ports of Entry:',
+    vi: 'Cửa Khẩu Cho Phép Nhập Cảnh:',
+    fr: 'Points d\'entrée autorisés:',
+    de: 'Zugelassene Einreisehäfen:',
+    ja: '利用可能な入国Immigrationゲート:',
+    zh: '允许入境的边境口岸:',
+    he: 'מעברי גבול מורשים:',
+    ko: '입국 허용 공항 및 경계 구역:',
+    es: 'Puertos de entrada autorizados:'
+  });
+
+  const portsText = tMulti(lang, {
+    en: 'E-Visa is valid for entry across 33 international border checkpoints including major airports: Hanoi (Noi Bai), Ho Chi Minh City (Tan Son Nhat), Da Nang, Cam Ranh, and Phu Quoc.',
+    vi: 'E-Visa có giá trị tại 33 cửa khẩu quốc tế bao gồm các sân bay lớn: Nội Bài (Hà Nội), Tân Sơn Nhất (TP.HCM), Đà Nẵng, Cam Ranh (Nha Trang), Phú Quốc, Cát Bi (Hải Phòng).',
+    fr: 'L\'e-Visa est valable dans 33 points de contrôle frontaliers internationaux, y compris les grands aéroports : Hanoï, Ho Chi Minh-Ville, Da Nang, Cam Ranh et Phu Quoc.',
+    de: 'Das E-Visum gilt an 33 internationalen Grenzübergängen, darunter den wichtigsten Flughäfen: Hanoi, Ho-Chi-Minh-Stadt, Da Nang, Cam Ranh und Phu Quoc.',
+    ja: 'e-Visaは、ハノイ、ホーチミン、ダナン、カムラン、フーコックを含む33の国際出入国ゲートで利用可能です。',
+    zh: '电子签证适用于 33 个国际出入境口岸，包括各大主要机场：河内（内排）、胡志明市（新山一）、岘港、金兰及富国岛。',
+    he: 'הויזה בתוקף ב-33 מעברי גבול בינלאומיים כולל שדות התעופה המרכזיים: האנוי, הו צ\'י מין סיטי, דה נאנג ופוקוק.',
+    ko: '전자비자는 하노이(노이바이), 호치민(탄손누트), 다낭, 깜라인, 푸꾸옥 등 33개 국제 공항 및 경계 구역에서 사용 가능합니다.',
+    es: 'La e-Visa es válida en 33 puestos fronterizos internacionales, incluidos los principales aeropuertos: Hanói, Ho Chi Minh, Da Nang, Cam Ranh y Phu Quoc.'
+  });
 
   const content = `
     ${exemptionNoticeHtml}
     
-    <h3>${isVi ? 'Điều Kiện Hộ Chiếu & Hồ Sơ Bắt Buộc:' : 'Passport & Photo Compliance Checklist:'}</h3>
+    <h3>${h3Checklist}</h3>
     <ul>
-      <li><strong>${isVi ? 'Thời hạn hộ chiếu:' : 'Passport Validity:'}</strong> ${isVi ? 'Còn hạn ít nhất 6 tháng tính từ ngày nhập cảnh Việt Nam, có ít nhất 2 trang trống.' : 'Must have at least 6 months remaining validity from arrival date with 2 blank pages.'}</li>
-      <li><strong>${isVi ? 'Ảnh chân dung:' : 'Portrait Photo:'}</strong> ${isVi ? 'Mới chụp trong 6 tháng, phông nền trắng, rõ mặt, không đeo kính râm.' : '4x6cm digital photo, white background, no eyeglasses, clear face facing forward.'}</li>
-      <li><strong>${isVi ? 'Trang thông tin hộ chiếu:' : 'Passport Bio-Page Scan:'}</strong> ${isVi ? 'Ảnh chụp hoặc scan rõ nét 4 góc, đầy đủ mã ICAO MRZ bên dưới.' : 'Clear high-resolution color scan showing full bio-page and MRZ code.'}</li>
+      <li>${liValidity}</li>
+      <li>${liPhoto}</li>
     </ul>
 
-    <h3>${isVi ? 'Loại E-Visa & Thời Gian Xử Lý:' : 'E-Visa Categories & Speed Options:'}</h3>
-    <p>${isVi ? notesVi : notes}</p>
-    <ul>
-      <li><strong>${isVi ? 'Tiêu chuẩn (Standard):' : 'Standard Processing:'}</strong> 3 ${isVi ? 'ngày làm việc' : 'working days'}.</li>
-      <li><strong>${isVi ? 'Khẩn 24h (Urgent):' : 'Urgent 24 Hours:'}</strong> ${isVi ? 'Duyệt trong 24 giờ làm việc.' : 'Approved within 24 working hours.'}</li>
-      <li><strong>${isVi ? 'Khẩn Cấp 1H - 4H (Super Urgent):' : 'Super Urgent 1-4 Hours:'}</strong> ${isVi ? 'Xử lý gấp trong 1 đến 4 giờ làm việc cho chuyến bay chót.' : 'Emergency clearance in 1 to 4 hours for upcoming flights.'}</li>
-    </ul>
+    <h3>${h3Options}</h3>
+    <p>${lang === 'vi' ? notesVi : notes}</p>
 
-    <h3>${isVi ? 'Cửa Khẩu Cho Phép Nhập Cảnh:' : 'Eligible Ports of Entry:'}</h3>
-    <p>${isVi ? `E-Visa có giá trị tại 33 cửa khẩu quốc tế bao gồm các sân bay lớn: Nội Bài (Hà Nội), Tân Sơn Nhất (TP.HCM), Đà Nẵng, Cam Ranh (Nha Trang), Phú Quốc, Cát Bi (Hải Phòng).` : `E-Visa is valid for entry across 33 international border checkpoints including major airports: Hanoi (Noi Bai), Ho Chi Minh City (Tan Son Nhat), Da Nang, Cam Ranh, and Phu Quoc.`}</p>
+    <h3>${h3Ports}</h3>
+    <p>${portsText}</p>
   `;
 
   return {

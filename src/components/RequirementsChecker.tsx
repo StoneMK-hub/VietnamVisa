@@ -27,6 +27,7 @@ import {
   getRequirementPostForCountry,
   fetchWpPostBySlug 
 } from '../services/wordpressApi';
+import { translateBlogPost } from '../services/translationService';
 import { getExactCountryRequirementUrl } from '../data/countryUrls';
 
 import { CustomSEOData } from './SEOMetadata';
@@ -127,9 +128,31 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   const isVi = currentLang === 'vi';
   const [searchTerm, setSearchTerm] = useState('');
   const [wpPosts, setWpPosts] = useState<BlogPost[]>([]);
+  const [rawPost, setRawPost] = useState<BlogPost | null>(null);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [selectedCountryName, setSelectedCountryName] = useState<string>('');
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
+
+  // Auto re-translate rawPost whenever currentLang or rawPost changes
+  useEffect(() => {
+    if (!rawPost) {
+      setSelectedPost(null);
+      return;
+    }
+
+    let isMounted = true;
+    setSelectedPost(rawPost);
+
+    if (currentLang !== 'en') {
+      translateBlogPost(rawPost, currentLang)
+        .then(translated => {
+          if (isMounted && translated) {
+            setSelectedPost(translated);
+          }
+        })
+        .catch(err => console.warn('Translation error:', err));
+    }
+  }, [rawPost, currentLang]);
 
   // Interactive Image Lightbox Zoom state
   const [lightboxImage, setLightboxImage] = useState<{ src: string; alt: string } | null>(null);
@@ -286,7 +309,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
       };
     }
 
-    setSelectedPost(postToDisplay);
+    // Set raw post (effect will handle translating to currentLang)
+    setRawPost(postToDisplay);
     setLoadingCode(null);
 
     // Update dynamic SEO metadata for head tag injection
@@ -303,6 +327,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   };
 
   const handleCloseArticle = () => {
+    setRawPost(null);
     setSelectedPost(null);
     setSelectedCountryName('');
     window.history.pushState({}, '', isHome ? '/' : '/vietnam-visa-requirements');
@@ -338,7 +363,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
         setLoadingCode('slug');
         const livePost = await fetchWpPostBySlug(slugFromPath);
         if (livePost) {
-          setSelectedPost(livePost);
+          setRawPost(livePost);
           setSelectedCountryName(livePost.title);
           if (onSEOChange) {
             onSEOChange({

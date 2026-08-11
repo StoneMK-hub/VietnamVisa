@@ -20,6 +20,7 @@ import {
 import { Language } from '../types';
 import { TRANSLATIONS, tMulti } from '../data/translations';
 import { WpFaqItem, fetchWpFaqPosts } from '../services/wordpressApi';
+import { translateWpFaqs } from '../services/translationService';
 
 interface FaqSectionProps {
   currentLang: Language;
@@ -187,7 +188,12 @@ export const FaqSection: React.FC<FaqSectionProps> = ({
     setLoading(true);
     try {
       const data = await fetchWpFaqPosts();
-      setWpFaqs(data);
+      if (currentLang !== 'en') {
+        const translated = await translateWpFaqs(data, currentLang);
+        setWpFaqs(translated);
+      } else {
+        setWpFaqs(data);
+      }
       if (data.length > 0) {
         setOpenWpId(data[0].id);
       }
@@ -202,7 +208,7 @@ export const FaqSection: React.FC<FaqSectionProps> = ({
     if (viewMode === 'grid') {
       loadWpFaqs();
     }
-  }, [viewMode]);
+  }, [viewMode, currentLang]);
 
   // Topic Keyword Filter Helper for WP FAQs
   const topicFilterKeywords: Record<string, string[]> = {

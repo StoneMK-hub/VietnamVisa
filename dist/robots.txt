@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /apply-online
+Allow: /fee-calculator
+Allow: /visa-requirements
+Allow: /track-application
+Allow: /faqs
+Allow: /contact-us
+
+Disallow: /api/
+
+Sitemap: https://vietnamvisa.govt.vn/sitemap.xml

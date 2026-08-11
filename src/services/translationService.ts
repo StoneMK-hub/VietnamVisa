@@ -290,6 +290,65 @@ export function fallbackTranslateHtml(html: string, lang: Language): string {
 }
 
 /**
+ * Helper: Client-side plain text translation using Google GTX Free API
+ */
+export async function translateTextClientGTX(text: string, targetLang: string): Promise<string> {
+  if (!text || !text.trim()) return text;
+  const langMap: Record<string, string> = {
+    zh: 'zh-CN',
+    he: 'iw',
+    ja: 'ja',
+    ko: 'ko',
+    vi: 'vi',
+    fr: 'fr',
+    de: 'de',
+    es: 'es'
+  };
+  const tl = langMap[targetLang] || targetLang;
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) return text;
+    const data = await res.json();
+    if (Array.isArray(data) && Array.isArray(data[0])) {
+      return data[0].map((item: any) => (item && item[0]) ? item[0] : '').join('');
+    }
+  } catch (err) {
+    console.warn('Client GTX translation error:', err);
+  }
+  return text;
+}
+
+/**
+ * Helper: Client-side HTML content translation node-by-node
+ */
+export async function translateHtmlClientGTX(html: string, targetLang: string): Promise<string> {
+  if (!html || !html.trim()) return html;
+  const parts = html.split(/(<[^>]+>)/g);
+  const textIndices: number[] = [];
+  const textPromises: Promise<string>[] = [];
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (!part || part.startsWith('<') || !part.trim()) continue;
+    if (/^[\d\s\p{P}]+$/u.test(part.trim())) continue;
+
+    textIndices.push(i);
+    textPromises.push(translateTextClientGTX(part, targetLang));
+  }
+
+  if (textPromises.length === 0) return html;
+
+  const translatedTexts = await Promise.all(textPromises);
+  for (let k = 0; k < textIndices.length; k++) {
+    parts[textIndices[k]] = translatedTexts[k];
+  }
+
+  return parts.join('');
+}
+
+/**
  * Translate a BlogPost object into target language asynchronously
  */
 export async function translateBlogPost(post: BlogPost, lang: Language, skipContent: boolean = false): Promise<BlogPost> {
@@ -366,7 +425,35 @@ export async function translateBlogPost(post: BlogPost, lang: Language, skipCont
       }
     }
   } catch (err) {
-    console.warn('Post translation API call failed:', err);
+    console.warn('Post translation API call failed (static hosting fallback):', err);
+  }
+
+  // 4. Client-Side GTX Translation Fallback (Guaranteed to work on pure static hosting like cPanel/GitHub Pages)
+  try {
+    const [clientTitle, clientExcerpt, clientContent] = await Promise.all([
+      translateTextClientGTX(post.title, lang),
+      translateTextClientGTX(post.excerpt, lang),
+      skipContent ? Promise.resolve('') : translateHtmlClientGTX(post.content, lang)
+    ]);
+
+    const translatedObj = {
+      title: clientTitle || post.title,
+      excerpt: clientExcerpt || post.excerpt,
+      content: clientContent || ''
+    };
+
+    saveToCache(slug, lang, translatedObj, skipContent);
+
+    return {
+      ...post,
+      title: translatedObj.title,
+      excerpt: translatedObj.excerpt,
+      content: skipContent ? post.content : (translatedObj.content || post.content),
+      category: getLocalizedCategory(post.category, lang),
+      readTime: getLocalizedReadTime(post.readTime, lang)
+    };
+  } catch (clientErr) {
+    console.warn('Client-side GTX translation failed:', clientErr);
   }
 
   // Fallback: apply rule-based text/HTML localizer
@@ -446,7 +533,33 @@ export async function translateWpFaq(faq: WpFaqItem, lang: Language): Promise<Wp
       }
     }
   } catch (err) {
-    console.warn('FAQ translation API call failed:', err);
+    console.warn('FAQ translation API call failed (static hosting fallback):', err);
+  }
+
+  // Client-Side GTX Fallback for Static Hosting
+  try {
+    const [clientQuestion, clientSummary, clientFullHtml] = await Promise.all([
+      translateTextClientGTX(faq.question, lang),
+      translateTextClientGTX(faq.answerSummary, lang),
+      translateHtmlClientGTX(faq.fullAnswerHtml, lang)
+    ]);
+
+    const translatedObj = {
+      title: clientQuestion || faq.question,
+      excerpt: clientSummary || faq.answerSummary,
+      content: clientFullHtml || faq.fullAnswerHtml
+    };
+
+    saveToCache(`faq_${slug}`, lang, translatedObj);
+
+    return {
+      ...faq,
+      question: translatedObj.title,
+      answerSummary: translatedObj.excerpt,
+      fullAnswerHtml: translatedObj.content
+    };
+  } catch (clientErr) {
+    console.warn('Client-side GTX FAQ translation failed:', clientErr);
   }
 
   return faq;

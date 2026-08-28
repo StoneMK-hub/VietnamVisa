@@ -799,57 +799,156 @@ app.get('/api/wordpress/post-by-slug', async (req, res) => {
   return res.status(404).json({ success: false, message: 'Post not found on WordPress' });
 });
 
-// SEO Endpoint 1: Dynamic XML Sitemap for Search Engine Crawlers
-app.get('/sitemap.xml', (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
+// SEO Endpoint 1: Dynamic SEO-Compliant XML Sitemap for Google Search Console (GSC)
+app.get('/sitemap.xml', async (req, res) => {
+  const host = req.get('host') || 'vietnamvisa.govt.vn';
+  const protocol = req.protocol === 'http' && host.includes('localhost') ? 'http' : 'https';
+  const baseUrl = `${protocol}://${host}`;
   const now = new Date().toISOString().split('T')[0];
 
-  const pages = [
-    { loc: '/', priority: '1.0', changefreq: 'daily' },
-    { loc: '/apply-online', priority: '0.9', changefreq: 'daily' },
-    { loc: '/fee-calculator', priority: '0.8', changefreq: 'weekly' },
-    { loc: '/visa-requirements', priority: '0.9', changefreq: 'weekly' },
-    { loc: '/track-application', priority: '0.8', changefreq: 'always' },
-    { loc: '/faqs', priority: '0.7', changefreq: 'weekly' },
-    { loc: '/contact-us', priority: '0.6', changefreq: 'monthly' }
+  // 1. Static Core Portals & Policy Pages
+  const corePages = [
+    { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: now },
+    { loc: '/overview', priority: '0.9', changefreq: 'weekly', lastmod: now },
+    { loc: '/how-to-apply', priority: '0.9', changefreq: 'daily', lastmod: now },
+    { loc: '/visa-fee', priority: '0.8', changefreq: 'weekly', lastmod: now },
+    { loc: '/visa-requirements', priority: '0.9', changefreq: 'weekly', lastmod: now },
+    { loc: '/blog', priority: '0.8', changefreq: 'daily', lastmod: now },
+    { loc: '/track-application', priority: '0.8', changefreq: 'always', lastmod: now },
+    { loc: '/faqs', priority: '0.7', changefreq: 'weekly', lastmod: now },
+    { loc: '/about', priority: '0.6', changefreq: 'monthly', lastmod: now },
+    { loc: '/contact-us', priority: '0.6', changefreq: 'monthly', lastmod: now },
+    { loc: '/sitemap', priority: '0.7', changefreq: 'weekly', lastmod: now },
+    { loc: '/payment-guidelines', priority: '0.5', changefreq: 'monthly', lastmod: now },
+    { loc: '/terms-and-conditions', priority: '0.5', changefreq: 'monthly', lastmod: now },
+    { loc: '/privacy-policy', priority: '0.5', changefreq: 'monthly', lastmod: now }
   ];
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages
+  // 2. Fetch fresh / cached WordPress Blog Posts & Requirement Posts
+  let blogList: any[] = [];
+  let reqList: any[] = [];
+
+  try {
+    if (postsCacheStore && postsCacheStore.data?.length > 0) {
+      blogList = postsCacheStore.data;
+    } else {
+      blogList = await fetchAndCachePosts();
+    }
+  } catch (e) {
+    console.warn('Error obtaining blog posts for sitemap.xml:', e);
+  }
+
+  try {
+    if (requirementsCacheStore && requirementsCacheStore.data?.length > 0) {
+      reqList = requirementsCacheStore.data;
+    } else {
+      reqList = await fetchAndCacheRequirements();
+    }
+  } catch (e) {
+    console.warn('Error obtaining requirement posts for sitemap.xml:', e);
+  }
+
+  // 3. Construct URL list with XML escape helper
+  const escapeXml = (unsafe: string) => {
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  };
+
+  const dynamicUrls: Array<{ loc: string; priority: string; changefreq: string; lastmod: string }> = [
+    ...corePages
+  ];
+
+  // Add Dynamic WordPress Blog Posts
+  if (Array.isArray(blogList)) {
+    blogList.forEach(post => {
+      if (post.slug) {
+        const postDate = post.date && /^\d{4}-\d{2}-\d{2}/.test(post.date) ? post.date : now;
+        dynamicUrls.push({
+          loc: `/blog/${post.slug}`,
+          priority: '0.8',
+          changefreq: 'weekly',
+          lastmod: postDate
+        });
+      }
+    });
+  }
+
+  // Add Dynamic WordPress Requirement & Country Guide Posts
+  if (Array.isArray(reqList)) {
+    reqList.forEach(post => {
+      if (post.slug) {
+        const postDate = post.date && /^\d{4}-\d{2}-\d{2}/.test(post.date) ? post.date : now;
+        dynamicUrls.push({
+          loc: `/visa-requirements/${post.slug}`,
+          priority: '0.8',
+          changefreq: 'weekly',
+          lastmod: postDate
+        });
+      }
+    });
+  }
+
+  // Remove potential duplicates
+  const seenLocs = new Set<string>();
+  const uniqueUrls = dynamicUrls.filter(u => {
+    if (seenLocs.has(u.loc)) return false;
+    seenLocs.add(u.loc);
+    return true;
+  });
+
+  const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+${uniqueUrls
   .map(
-    page => `  <url>
-    <loc>${baseUrl}${page.loc}</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>
+    item => `  <url>
+    <loc>${escapeXml(`${baseUrl}${item.loc}`)}</loc>
+    <lastmod>${item.lastmod}</lastmod>
+    <changefreq>${item.changefreq}</changefreq>
+    <priority>${item.priority}</priority>
   </url>`
   )
   .join('\n')}
 </urlset>`;
 
-  res.header('Content-Type', 'application/xml');
-  return res.send(xml);
+  res.header('Content-Type', 'application/xml; charset=utf-8');
+  res.header('Cache-Control', 'public, max-age=1800, s-maxage=3600');
+  return res.send(xmlContent);
 });
 
-// SEO Endpoint 2: Robots.txt Rules
+// SEO Endpoint 2: Robots.txt Rules with Sitemap Reference
 app.get('/robots.txt', (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  const host = req.get('host') || 'vietnamvisa.govt.vn';
+  const protocol = req.protocol === 'http' && host.includes('localhost') ? 'http' : 'https';
+  const baseUrl = `${protocol}://${host}`;
+
   const robots = `User-agent: *
 Allow: /
-Allow: /apply-online
-Allow: /fee-calculator
+Allow: /overview
+Allow: /how-to-apply
+Allow: /visa-fee
 Allow: /visa-requirements
+Allow: /blog
 Allow: /track-application
 Allow: /faqs
+Allow: /about
 Allow: /contact-us
+Allow: /sitemap
+Allow: /payment-guidelines
+Allow: /terms-and-conditions
+Allow: /privacy-policy
 
 Disallow: /api/
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;
 
-  res.header('Content-Type', 'text/plain');
+  res.header('Content-Type', 'text/plain; charset=utf-8');
   return res.send(robots);
 });
 

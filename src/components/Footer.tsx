@@ -442,6 +442,41 @@ export const Footer: React.FC<FooterProps> = ({ currentLang, onNavigate, onOpenC
                 </a>
               </li>
               <li>
+                <a
+                  href="/sitemap"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('sitemap');
+                  }}
+                  className="hover:text-indigo-600 text-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  <span>
+                    {tMulti(currentLang, {
+                      en: 'HTML Sitemap',
+                      vi: 'Sitemap HTML',
+                      fr: 'Plan du site HTML',
+                      de: 'HTML Sitemap',
+                      ja: 'サイトマップ',
+                      zh: '网站地图 (HTML)',
+                      he: 'מפת אתר HTML',
+                      ko: 'HTML 사이트맵',
+                      es: 'Mapa del sitio'
+                    })}
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/sitemap.xml"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-indigo-600 text-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  <span>Sitemap XML</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                </a>
+              </li>
+              <li>
                 <button
                   type="button"
                   onClick={onOpenCookiePreferences}

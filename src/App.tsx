@@ -18,6 +18,7 @@ import { PaymentGuidelinesView, TermsAndConditionsView, PrivacyPolicyView } from
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { AboutView } from './components/AboutView';
 import { OverviewView } from './components/OverviewView';
+import { HtmlSitemapView } from './components/HtmlSitemapView';
 import { NotFoundView } from './components/NotFoundView';
 import { BlogSection } from './components/BlogSection';
 
@@ -304,6 +305,14 @@ export default function App() {
             {/* ABOUT US TAB (Path: /about) */}
             {activeTab === 'about' && (
               <AboutView
+                currentLang={currentLang}
+                onNavigate={handleNavigate}
+              />
+            )}
+
+            {/* HTML SITEMAP TAB (Path: /sitemap) */}
+            {activeTab === 'sitemap' && (
+              <HtmlSitemapView
                 currentLang={currentLang}
                 onNavigate={handleNavigate}
               />

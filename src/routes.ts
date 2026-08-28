@@ -12,6 +12,7 @@ export type TabType =
   | 'faqs' 
   | 'contact'
   | 'about'
+  | 'sitemap'
   | 'payment-guidelines'
   | 'terms-and-conditions'
   | 'privacy-policy'
@@ -187,6 +188,18 @@ export const ROUTES: Record<TabType, RouteConfig> = {
     breadcrumbEn: 'About Us',
     breadcrumbVi: 'Giới Thệu'
   },
+  sitemap: {
+    tab: 'sitemap',
+    path: '/sitemap',
+    titleEn: 'HTML Sitemap & Complete Site Index | Vietnam Visa Portal',
+    titleVi: 'Sitemap HTML & Toàn Bộ Cấu Trúc Website | Cổng Visa Việt Nam',
+    descEn: 'Browse the complete HTML site structure, country visa guides, fee calculators, urgent blog articles, FAQs, and XML sitemap index.',
+    descVi: 'Xem toàn bộ sơ đồ cấu trúc trang web, danh sách hướng dẫn visa theo từng quốc gia, bảng tính phí, bài viết tin tức, hỏi đáp và sơ đồ XML.',
+    keywordsEn: 'vietnam visa sitemap, html sitemap, xml sitemap, website index, visa country guides list',
+    keywordsVi: 'sitemap visa viet nam, so do trang web, danh muc trang web, danh sach huong dan visa',
+    breadcrumbEn: 'HTML Sitemap',
+    breadcrumbVi: 'Sơ Đồ Trang Web'
+  },
   'not-found': {
     tab: 'not-found',
     path: '/404',
@@ -209,6 +222,11 @@ export function getTabFromPath(pathname: string): TabType {
 
   for (const config of Object.values(ROUTES)) {
     if (config.path === normalized) return config.tab;
+  }
+
+  // Handle sitemap aliases
+  if (normalized === '/sitemap' || normalized === '/sitemap.html' || normalized === '/html-sitemap' || normalized === '/site-map') {
+    return 'sitemap';
   }
 
   // Handle /vietnam-visa-requirements or sub-slugs or legacy country post URLs

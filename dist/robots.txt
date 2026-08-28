@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /overview
+Allow: /how-to-apply
+Allow: /visa-fee
+Allow: /visa-requirements
+Allow: /blog
+Allow: /track-application
+Allow: /faqs
+Allow: /about
+Allow: /contact-us
+Allow: /sitemap
+Allow: /payment-guidelines
+Allow: /terms-and-conditions
+Allow: /privacy-policy
+
+Disallow: /api/
+
+Sitemap: https://vietnamvisa.govt.vn/sitemap.xml

@@ -195,7 +195,12 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   }, []);
 
   // Helper function to map a WordPress Category 70 post to its corresponding ISO-2 country code
-  const getCountryCodeForPost = React.useCallback((post: { id?: number; slug?: string; title?: string }): string | null => {
+  const getCountryCodeForPost = React.useCallback((post: { id?: number; slug?: string; title?: string; category?: string }): string | null => {
+    // Strictly reject posts that are explicitly not Visa Requirements
+    if (post.category && post.category !== 'Visa Requirements') {
+      return null;
+    }
+
     const pSlug = (post.slug || '').toLowerCase().trim();
     const pTitle = (post.title || '').toLowerCase();
 
@@ -218,11 +223,16 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
       }
     }
 
-    // 3. Fallback: match by country name or localized name in post title
+    // 3. Fallback: only match visa requirement articles (must contain requirement/visa keywords in slug or title)
+    const isVisaReqPost = pSlug.includes('visa-requirements') || pSlug.includes('vietnam-e-visa') || pTitle.includes('visa requirement') || pTitle.includes('e-visa');
+    if (!isVisaReqPost) {
+      return null;
+    }
+
     const found = COUNTRIES_DATA.find(c => {
       const cName = c.countryName.toLowerCase();
       const cNameVi = c.countryNameVi.toLowerCase();
-      return pTitle.includes(cName) || pTitle.includes(cNameVi);
+      return pTitle.includes(cName) || pTitle.includes(cNameVi) || pSlug.includes(cName.replace(/\s+/g, '-'));
     });
 
     return found ? found.code : null;

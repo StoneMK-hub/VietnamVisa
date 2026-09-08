@@ -162,7 +162,7 @@ async function fetchUrgentBlogPostsNetwork(): Promise<BlogPost[]> {
   }
 
   try {
-    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=100&_embed=true`);
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?categories=16&per_page=100&_embed=true`);
     if (directRes.ok) {
       const posts = await directRes.json();
       if (Array.isArray(posts) && posts.length > 0) {
@@ -494,12 +494,25 @@ export function getRequirementPostForCountry(
   const queryCode = countryCode.toLowerCase();
   const exactUrl = getExactCountryRequirementUrl(countryCode, countryName);
 
-  // 1. Try to find an exact or partial match from WordPress API fetched posts
+  // 1. Try to find an exact or verified match from WordPress Category 70 requirement posts
+  const targetSlug = exactUrl.replace(/\/$/, '').split('/').pop()?.toLowerCase();
   const matchedPost = wpPosts.find((p) => {
-    const t = p.title.toLowerCase();
-    const s = p.slug.toLowerCase();
-    const l = p.link ? p.link.toLowerCase() : '';
-    return t.includes(queryName) || s.includes(queryName) || l.includes(queryName) || (queryName === 'united states' && (t.includes('us ') || t.includes('usa') || t.includes('american')));
+    // Only consider posts belonging to Visa Requirements
+    if (p.category && p.category !== 'Visa Requirements') return false;
+    const s = (p.slug || '').toLowerCase();
+    const l = (p.link || '').toLowerCase();
+    const t = (p.title || '').toLowerCase();
+
+    // Exact slug or link match
+    if (targetSlug && (s === targetSlug || l.endsWith(`/${targetSlug}/`) || l.endsWith(`/${targetSlug}`))) {
+      return true;
+    }
+
+    // Must have requirement keywords in slug or title
+    const isReqTitle = t.includes('requirement') || t.includes('visa') || s.includes('visa-requirements') || s.includes('vietnam-e-visa');
+    if (!isReqTitle) return false;
+
+    return t.includes(queryName) || s.includes(queryName) || (queryName === 'united states' && (t.includes('us ') || t.includes('usa') || t.includes('american')));
   });
 
   if (matchedPost) {

@@ -723,53 +723,74 @@ app.get('/api/wordpress/requirements', async (req, res) => {
   return res.json({ success: true, posts, source: 'fresh' });
 });
 
-// API 8: Fetch individual WordPress post by slug
+// API 8: Fetch individual WordPress post by slug (strictly respecting category)
 app.get('/api/wordpress/post-by-slug', async (req, res) => {
   const slug = (req.query.slug as string || '').trim().toLowerCase();
+  const categoryParam = (req.query.category as string || '').trim().toLowerCase();
+
   if (!slug) {
     return res.status(400).json({ success: false, error: 'Slug parameter is required' });
   }
 
-  // 1. Check slug cache map
-  const cachedSlug = slugPostsCacheMap.get(slug);
+  const isRequirementPost = categoryParam === '70' ||
+    categoryParam === 'requirements' ||
+    slug.startsWith('vietnam-visa-requirements') ||
+    slug.startsWith('vietnam-e-visa-for-');
+
+  // Cache key separated by category context to avoid any blog vs requirement collisions
+  const cacheKey = `${isRequirementPost ? 'req' : 'blog'}:${slug}`;
+  const cachedSlug = slugPostsCacheMap.get(cacheKey) || slugPostsCacheMap.get(slug);
   if (cachedSlug) {
-    return res.json({ success: true, post: cachedSlug.data, source: 'cache' });
-  }
-
-  // 2. Check in postsCacheStore / requirementsCacheStore
-  if (postsCacheStore) {
-    const found = postsCacheStore.data.find((p: any) => p.slug && p.slug.toLowerCase() === slug);
-    if (found) {
-      slugPostsCacheMap.set(slug, { data: found, timestamp: Date.now() });
-      return res.json({ success: true, post: found, source: 'posts_cache' });
-    }
-  }
-  if (requirementsCacheStore) {
-    const found = requirementsCacheStore.data.find((p: any) => p.slug && p.slug.toLowerCase() === slug);
-    if (found) {
-      slugPostsCacheMap.set(slug, { data: found, timestamp: Date.now() });
-      return res.json({ success: true, post: found, source: 'requirements_cache' });
+    // If it's a requirement post, ensure cached post is from Visa Requirements
+    if (!isRequirementPost || cachedSlug.data?.category === 'Visa Requirements' || cachedSlug.data?.categories?.includes(70)) {
+      return res.json({ success: true, post: cachedSlug.data, source: 'cache' });
     }
   }
 
-  // 3. Direct WP fetch if not found in cache
+  // Check specific cache store based on type
+  if (isRequirementPost) {
+    if (requirementsCacheStore) {
+      const found = requirementsCacheStore.data.find((p: any) => p.slug && p.slug.toLowerCase() === slug);
+      if (found) {
+        slugPostsCacheMap.set(cacheKey, { data: found, timestamp: Date.now() });
+        return res.json({ success: true, post: found, source: 'requirements_cache' });
+      }
+    }
+  } else {
+    if (postsCacheStore) {
+      const found = postsCacheStore.data.find((p: any) => p.slug && p.slug.toLowerCase() === slug);
+      if (found) {
+        slugPostsCacheMap.set(cacheKey, { data: found, timestamp: Date.now() });
+        return res.json({ success: true, post: found, source: 'posts_cache' });
+      }
+    }
+  }
+
+  // Direct WP fetch if not found in cache
   try {
     const { wpBaseUrl, authHeader } = getWpCredentials();
-    const postRes = await fetch(`${wpBaseUrl}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=true`, {
+    const catQuery = isRequirementPost ? '&categories=70' : (categoryParam === '16' ? '&categories=16' : '');
+    const postRes = await fetch(`${wpBaseUrl}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}${catQuery}&_embed=true`, {
       headers: { 'Authorization': authHeader, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(6000)
     });
 
     if (postRes.ok) {
       const posts = await postRes.json();
       if (Array.isArray(posts) && posts.length > 0) {
         const p = posts[0];
+
+        // Ensure post strictly belongs to category 70 if requirement was requested
+        if (isRequirementPost && Array.isArray(p.categories) && !p.categories.includes(70)) {
+          return res.status(404).json({ success: false, message: 'Post does not belong to category 70 (Visa Requirements)' });
+        }
+
         let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
         if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
           featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
         }
 
-        const rawTitle = p.title?.rendered || 'Vietnam Visa Requirements';
+        const rawTitle = p.title?.rendered || (isRequirementPost ? 'Vietnam Visa Requirements' : 'Urgent Vietnam Visa');
         const cleanTitle = decodeWpHtml(rawTitle);
         const rawExcerpt = p.excerpt?.rendered || '';
         const cleanExcerpt = decodeWpHtml(rawExcerpt.replace(/<[^>]+>/g, '').trim());
@@ -782,13 +803,13 @@ app.get('/api/wordpress/post-by-slug', async (req, res) => {
           date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
           author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
           featuredImage,
-          category: 'Visa Requirements',
-          readTime: '4 min read',
+          category: isRequirementPost ? 'Visa Requirements' : 'Urgent Vietnam Visa Blog New',
+          readTime: isRequirementPost ? '4 min read' : '3 min read',
           link: p.link || `https://blog.vietnamevisaservice.com/${slug}/`,
           slug: p.slug || slug
         };
 
-        slugPostsCacheMap.set(slug, { data: postObj, timestamp: Date.now() });
+        slugPostsCacheMap.set(cacheKey, { data: postObj, timestamp: Date.now() });
         return res.json({ success: true, post: postObj, source: 'wordpress_rest' });
       }
     }

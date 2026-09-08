@@ -840,17 +840,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     notesVi: 'Được cấp e-Visa 30-90 ngày.'
   },
   {
-    code: 'ZA',
-    countryName: 'South Africa',
-    countryNameVi: 'Nam Phi',
-    flagEmoji: '🇿🇦',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
     code: 'NG',
     countryName: 'Nigeria',
     countryNameVi: 'Nigeria',
@@ -950,39 +939,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     notesVi: 'Được cấp e-Visa 30-90 ngày.'
   },
   {
-    code: 'AE',
-    countryName: 'United Arab Emirates',
-    countryNameVi: 'Các Tiểu Vương Quốc Ả Rập Thống Nhất (UAE)',
-    flagEmoji: '🇦🇪',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'SA',
-    countryName: 'Saudi Arabia',
-    countryNameVi: 'Ả Rập Xê Út',
-    flagEmoji: '🇸🇦',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'QA',
-    countryName: 'Qatar',
-    countryNameVi: 'Qatar',
-    flagEmoji: '🇶🇦',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
     code: 'KW',
     countryName: 'Kuwait',
     countryNameVi: 'Kuwait',
@@ -1038,28 +994,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     notesVi: 'Được cấp e-Visa 30-90 ngày.'
   },
   {
-    code: 'IL',
-    countryName: 'Israel',
-    countryNameVi: 'Israel',
-    flagEmoji: '🇮🇱',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'TR',
-    countryName: 'Turkey',
-    countryNameVi: 'Thổ Nhĩ Kỳ',
-    flagEmoji: '🇹🇷',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
     code: 'CY',
     countryName: 'Cyprus',
     countryNameVi: 'Cộng hòa Síp',
@@ -1069,17 +1003,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     visaOnArrivalEligible: true,
     notes: 'Eligible for 30-day and 90-day e-Visa.',
     notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'KZ',
-    countryName: 'Kazakhstan',
-    countryNameVi: 'Kazakhstan',
-    flagEmoji: '🇰🇿',
-    exemptionDays: 30,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: '30-day visa exemption. e-Visa available.',
-    notesVi: 'Miễn visa 30 ngày. Đủ điều kiện e-Visa.'
   },
   {
     code: 'UZ',
@@ -1126,17 +1049,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     notesVi: 'Được cấp e-Visa 30-90 ngày.'
   },
   {
-    code: 'MN',
-    countryName: 'Mongolia',
-    countryNameVi: 'Mông Cổ',
-    flagEmoji: '🇲🇳',
-    exemptionDays: 30,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: '30-day visa exemption.',
-    notesVi: 'Miễn visa 30 ngày.'
-  },
-  {
     code: 'GE',
     countryName: 'Georgia',
     countryNameVi: 'Georgia',
@@ -1163,39 +1075,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     countryName: 'Azerbaijan',
     countryNameVi: 'Azerbaijan',
     flagEmoji: '🇦🇿',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'PK',
-    countryName: 'Pakistan',
-    countryNameVi: 'Pakistan',
-    flagEmoji: '🇵🇰',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'BD',
-    countryName: 'Bangladesh',
-    countryNameVi: 'Bangladesh',
-    flagEmoji: '🇧🇩',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'LK',
-    countryName: 'Sri Lanka',
-    countryNameVi: 'Sri Lanka',
-    flagEmoji: '🇱🇰',
     exemptionDays: 0,
     eVisaEligible: true,
     visaOnArrivalEligible: true,
@@ -1251,17 +1130,6 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     countryName: 'Iceland',
     countryNameVi: 'Iceland',
     flagEmoji: '🇮🇸',
-    exemptionDays: 0,
-    eVisaEligible: true,
-    visaOnArrivalEligible: true,
-    notes: 'Eligible for 30-day and 90-day e-Visa.',
-    notesVi: 'Được cấp e-Visa 30-90 ngày.'
-  },
-  {
-    code: 'LU',
-    countryName: 'Luxembourg',
-    countryNameVi: 'Luxembourg',
-    flagEmoji: '🇱🇺',
     exemptionDays: 0,
     eVisaEligible: true,
     visaOnArrivalEligible: true,

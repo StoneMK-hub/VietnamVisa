@@ -127,6 +127,19 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
   const isVi = currentLang === 'vi';
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchContainerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const [wpPosts, setWpPosts] = useState<BlogPost[]>([]);
   const [rawPost, setRawPost] = useState<BlogPost | null>(null);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -217,7 +230,14 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
   // Dynamically derive and order countries list based on WordPress Category "Visa Requirements" (wpPosts)
   const dynamicCountries = React.useMemo(() => {
-    const list = [...COUNTRIES_DATA];
+    // 1. Strictly deduplicate COUNTRIES_DATA by unique code
+    const uniqueMap = new Map<string, typeof COUNTRIES_DATA[0]>();
+    COUNTRIES_DATA.forEach(c => {
+      if (!uniqueMap.has(c.code)) {
+        uniqueMap.set(c.code, c);
+      }
+    });
+    const list = Array.from(uniqueMap.values());
     if (!wpPosts || wpPosts.length === 0) {
       return list;
     }
@@ -286,8 +306,8 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
         link: `${window.location.origin}/vietnam-visa-requirements/${slug}`
       };
     } else if (slug) {
-      // 2. Fetch live post directly from WordPress API by slug
-      const livePost = await fetchWpPostBySlug(slug);
+      // 2. Fetch live post directly from WordPress API by slug (Category 70 only)
+      const livePost = await fetchWpPostBySlug(slug, 70);
       if (livePost && livePost.content) {
         postToDisplay = {
           ...livePost,
@@ -364,9 +384,9 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
           return;
         }
 
-        // Direct slug lookup if not in local list
+        // Direct slug lookup if not in local list (Category 70 only)
         setLoadingCode('slug');
-        const livePost = await fetchWpPostBySlug(slugFromPath);
+        const livePost = await fetchWpPostBySlug(slugFromPath, 70);
         if (livePost) {
           setRawPost(livePost);
           setSelectedCountryName(livePost.title);
@@ -405,13 +425,46 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     .map(code => dynamicCountries.find(c => c.code === code) || COUNTRIES_DATA.find(c => c.code === code))
     .filter((c): c is typeof COUNTRIES_DATA[0] => c !== undefined);
 
-  const filteredCountries = dynamicCountries.filter(c =>
-    c.countryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.countryNameVi.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCountries = React.useMemo(() => {
+    if (!searchTerm.trim()) {
+      return dynamicCountries;
+    }
+    const cleanSearch = searchTerm.toLowerCase().trim();
+    const normalizedSearch = cleanSearch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  const countriesToDisplay = isHome ? top8Countries : filteredCountries;
+    return dynamicCountries.filter(c => {
+      const name = c.countryName.toLowerCase();
+      const nameNorm = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const nameVi = (c.countryNameVi || '').toLowerCase();
+      const nameViNorm = nameVi.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const code = c.code.toLowerCase();
+      const locName = getLocalizedCountryName(c, currentLang).toLowerCase();
+      const locNameNorm = locName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // Common aliases check (USA, UK, UAE, etc.)
+      const isUsa = (cleanSearch === 'usa' || cleanSearch === 'us' || cleanSearch === 'america' || cleanSearch === 'my' || cleanSearch === 'hoa ky' || cleanSearch === 'hoa kỳ') && (c.code === 'US');
+      const isUk = (cleanSearch === 'uk' || cleanSearch === 'anh' || cleanSearch === 'britain') && (c.code === 'GB');
+      const isUae = (cleanSearch === 'uae') && (c.code === 'AE');
+
+      return (
+        isUsa || isUk || isUae ||
+        name.includes(cleanSearch) || nameNorm.includes(normalizedSearch) ||
+        nameVi.includes(cleanSearch) || nameViNorm.includes(normalizedSearch) ||
+        locName.includes(cleanSearch) || locNameNorm.includes(normalizedSearch) ||
+        code === cleanSearch || code.startsWith(cleanSearch)
+      );
+    });
+  }, [dynamicCountries, searchTerm, currentLang]);
+
+  const countriesToDisplay = React.useMemo(() => {
+    if (isHome) {
+      if (searchTerm.trim()) {
+        return filteredCountries;
+      }
+      return top8Countries;
+    }
+    return filteredCountries;
+  }, [isHome, searchTerm, filteredCountries, top8Countries]);
 
   if (selectedPost) {
     return (
@@ -578,28 +631,142 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
         {/* Search Input & Counter (Only on Full Requirements Page) */}
         {!isHome && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 max-w-2xl mx-auto">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-              <input
-                type="text"
-                placeholder={t.searchCountryPlaceholder}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-              />
+          <div ref={searchContainerRef} className="relative max-w-2xl mx-auto w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 w-full">
+              <div className="relative w-full sm:w-96">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder={t.searchCountryPlaceholder || (isVi ? 'Tìm quốc gia (VD: Israel, Ấn Độ, Mỹ...)' : 'Search country (e.g. Israel, India, US...)')}
+                  value={searchTerm}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setIsSearchFocused(true);
+                  }}
+                  className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-9 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 shadow-sm"
+                />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setIsSearchFocused(false);
+                    }}
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                    title={isVi ? 'Xóa tìm kiếm' : 'Clear search'}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="text-xs sm:text-sm font-bold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shrink-0">
+                {isVi
+                  ? `Hiển thị ${filteredCountries.length} / ${dynamicCountries.length} quốc gia`
+                  : `Showing ${filteredCountries.length} of ${dynamicCountries.length} countries`}
+              </div>
             </div>
 
-            <div className="text-xs sm:text-sm font-bold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shrink-0">
-              {isVi
-                ? `Hiển thị ${filteredCountries.length} / ${dynamicCountries.length} quốc gia`
-                : `Showing ${filteredCountries.length} of ${dynamicCountries.length} countries`}
-            </div>
+            {/* Instant Auto-Suggest Dropdown Popup */}
+            {isSearchFocused && searchTerm.trim().length > 0 && (
+              <div className="absolute left-0 top-full mt-2 w-full sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 max-h-80 overflow-y-auto">
+                {filteredCountries.length > 0 ? (
+                  <>
+                    <div className="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 flex items-center justify-between">
+                      <span>{isVi ? 'Gợi ý quốc gia' : 'Matching countries'}</span>
+                      <span>{filteredCountries.length} {isVi ? 'kết quả' : 'results'}</span>
+                    </div>
+                    {filteredCountries.slice(0, 8).map((c) => {
+                      const locName = getLocalizedCountryName(c, currentLang);
+                      return (
+                        <button
+                          key={`sugg-${c.code}`}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setIsSearchFocused(false);
+                            handleOpenCountryPost(c);
+                          }}
+                          className="w-full text-left px-3.5 py-2.5 hover:bg-indigo-50/70 transition-colors flex items-center justify-between gap-2.5 group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <img
+                              src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
+                              alt={`${c.countryName} flag`}
+                              className="w-5 h-3.5 object-cover rounded-[2px] border border-slate-200 shrink-0"
+                            />
+                            <div className="truncate">
+                              <span className="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-indigo-600 transition-colors">
+                                {locName}
+                              </span>
+                              {locName !== c.countryName && (
+                                <span className="text-[11px] text-slate-400 ml-1.5 font-medium">
+                                  ({c.countryName})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="shrink-0 flex items-center gap-1.5">
+                            {c.exemptionDays > 0 ? (
+                              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-1.5 py-0.5 rounded border border-emerald-200">
+                                {c.exemptionDays}D Free
+                              </span>
+                            ) : (
+                              <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-200">
+                                e-Visa
+                              </span>
+                            )}
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <div className="p-4 text-center text-xs sm:text-sm text-slate-500">
+                    <p className="font-semibold text-slate-700">
+                      {isVi ? 'Không tìm thấy quốc gia phù hợp' : 'No matching countries found'}
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      {isVi ? 'Thử tìm với từ khóa khác (VD: Israel, Ấn Độ, Mỹ...)' : 'Try another keyword (e.g. Israel, India, US...)'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Country Cards Grid (4 items on mobile, 8 items on desktop when on Home page) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 pt-1 sm:pt-2">
+        {/* Empty Search Result State */}
+        {countriesToDisplay.length === 0 ? (
+          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 text-center max-w-md mx-auto my-4 space-y-3">
+            <div className="w-12 h-12 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
+              <Search className="w-6 h-6 text-slate-400" />
+            </div>
+            <h3 className="font-bold text-slate-800 text-sm sm:text-base">
+              {isVi ? 'Không tìm thấy quốc gia nào' : 'No countries found'}
+            </h3>
+            <p className="text-xs text-slate-500">
+              {isVi
+                ? `Không có kết quả nào cho "${searchTerm}". Vui lòng thử tìm kiếm bằng tên tiếng Anh, tiếng Việt hoặc mã quốc gia.`
+                : `No results found for "${searchTerm}". Try searching by English, Vietnamese name, or country code.`}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setIsSearchFocused(false);
+              }}
+              className="inline-flex items-center gap-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>{isVi ? 'Xóa bộ lọc tìm kiếm' : 'Clear search'}</span>
+            </button>
+          </div>
+        ) : (
+          /* Country Cards Grid (4 items on mobile, 8 items on desktop when on Home page) */
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 pt-1 sm:pt-2">
           {countriesToDisplay.map((c, index) => {
             const isHiddenOnMobileForHome = isHome && index >= 4;
             const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
@@ -668,6 +835,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
             );
           })}
         </div>
+      )}
 
         {/* Home Page Call to Action Banner to View All Countries */}
         {isHome && onViewAll && (

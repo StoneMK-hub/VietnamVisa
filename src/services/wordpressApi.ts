@@ -437,32 +437,37 @@ async function fetchWpRequirementPostsNetwork(): Promise<BlogPost[]> {
     console.warn('Backend WordPress Requirement Posts fetch failed, trying direct REST API:', err);
   }
 
-  // Direct WP REST API fallback for static hosts
+  // Direct WP REST API fallback for static hosts (fetches Category 70 - both page 1 & 2 for all 101 posts)
   try {
-    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?categories=70&per_page=100&_embed=true`);
-    if (directRes.ok) {
-      const posts = await directRes.json();
-      if (Array.isArray(posts) && posts.length > 0) {
-        return posts.map((p: any) => {
-          let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
-          if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
-            featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
-          }
-          return {
-            id: p.id,
-            title: decodeHtmlEntities(p.title?.rendered || ''),
-            excerpt: decodeHtmlEntities((p.excerpt?.rendered || '').replace(/<[^>]+>/g, '').trim()),
-            content: p.content?.rendered || '',
-            date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
-            author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
-            featuredImage,
-            category: 'Visa Requirements',
-            readTime: '4 min read',
-            link: p.link || `${DIRECT_WP_BASE}/${p.slug}/`,
-            slug: p.slug || ''
-          };
-        });
-      }
+    const [res1, res2] = await Promise.all([
+      fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?categories=70&per_page=100&_embed=true&page=1`),
+      fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?categories=70&per_page=100&_embed=true&page=2`).catch(() => null)
+    ]);
+
+    const posts1 = res1.ok ? await res1.json() : [];
+    const posts2 = res2 && res2.ok ? await res2.json() : [];
+    const allRaw = [...(Array.isArray(posts1) ? posts1 : []), ...(Array.isArray(posts2) ? posts2 : [])];
+
+    if (allRaw.length > 0) {
+      return allRaw.map((p: any) => {
+        let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+        if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
+          featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
+        }
+        return {
+          id: p.id,
+          title: decodeHtmlEntities(p.title?.rendered || ''),
+          excerpt: decodeHtmlEntities((p.excerpt?.rendered || '').replace(/<[^>]+>/g, '').trim()),
+          content: p.content?.rendered || '',
+          date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
+          featuredImage,
+          category: 'Visa Requirements',
+          readTime: '4 min read',
+          link: p.link || `${DIRECT_WP_BASE}/${p.slug}/`,
+          slug: p.slug || ''
+        };
+      });
     }
   } catch (err) {
     console.warn('Direct WordPress REST API requirement posts fetch failed:', err);
@@ -692,10 +697,12 @@ export function getRequirementPostForCountry(
 /**
  * Fetch a single post by slug directly from the backend proxy or direct WP REST API
  */
-export async function fetchWpPostBySlug(slug: string): Promise<BlogPost | null> {
+export async function fetchWpPostBySlug(slug: string, categoryId?: number | string): Promise<BlogPost | null> {
+  const catQuery = categoryId !== undefined ? `&category=${encodeURIComponent(categoryId)}` : '';
+
   // 1. Try backend API proxy
   try {
-    const res = await fetch(`/api/wordpress/post-by-slug?slug=${encodeURIComponent(slug)}`, {
+    const res = await fetch(`/api/wordpress/post-by-slug?slug=${encodeURIComponent(slug)}${catQuery}`, {
       headers: {
         'Accept': 'application/json'
       }
@@ -713,15 +720,24 @@ export async function fetchWpPostBySlug(slug: string): Promise<BlogPost | null> 
 
   // 2. Direct fetch from WordPress REST API (for static hosts like cPanel, Netlify, Vercel)
   try {
-    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed=true`);
+    const directCatQuery = categoryId !== undefined ? `&categories=${encodeURIComponent(categoryId)}` : '';
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}${directCatQuery}&_embed=true`);
     if (directRes.ok) {
       const posts = await directRes.json();
       if (Array.isArray(posts) && posts.length > 0) {
         const p = posts[0];
+
+        // If categoryId was requested, enforce it
+        if (categoryId !== undefined && Number(categoryId) === 70 && Array.isArray(p.categories) && !p.categories.includes(70)) {
+          return null;
+        }
+
         let featuredImage = 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
         if (p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0]) {
           featuredImage = p._embedded['wp:featuredmedia'][0].source_url || featuredImage;
         }
+
+        const isReq = categoryId === 70 || Number(categoryId) === 70 || slug.includes('visa-requirements') || slug.includes('vietnam-e-visa-for-');
 
         return {
           id: p.id,
@@ -731,8 +747,8 @@ export async function fetchWpPostBySlug(slug: string): Promise<BlogPost | null> 
           date: p.date ? p.date.split('T')[0] : new Date().toISOString().split('T')[0],
           author: p._embedded?.author?.[0]?.name || 'Immigration Advisory Team',
           featuredImage,
-          category: 'Visa Requirements',
-          readTime: '4 min read',
+          category: isReq ? 'Visa Requirements' : 'Urgent Vietnam Visa Blog New',
+          readTime: isReq ? '4 min read' : '3 min read',
           link: p.link || `${DIRECT_WP_BASE}/${slug}/`,
           slug: p.slug || slug
         };

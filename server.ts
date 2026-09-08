@@ -605,8 +605,8 @@ async function fetchAndCacheFaqs(): Promise<any[]> {
 async function fetchAndCacheRequirements(): Promise<any[]> {
   try {
     const { wpBaseUrl, authHeader } = getWpCredentials();
-    const page1Url = `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=100&_embed=true&page=1`;
-    const page2Url = `${wpBaseUrl}/wp-json/wp/v2/posts?per_page=100&_embed=true&page=2`;
+    const page1Url = `${wpBaseUrl}/wp-json/wp/v2/posts?categories=70&per_page=100&_embed=true&page=1`;
+    const page2Url = `${wpBaseUrl}/wp-json/wp/v2/posts?categories=70&per_page=100&_embed=true&page=2`;
 
     const [res1, res2] = await Promise.allSettled([
       fetch(page1Url, { headers: { 'Authorization': authHeader, 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(8000) }),

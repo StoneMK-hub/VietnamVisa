@@ -439,7 +439,7 @@ async function fetchWpRequirementPostsNetwork(): Promise<BlogPost[]> {
 
   // Direct WP REST API fallback for static hosts
   try {
-    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?per_page=100&_embed=true`);
+    const directRes = await fetch(`${DIRECT_WP_BASE}/wp-json/wp/v2/posts?categories=70&per_page=100&_embed=true`);
     if (directRes.ok) {
       const posts = await directRes.json();
       if (Array.isArray(posts) && posts.length > 0) {

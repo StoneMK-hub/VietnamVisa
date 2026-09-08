@@ -554,8 +554,9 @@ export const HtmlSitemapView: React.FC<HtmlSitemapViewProps> = ({ currentLang, o
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
           {filteredCountries.map((c) => {
             const locName = getLocalizedCountryName(c, currentLang);
-            const countrySlug = c.countryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            const targetUrl = `/vietnam-visa-requirements-for-${countrySlug}-citizens/`;
+            const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
+            const slug = exactUrl.replace(/\/$/, '').split('/').pop() || '';
+            const targetUrl = `/vietnam-visa-requirements/${slug}`;
 
             return (
               <a
@@ -563,7 +564,8 @@ export const HtmlSitemapView: React.FC<HtmlSitemapViewProps> = ({ currentLang, o
                 href={targetUrl}
                 onClick={(e) => {
                   e.preventDefault();
-                  // Navigate to requirements checker tab
+                  window.history.pushState({}, '', targetUrl);
+                  window.dispatchEvent(new Event('popstate'));
                   onNavigate('requirements');
                 }}
                 className="group p-2.5 rounded-xl border border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all flex flex-col justify-between text-left"

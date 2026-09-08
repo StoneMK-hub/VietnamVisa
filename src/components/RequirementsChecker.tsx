@@ -28,7 +28,7 @@ import {
   fetchWpPostBySlug 
 } from '../services/wordpressApi';
 import { translateBlogPost } from '../services/translationService';
-import { getExactCountryRequirementUrl } from '../data/countryUrls';
+import { getExactCountryRequirementUrl, COUNTRY_REQUIREMENT_URLS } from '../data/countryUrls';
 
 import { CustomSEOData } from './SEOMetadata';
 import { getRequirementSlugFromPath } from '../routes';
@@ -181,6 +181,40 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
     loadReqPosts();
   }, []);
 
+  // Helper function to map a WordPress Category 70 post to its corresponding ISO-2 country code
+  const getCountryCodeForPost = React.useCallback((post: { id?: number; slug?: string; title?: string }): string | null => {
+    const pSlug = (post.slug || '').toLowerCase().trim();
+    const pTitle = (post.title || '').toLowerCase();
+
+    // 1. Specific exceptions where WordPress slug or title has historic quirks
+    if (post.id === 680 || (pSlug === 'vietnam-e-visa-for-qatari-citizens' && pTitle.includes('belgium'))) {
+      return 'BE';
+    }
+    if (post.id === 669) {
+      return 'DE';
+    }
+    if (post.id === 660 || (pSlug === 'vietnam-e-visa-for-french-guiana-citizens' && pTitle.includes('french'))) {
+      return 'FR';
+    }
+
+    // 2. Exact match against COUNTRY_REQUIREMENT_URLS
+    for (const [code, url] of Object.entries(COUNTRY_REQUIREMENT_URLS)) {
+      const slug = url.replace(/\/$/, '').split('/').pop()?.toLowerCase();
+      if (slug === pSlug) {
+        return code;
+      }
+    }
+
+    // 3. Fallback: match by country name or localized name in post title
+    const found = COUNTRIES_DATA.find(c => {
+      const cName = c.countryName.toLowerCase();
+      const cNameVi = c.countryNameVi.toLowerCase();
+      return pTitle.includes(cName) || pTitle.includes(cNameVi);
+    });
+
+    return found ? found.code : null;
+  }, []);
+
   // Dynamically derive and order countries list based on WordPress Category "Visa Requirements" (wpPosts)
   const dynamicCountries = React.useMemo(() => {
     const list = [...COUNTRIES_DATA];
@@ -190,69 +224,38 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
     // Set of country codes that have matching posts in WordPress REST API
     const wpMatchedCodes = new Set<string>();
-    const extraSynthesized: typeof COUNTRIES_DATA[0][] = [];
 
-    wpPosts.forEach((post, idx) => {
-      const titleLower = post.title.toLowerCase();
-      const slugLower = post.slug.toLowerCase();
-
-      const matched = list.find(c => {
-        const cNameLower = c.countryName.toLowerCase();
-        const cViLower = c.countryNameVi.toLowerCase();
-        return (
-          titleLower.includes(cNameLower) ||
-          slugLower.includes(cNameLower) ||
-          titleLower.includes(cViLower) ||
-          (c.code === 'US' && (titleLower.includes('united states') || titleLower.includes('us ') || titleLower.includes('american'))) ||
-          (c.code === 'GB' && (titleLower.includes('united kingdom') || titleLower.includes('uk ') || titleLower.includes('british')))
-        );
-      });
-
-      if (matched) {
-        wpMatchedCodes.add(matched.code);
-      } else {
-        // Extract country name from post title e.g., "Vietnam Visa Requirements for [Country] Citizens"
-        const matchTitle = post.title.match(/for\s+([A-Za-z\s]+?)\s+(citizens|passport|national|travelers|202\d|$)/i);
-        if (matchTitle && matchTitle[1]) {
-          const rawCountry = matchTitle[1].trim();
-          if (rawCountry.length > 2) {
-            const cleanCountryName = rawCountry.charAt(0).toUpperCase() + rawCountry.slice(1);
-            const synCode = `WP${post.id || idx}`;
-            if (!extraSynthesized.some(e => e.countryName.toLowerCase() === cleanCountryName.toLowerCase())) {
-              const synCountry: typeof COUNTRIES_DATA[0] = {
-                code: synCode,
-                countryName: cleanCountryName,
-                countryNameVi: cleanCountryName,
-                flagEmoji: '🌐',
-                exemptionDays: 0,
-                eVisaEligible: true,
-                visaOnArrivalEligible: true,
-                notes: 'Eligible for 30-day and 90-day e-Visa.',
-                notesVi: 'Được cấp e-Visa 30-90 ngày.'
-              };
-              extraSynthesized.push(synCountry);
-              wpMatchedCodes.add(synCode);
-            }
-          }
-        }
+    wpPosts.forEach((post) => {
+      const code = getCountryCodeForPost(post);
+      if (code) {
+        wpMatchedCodes.add(code);
       }
     });
 
-    const combinedList = [...list, ...extraSynthesized];
+    // Priority tourist destination codes to highlight early in the list
+    const priorityCodes = ['US', 'GB', 'AU', 'CA', 'DE', 'FR', 'JP', 'KR', 'CN', 'IN', 'ES', 'IT', 'NL', 'SG', 'MY', 'TH', 'ID', 'PH'];
 
     // Re-order list so countries with live WordPress category posts are prioritized first
-    return combinedList.sort((a, b) => {
+    return list.sort((a, b) => {
       const aHasWp = wpMatchedCodes.has(a.code);
       const bHasWp = wpMatchedCodes.has(b.code);
       if (aHasWp && !bHasWp) return -1;
       if (!aHasWp && bHasWp) return 1;
-      return 0;
+
+      // Both have WP posts or neither has WP posts
+      const aPrio = priorityCodes.indexOf(a.code);
+      const bPrio = priorityCodes.indexOf(b.code);
+      if (aPrio !== -1 && bPrio !== -1) return aPrio - bPrio;
+      if (aPrio !== -1) return -1;
+      if (bPrio !== -1) return 1;
+
+      return a.countryName.localeCompare(b.countryName);
     });
-  }, [wpPosts]);
+  }, [wpPosts, getCountryCodeForPost]);
 
   const handleOpenCountryPost = async (c: typeof COUNTRIES_DATA[0], updateUrl = true) => {
     const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
-    const slug = exactUrl.split('/').filter(Boolean).pop() || '';
+    const slug = exactUrl.replace(/\/$/, '').split('/').pop() || '';
 
     setSelectedCountryName(c.countryName);
     setLoadingCode(c.code);
@@ -268,14 +271,16 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
 
     let postToDisplay: BlogPost | null = null;
 
-    // 1. Try finding in pre-fetched wpPosts array
-    const existingPost = wpPosts.find(p => 
-      p.slug === slug || 
-      (p.link && p.link.replace(/\/$/, '').endsWith(slug)) ||
-      p.title.toLowerCase().includes(c.countryName.toLowerCase())
-    );
+    // 1. Try finding in pre-fetched wpPosts array using exact country mapping
+    const existingPost = wpPosts.find(p => {
+      const postCode = getCountryCodeForPost(p);
+      if (postCode && postCode === c.code) return true;
+      if (p.slug && p.slug === slug) return true;
+      if (p.link && p.link.replace(/\/$/, '').endsWith(slug)) return true;
+      return false;
+    });
 
-    if (existingPost && existingPost.content && existingPost.content.length > 300) {
+    if (existingPost && existingPost.content && existingPost.content.length > 200) {
       postToDisplay = {
         ...existingPost,
         link: `${window.location.origin}/vietnam-visa-requirements/${slug}`
@@ -598,7 +603,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
           {countriesToDisplay.map((c, index) => {
             const isHiddenOnMobileForHome = isHome && index >= 4;
             const exactUrl = getExactCountryRequirementUrl(c.code, c.countryName);
-            const slug = exactUrl.split('/').filter(Boolean).pop() || '';
+            const slug = exactUrl.replace(/\/$/, '').split('/').pop() || '';
             const href = `/vietnam-visa-requirements/${slug}`;
 
             return (
@@ -615,7 +620,7 @@ export const RequirementsChecker: React.FC<RequirementsCheckerProps> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1.5 sm:pb-2 border-b border-slate-200/70 gap-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <img
-                        src={c.code.startsWith('WP') ? 'https://flagcdn.com/w40/un.png' : `https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
+                        src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
                         alt={`${c.countryName} flag`}
                         className="w-4.5 h-3 sm:w-5 sm:h-3.5 object-cover rounded-[2px] border border-slate-200/80 shrink-0 shadow-2xs"
                         loading="lazy"

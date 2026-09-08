@@ -1344,6 +1344,237 @@ export const COUNTRIES_DATA: CountryRequirement[] = [
     visaOnArrivalEligible: true,
     notes: 'Eligible for 30-day and 90-day e-Visa.',
     notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'AD',
+    countryName: 'Andorra',
+    countryNameVi: 'Andorra',
+    flagEmoji: '🇦🇩',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'BY',
+    countryName: 'Belarus',
+    countryNameVi: 'Belarus',
+    flagEmoji: '🇧🇾',
+    exemptionDays: 45,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Visa exemption up to 45 days. 90-day e-Visa available.',
+    notesVi: 'Miễn visa 45 ngày. Có thể xin e-Visa 90 ngày.'
+  },
+  {
+    code: 'BT',
+    countryName: 'Bhutan',
+    countryNameVi: 'Bhutan',
+    flagEmoji: '🇧🇹',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'BO',
+    countryName: 'Bolivia',
+    countryNameVi: 'Bolivia',
+    flagEmoji: '🇧🇴',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'EE',
+    countryName: 'Estonia',
+    countryNameVi: 'Estonia',
+    flagEmoji: '🇪🇪',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'GF',
+    countryName: 'French Guiana',
+    countryNameVi: 'Guyane thuộc Pháp',
+    flagEmoji: '🇬🇫',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'HN',
+    countryName: 'Honduras',
+    countryNameVi: 'Honduras',
+    flagEmoji: '🇭🇳',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'LV',
+    countryName: 'Latvia',
+    countryNameVi: 'Latvia',
+    flagEmoji: '🇱🇻',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'LI',
+    countryName: 'Liechtenstein',
+    countryNameVi: 'Liechtenstein',
+    flagEmoji: '🇱🇮',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'LT',
+    countryName: 'Lithuania',
+    countryNameVi: 'Litva',
+    flagEmoji: '🇱🇹',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'MD',
+    countryName: 'Moldova',
+    countryNameVi: 'Moldova',
+    flagEmoji: '🇲🇩',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'NR',
+    countryName: 'Nauru',
+    countryNameVi: 'Nauru',
+    flagEmoji: '🇳🇷',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'NI',
+    countryName: 'Nicaragua',
+    countryNameVi: 'Nicaragua',
+    flagEmoji: '🇳🇮',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'PW',
+    countryName: 'Palau',
+    countryNameVi: 'Palau',
+    flagEmoji: '🇵🇼',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'PY',
+    countryName: 'Paraguay',
+    countryNameVi: 'Paraguay',
+    flagEmoji: '🇵🇾',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'WS',
+    countryName: 'Samoa',
+    countryNameVi: 'Samoa',
+    flagEmoji: '🇼🇸',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'SM',
+    countryName: 'San Marino',
+    countryNameVi: 'San Marino',
+    flagEmoji: '🇸🇲',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'SC',
+    countryName: 'Seychelles',
+    countryNameVi: 'Seychelles',
+    flagEmoji: '🇸🇨',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'SB',
+    countryName: 'Solomon Islands',
+    countryNameVi: 'Quần đảo Solomon',
+    flagEmoji: '🇸🇧',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'TL',
+    countryName: 'Timor-Leste',
+    countryNameVi: 'Đông Timor',
+    flagEmoji: '🇹🇱',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
+  },
+  {
+    code: 'VU',
+    countryName: 'Vanuatu',
+    countryNameVi: 'Vanuatu',
+    flagEmoji: '🇻🇺',
+    exemptionDays: 0,
+    eVisaEligible: true,
+    visaOnArrivalEligible: true,
+    notes: 'Eligible for 30-day and 90-day e-Visa.',
+    notesVi: 'Được cấp e-Visa 30-90 ngày.'
   }
 ];
 
